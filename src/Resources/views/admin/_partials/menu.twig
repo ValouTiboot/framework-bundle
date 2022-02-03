@@ -1,0 +1,32 @@
+<nav class="main-nav">
+	<ul class="main-menu">
+		{% for menuKey,menuItem in adminMenu %}
+		<li class="menu-items">
+			<a class="menu-links 
+				{% if ((menuItem.sub is defined) and (attribute(menuItem.sub, entity_name) is defined)) or (menuKey == entity_name) %}
+					active
+					{% if menuItem.sub is defined %}
+					 expand
+					{% endif %}
+				{% endif %}" 
+				href="{% if menuItem.route != '' %}{{ path(menuItem.route, {entityName: menuKey}) }}{% else %}#{% endif %}"
+				>
+				<i class="material-icons">{{ menuItem.icon }}</i> 
+				{{ menuItem.title }}
+				{% if menuItem.route == '' %}
+				<i class="expand-more material-icons">expand_more</i>
+				{% endif %}
+			</a>
+			{% if menuItem.sub is defined %}
+			<ul class="sub-menu {% if ((attribute(menuItem.sub, entity_name) is defined)) %}show{% else %}hide{% endif %}">
+				{% for subKey, subItem in menuItem.sub %}
+				<li class="sub-menu-items">
+					<a class="sub-menu-links {% if subKey == entity_name %}active{% endif %}" href="{{ path(subItem.route, {entityName: subKey}) }}">{{ subItem.title }}</a>
+				</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+</nav>

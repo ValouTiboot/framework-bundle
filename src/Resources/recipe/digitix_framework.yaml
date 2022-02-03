@@ -1,0 +1,673 @@
+digitix_framework:
+  admin_menu:
+    dashboard:
+      title: Dashbord
+      route: dgtx_admin_entity_view
+      icon: home
+    cms:
+      title: Pages
+      route: dgtx_admin_entity_read
+      icon: web
+    international:
+      title: International
+      route: ~
+      icon: language
+      sub:
+        language:
+          title: Langues
+          route: dgtx_admin_entity_read
+        translation:
+          title: Traductions
+          route: dgtx_admin_entity_read
+    parameters:
+      title: Parametres
+      route: ~
+      icon: settings
+      sub:
+        parameter:
+          title: Parametres globals
+          route: dgtx_admin_entity_create
+        user:
+          title: Utilisateurs
+          route: dgtx_admin_entity_read
+        role:
+          title: Roles
+          route: dgtx_admin_entity_read
+        meta:
+          title: SEO
+          route: dgtx_admin_entity_read
+    performance:
+      title: Performances
+      route: dgtx_admin_entity_create
+      icon: speed
+  # Admin Entities
+  admin_entities:
+    Dashboard:
+      view:
+        template: null
+    User:
+      list:
+        template: null
+        has_create: true
+        toolbar: ['add','backup']
+        actions: ['edit','delete']
+        fields:
+          id:
+            label: label.default.id
+            name: id
+            type: 'text'
+            sort: true
+            default_sort: 'asc'
+          email:
+            label: label.user.email
+            name: email
+            type: text
+            sort: true
+          lastname:
+            label: label.user.lastname
+            name: lastname
+            type: text
+            sort: true
+          firstname:
+            label: label.user.firstname
+            name: firstname
+            type: text
+            sort: true
+          role:
+            label: label.user.role
+            name: role
+            type: entity
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            sort: true
+          dateAdd:
+            label: label.default.dateAdd
+            name: dateAdd
+            type: datetime
+            sort: true
+        filters:
+          email:
+            label: label.user.email
+            type: text
+          lastname:
+            label: label.user.lastname
+            type: text
+          firstname:
+            label: label.user.firstname
+            type: text
+          role:
+            label: label.user.role
+            type: entity
+          active:
+            label: label.default.active
+            type: 'bool'
+      form:
+        fields:
+          email:
+            label: label.user.email
+            name: email
+            type: email
+          plainPassword:
+            label: label.user.password
+            name: password
+            type: password
+            required: false
+          lastname:
+            label: label.user.lastname
+            name: lastname
+            type: text
+          firstname:
+            label: label.user.firstname
+            name: firstname
+            type: text
+          role:
+            label: label.user.role
+            name: role
+            type: entity
+            required: true
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            required: true
+    Role:
+      list:
+        template: null
+        has_create: true
+        toolbar: ['add']
+        actions: ['edit','delete']
+        fields:
+          id:
+            label: label.default.id
+            name: id
+            type: text
+            sort: true
+            default_sort: 'asc'
+          name:
+            label: label.role.name
+            name: name
+            type: text
+            sort: true
+      form:
+        fields:
+          name:
+            label: label.role.name
+            name: name
+            type: text
+    Language:
+      list:
+        template: null
+        has_create: true
+        toolbar: ['add']
+        actions: ['edit','delete']
+        fields:
+          id:
+            label: label.default.id
+            name: id
+            type: text
+            sort: true
+            default_sort: 'asc'
+          name:
+            label: label.language.name
+            name: name
+            type: text
+            sort: true
+          iso:
+            label: label.language.iso
+            name: iso
+            type: text
+            sort: true
+          locale:
+            label: label.language.locale
+            name: locale
+            type: text
+            sort: true
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            sort: true
+          defaultLanguage:
+            label: label.language.defaultLanguage
+            name: defaultLanguage
+            type: bool
+            sort: true
+          dateAdd:
+            label: label.default.dateAdd
+            name: dateAdd
+            type: datetime
+            sort: true
+        filters:
+          name:
+            label: label.language.name
+            type: text
+          iso:
+            label: label.language.iso
+            type: text
+          locale:
+            label: label.language.locale
+            type: text
+          active:
+            label: label.default.active
+            type: 'bool'
+          defaultLanguage:
+            label: label.language.defaultLanguage
+            type: 'bool'
+      form:
+        fields:
+          name:
+            label: label.language.name
+            name: name
+            type: text
+          iso:
+            label: label.language.iso
+            name: iso
+            type: text
+            help: help.language.iso
+          locale:
+            label: label.language.locale
+            name: locale
+            type: text
+            help: help.language.local
+          formatDate:
+            label: label.language.formatDate
+            name: formatDate
+            type: text
+            help: help.language.formatDate
+          formatDatetime:
+            label: label.language.formatDatetime
+            name: formatDatetime
+            type: text
+            help: help.language.formatDatetime
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            required: true
+          defaultLanguage:
+            label: label.language.defaultLanguage
+            name: defaultLanguage
+            type: bool
+            required: true
+          rtl:
+            label: label.language.rtl
+            name: rtl
+            type: bool
+            required: true
+    Translation:
+      list:
+        template: null
+        has_create: false
+        fields: ~
+      form:
+        has_return_link: false
+        fields:
+          type:
+            label: label.translation.type
+            name: type
+            type: choice
+            choice: {'label.translation.bo': 'bo', 'label.translation.fo': 'fo', 'label.translation.theme': 'theme', 'label.translation.email': 'email'}
+            required: true
+          theme:
+            label: label.translation.theme
+            name: type
+            type: choice
+            callback: 'Digitix\FrameworkBundle\Factory\TranslationFormFactory::findThemes'
+            required: true
+          locale:
+            label: label.translation.locale
+            name: locale
+            type: entity
+            collection: {name: Language, value: locale}
+            required: true
+    Parameter:
+      list:
+      form:
+        has_return_link: false
+        fields:
+          mailFrom:
+            label: label.parameter.mailFrom
+            name: mailFrom
+            type: email
+            required: false
+          mailFromName:
+            label: label.parameter.mailFromName
+            name: mailFromName
+            type: text
+            required: false
+          ssl:
+            label: label.parameter.ssl
+            name: ssl
+            type: bool
+            required: true
+          gtm:
+            label: label.parameter.gtm
+            name: gtm
+            type: text
+            required: false
+          tag:
+            label: label.parameter.tag
+            name: tag
+            type: textarea
+            rows: 10
+            required: false
+    Performance:
+      list:
+      form:
+        has_return_link: false
+        template: '@DigitixFramework/admin/helper/form/performance/create'
+        fields:
+          cache:
+            label: label.performance.cache
+            name: cache
+            type: bool
+            required: true
+          compile:
+            label: label.performance.compile
+            name: compile
+            type: bool
+            required: true
+          compileCss:
+            label: label.performance.compileCss
+            name: compileCss
+            type: bool
+            required: true
+          compileJs:
+            label: label.performance.compileJs
+            name: compileJs
+            type: bool
+            required: true
+          debug:
+            label: label.performance.debug
+            name: debug
+            type: bool
+            required: true
+    Meta:
+      list:
+        template: null
+        has_create: true
+        toolbar: ['add']
+        actions: ['edit'] # delete disabled but not in list
+        fields:
+          id:
+            label: label.default.id
+            name: id
+            type: text
+            sort: true
+            default_sort: 'asc'
+          page:
+            label: label.meta.page
+            name: page
+            type: choice
+            sort: true
+      form:
+        fields:
+          page:
+            label: label.meta.page
+            name: page
+            type: choice
+            choice: {
+              label.meta.dgtx_index: dgtx_index,
+              label.meta.front_contact: front_contact,
+            }
+            required: true
+          translatableMetaTitle:
+            label: label.meta.metaTitle
+            name: metaTitle
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+            required: true
+          translatableMetaDescription:
+            label: label.meta.metaDescription
+            name: metaDescription
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
+            required: false
+          translatableMetaKeywords:
+            label: label.meta.metaKeywords
+            name: metaKeyword
+            type: translate
+            class: tag
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+            required: false
+          translatableRewrite:
+            label: label.meta.rewrite
+            name: rewrite
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+            required: false
+    CmsCategory:
+      list:
+        template: null
+        has_create: true
+        toolbar: ['add']
+        actions: ['edit', 'delete']
+        fields:
+          id:
+            label: label.default.id
+            name: id
+            type: text
+            sort: true
+            default_sort: 'asc'
+          name:
+            label: label.cmsCategory.name
+            name: name
+            type: text
+            sort: true
+          parent:
+            label: label.cmsCategory.parent
+            name: parent
+            type: entity
+            sort: true
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            sort: true
+        filters:
+          name:
+            label: label.cmsCategory.name
+            type: text
+            alias: 't'
+          parent:
+            label: label.cmsCategory.parent
+            type: entity
+            collection: {name: CmsCategory}
+          active:
+            label: label.default.active
+            type: 'bool'
+      form:
+        fields:
+          translatableName:
+            label: label.cmsCategory.name
+            name: name
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+          parent:
+            label: label.cmsCategory.parent
+            name: parent
+            type: entity
+            collection: {name: CmsCategory, value: name}
+            required: false
+          translatableMetaTitle:
+            label: label.cmsCategory.metaTitle
+            name: metaTitle
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+            required: true
+          translatableMetaDescription:
+            label: label.cmsCategory.metaDescription
+            name: metaDescription
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
+            required: false
+          translatableMetaKeywords:
+            label: label.cmsCategory.metaKeywords
+            name: metaKeyword
+            type: translate
+            class: tag
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+            required: false
+          translatableRewrite:
+            label: label.cmsCategory.rewrite
+            name: rewrite
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+            required: true
+          active:
+            label: label.cmsCategory.active
+            name: active
+            type: bool
+            required: true
+    Cms:
+      list:
+        template: null
+        has_create: true
+        header_link: [{entity: 'cmsCategory', name: label.cms.addButtonCat}]
+        toolbar: ['add']
+        actions: ['edit', 'delete']
+        fields:
+          id:
+            label: label.default.id
+            name: id
+            type: text
+            sort: true
+            default_sort: 'asc'
+          name:
+            label: label.cms.name
+            name: name
+            type: text
+            sort: true
+          category:
+            label: label.cms.category
+            name: category
+            type: entity
+            sort: true
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            sort: true
+          dateAdd:
+            label: label.default.dateAdd
+            name: dateAdd
+            type: datetime
+        filters:
+          name:
+            label: label.cms.name
+            type: text
+            alias: 't'
+          category:
+            label: label.cms.category
+            type: entity
+            collection: {name: CmsCategory}
+          active:
+            label: label.default.active
+            type: 'bool'
+      form:
+        fields:
+          translatableName:
+            label: label.cms.name
+            name: name
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+          category:
+            label: label.cms.category
+            name: category
+            type: entity
+            collection: {name: CmsCategory, value: name}
+            required: false
+          translatableContent:
+            label: label.cms.content
+            name: content
+            type: translate
+            class: tinymce
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
+            required: false
+          translatableMetaTitle:
+            label: label.cms.metaTitle
+            name: metaTitle
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+            required: true
+          translatableMetaDescription:
+            label: label.cms.metaDescription
+            name: metaDescription
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
+            required: false
+          translatableMetaKeywords:
+            label: label.cms.metaKeywords
+            name: metaKeyword
+            type: translate
+            class: tag
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+            required: false
+          translatableRewrite:
+            label: label.cms.rewrite
+            name: rewrite
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+            required: true
+          active:
+            label: label.cms.active
+            name: active
+            type: bool
+            required: true
+    Faq:
+      list:
+        template: null
+        has_create: true
+        sortable: true
+        toolbar: ['add']
+        actions: ['edit', 'delete']
+        fields:
+          id:
+            label: label.default.id
+            name: id
+            type: text
+            sort: true
+          question:
+            label: label.faq.question
+            name: question
+            type: text
+            sort: true
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            sort: true
+          position:
+            label: label.default.position
+            name: position
+            type: sortable
+            sort: true
+            default_sort: 'asc'
+          dateAdd:
+            label: label.default.dateAdd
+            name: dateAdd
+            type: datetime
+        filters:
+          question:
+            label: label.faq.question
+            type: text
+            alias: 't'
+          active:
+            label: label.default.active
+            type: 'bool'
+      form:
+        fields:
+          translatableQuestion:
+            label: label.faq.question
+            name: question
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+          translatableAnswer:
+            label: label.faq.answer
+            name: answer
+            type: translate
+            class: tinymce
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
+            required: false
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            required: true
+  #front entities
+  front_entities:
+    Contact:
+      form:
+        translation_domain: 'Front.Fields.Label'
+        has_auto_submit_button: false
+        fields:
+          lastname:
+            label: label.contact.lastname
+            name: lastname
+            type: text
+            attr:
+              placeholder: label.contact.lastname
+          firstname:
+            label: label.contact.firstname
+            name: firstname
+            type: text
+            attr:
+              placeholder: label.contact.firstname
+          mail:
+            label: label.contact.email
+            name: mail
+            type: email
+            attr:
+              placeholder: label.contact.email
+          message:
+            label: label.contact.message
+            name: message
+            type: textarea
+            attr:
+              placeholder: label.contact.message
+          send:
+            label: label.contact.send
+            name: send
+            type: submit

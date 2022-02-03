@@ -1,0 +1,3 @@
+digitix_framework:
+  resource: .
+  type: digitix_framework

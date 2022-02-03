@@ -1,0 +1,230 @@
+/*common*/
+
+.bg-white {background-color:$white;}
+.padding-20 {padding: 20px;}
+.padding-30 {padding: 30px;}
+.padding-40 {padding: 40px;}
+.margin-b-10 {margin-bottom: 10px;}
+.margin-b-20 {margin-bottom: 20px;}
+.margin-b-40 {margin-bottom: 40px;}
+.margin-b-60 {margin-bottom: 60px;}
+.margin-t-10 {margin-top: 10px;}
+.margin-t-20 {margin-top: 20px;}
+.margin-t-40 {margin-top: 40px;}
+.margin-t-60 {margin-top: 60px;}
+
+.alt-bg-primary {@extend .bg-primary}
+.alt-bg-success {@extend .bg-success}
+.alt-bg-info {@extend .bg-info}
+.alt-bg-warning {@extend .bg-warning}
+.alt-bg-danger {@extend .bg-danger}
+
+.t-bg-success {color:$bg-success-color;}
+.t-bg-info {color:$bg-info-color;}
+.t-bg-warning {color:$bg-warning-color;}
+.t-bg-danger {color:$bg-danger-color;}
+
+.t-success {color: $success-color;}
+.t-warning {color: $warning-color;}
+.t-info {color: $info-color;}
+.t-danger {color: $danger-color;}
+
+/* Rules for sizing the icon. */
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+
+.cursor-p {cursor: pointer;}
+.hide {display: none;}
+.no-radius {border-radius: 0;}
+.btn {@extend .no-radius;}
+.alert {@extend .no-radius;}
+
+a {
+	transition: ease all .2s;
+}
+
+i.material-icons {
+	display: inline-block;
+	font-size: 24px;
+	vertical-align: middle;
+}
+
+.table {
+	thead {
+		tr {
+			th {
+				padding: 0.3rem;
+				.form-control {
+					height: calc(1.5em + 0.4rem);
+			    padding: 0.2rem 0.5rem;
+			    font-size: 13px;
+			    line-height: 1;
+			    border-radius: 0;
+			    &::placeholder {
+			    	font-size:13px;
+			    }
+				}
+				.btn {
+					padding: 0.1rem 0.75rem;
+    			font-size: 14px;
+				}
+			}
+			&:first-child {
+				th {
+					border-top: none;
+					color: $dark-blue;
+					font-weight: normal;
+					i.material-icons {
+						line-height:0.4;
+						&:hover, &.active_sort {color:$blue-t;}
+					}
+				}
+			}
+			&:nth-child(even) {
+				background-color: $font-light-grey;
+			}
+		}
+	}
+	tbody {
+		tr {
+			td {
+				i.material-icons {
+					font-size: 22px;
+				}
+			}
+			&:last-child {
+				border-bottom: 1px solid #dee2e6;
+			}
+		}
+	}
+	&.table-hover {
+		tbody {
+			tr {
+				&:hover {
+					background-color:$tr-hover;
+					td.sortable-cell {
+						.sortable-item {display: inline-block;}
+					}
+				}
+				td {
+					padding: 0.4rem 0.75rem;
+					vertical-align: middle;
+					&.sortable-cell {
+						padding: 0.4rem 0.2rem;
+						min-width: 29px;
+						.sortable-item {
+							color: #17a2b8;
+							cursor: pointer;
+							display: none;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.pagination {
+	.page-link {
+		align-items: center;
+		display: flex;
+		height: 100%;
+		line-height: 1.6;
+		&.page-link-i {
+			padding: 0.25rem 0.25rem;
+			border-radius:0 !important;
+		}
+		i {font-size: 16px;}
+	}
+}
+
+form {
+	.form-group {
+		.form-control {
+			@extend .no-radius;
+		}
+		&.submit {
+			justify-content: flex-end;
+		}
+	}
+}
+.dgtx-form {
+	position: relative;
+	.form-group {
+		.date-select {
+			.form-control {margin-right: 10px;}
+		}
+		&.submit {
+			border-top: 1px solid #eee;
+			justify-content: flex-end;
+			margin-bottom:0;
+			margin-top: 45px;
+			padding-top: 20px;
+		}
+	}
+	.form-return-link {
+		bottom:0;
+		left: 0;
+		position: absolute;
+	}
+}
+
+.dgtx-switch {
+	align-items: center;
+	background:$grey;
+	display: inline-flex;
+	height: 100%;
+	position: relative;
+	width: auto;
+	.form-check {
+		padding:0;
+		height: 100%;
+		input[type="radio"] {display: none;}
+		label {
+			align-items: center;
+			color: $grey4;
+			cursor: pointer;
+			display: flex;
+			justify-content: center;
+			height: 100%;
+			position: relative;
+			width: 80px;
+			z-index: 3;
+			&.checked {color:$white;}
+		}
+	}
+	&::before {
+		content: " ";
+		display: flex;
+		height: 100%;
+		position: absolute;
+		transition: all ease .3s;
+		margin-left: 0;
+		width: 80px;
+		z-index: 2;
+	}
+	&.dgtx-switch-yes::before {
+		@extend .bg-primary;
+	}
+	&.dgtx-switch-no::before {
+		@extend .bg-danger;
+		margin-left: 80px;
+	}
+}
+
+.tagify.tag {
+  --tag-bg: #17a2b8;
+  --tag-hover: #17a2b8;
+  --tag-text-color: #ffffff;
+  --tag-remove-btn-color: #ffffff;
+}

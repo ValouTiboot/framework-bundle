@@ -1,0 +1,55 @@
+{% extends '@DigitixFramework/admin/layout.html.twig' %}
+
+{% block content_header %}
+	<div class="content-header bg-white padding-30 margin-b-20">
+		<div class="d-flex align-items-center justify-content-between">
+			<div class="content-header-title">{{ controller_name }}</div>
+			<div class="content-header-btn">
+				{% if header_link is defined and header_link|length %}
+					{% for h_link in header_link %}
+					<a href="{{ path('dgtx_admin_entity_read', {entityName: h_link.entity}) }}" class="btn btn-info">
+						<i class="material-icons md-light">add_box</i>
+						{{ h_link.name|trans({}, 'Admin.Fields.Label') }}
+					</a>
+				</a>
+					{% endfor %}
+				{% endif %}
+				<a href="{{ path('dgtx_admin_entity_create', {entityName: entity_name}) }}" class="btn btn-info">
+					<i class="material-icons md-light">add_box</i>
+					{{ 'list.default.add'|trans({}, 'Admin.List.Default') }}
+				</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block toolbar%}
+	{% if toolbar|length %}
+	<div class="bg-white toolbar">
+		<div class="d-flex align-items-center justify-content-end">
+		{% for btn in toolbar %}
+			<a href="{{ path('dgtx_admin_entity_create', {entityName: entity_name}) }}" class="toolbar-btn
+				{% if btn == 'add' %}
+					alt-bg-primary
+				{% elseif btn == 'backup' %}
+					alt-bg-success
+				{% endif %}">
+				<i class="material-icons md-light">{{ btn }}</i>
+			</a>
+		{% endfor %}
+		</div>
+	</div>
+	{% endif %}
+{% endblock %}
+
+{% block content%}
+
+	{% block list %}
+		{% include '@DigitixFramework/admin/helper/list/_partials/list.twig' %}
+	{% endblock %}
+
+	{% block pagination %}
+		{% include '@DigitixFramework/admin/helper/list/_partials/pagination.twig' %}
+	{% endblock %}
+
+{% endblock %}
