@@ -20,7 +20,7 @@ class FrontController extends Controller
 {
     public $breadcrumb = [];
 
-	public static function getSubscribedServices()
+	public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
             'password.encoder' => '?'. UserPasswordEncoderInterface::class,

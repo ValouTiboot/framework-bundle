@@ -2,32 +2,63 @@
 
 namespace Digitix\FrameworkBundle\Factory;
 
-use Digitix\FrameworkBundle\Provider\ContextProvider;
 use Digitix\FrameworkBundle\Orm\Paginator;
-use Doctrine\Orm\QueryBuilder;
+use Digitix\FrameworkBundle\Factory\SearchFactory;
+use Digitix\FrameworkBundle\Factory\SorterFactory;
+use Digitix\FrameworkBundle\Provider\ContextProvider;
+use Digitix\FrameworkBundle\Repository\EntityRepository;
+use Digitix\FrameworkBundle\Config\EntityConfigInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class PaginatorFactory
 {
 	private $context;
+	private $entityConfig;
+	private $entityRepository;
+	private $searchFactory;
+	private $sorterFactory;
 	private $urlGenerator;
 
-	public function __construct(ContextProvider $context, UrlGeneratorInterface $urlGenerator)
+	public function __construct(
+		ContextProvider $context,
+		EntityConfigInterface $entityConfig,
+		EntityRepository $entityRepository,
+		SearchFactory $searchFactory,
+		SorterFactory $sorterFactory,
+		UrlGeneratorInterface $urlGenerator
+	)
 	{
 		$this->context = $context->getContext();
+		$this->entityConfig = $entityConfig;
+		$this->entityRepository = $entityRepository;
+		$this->searchFactory = $searchFactory;
+		$this->sorterFactory = $sorterFactory;
 		$this->urlGenerator = $urlGenerator;
 	}
 
-	public function build(QueryBuilder $queryBuilder)
+	public function build()
 	{
+		dump($this->buildQuery());
+		/**
+		 * TODO Can ->setItemPerPage on paginator : default 50 Fron entityConfig yml
+		 */
 		$paginator = new Paginator();
 		$paginator
-			->setQueryBuilder($queryBuilder)
+			->setQueryBuilder($this->buildQuery())
 			->setCurrentPage($this->context->getRequest()->query->get('page',1))
 			->setContext($this->context)
 			->setUrlGenerator($this->urlGenerator)
 		;
 
 		return $paginator;
+	}
+
+	protected function buildQuery()
+	{
+		return $this->entityRepository->buildQuery(
+			$this->entityConfig->getListFields(),
+			$this->searchFactory->build(),
+			$this->sorterFactory->build()
+		);
 	}
 }

@@ -2,8 +2,10 @@
 
 namespace Digitix\FrameworkBundle\Controller\Admin;
 
-use Digitix\FrameworkBundle\Controller\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
+use Digitix\FrameworkBundle\Controller\Controller;
+use Digitix\FrameworkBundle\Factory\HelperListFactory;
+use Digitix\FrameworkBundle\Factory\HelperViewFactory;
 // use Symfony\Component\Routing\Annotation\Route;
 
 class AdminController extends Controller
@@ -21,14 +23,21 @@ class AdminController extends Controller
     	$this->denyAccessUnlessGranted($attributes, $subject, $message);
     }
 
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'dgtx.helper.view.factory' => '?'. HelperViewFactory::class,
+            'dgtx.helper.list.factory' => '?'. HelperListFactory::class,
+        ] + parent::getSubscribedServices();
+    }
+
     /**
      *
      * @return Response
      */
     public function view()
     {
-        $tplVars = [];
-        $helperView = $this->get('dgtx.helper.view.factory')->build($this->get('dgtx.view.config'), $tplVars);
+        $helperView = $this->get('dgtx.helper.view.factory')->build([]);
 
         return $this->display($helperView->generateView());
     }
@@ -41,25 +50,28 @@ class AdminController extends Controller
     {
         $tplVars = [];
 
-        $fieldConfig = $this->get('dgtx.entity.config');
-        $listFields = $fieldConfig->getListFields();
-        $sorter = $this->get('dgtx.sorter.factory')->build($listFields);
+        // $fieldConfig = $this->get('dgtx.entity.config');
+        // $listFields = $fieldConfig->getListFields();
+        // $sorter = $this->get('dgtx.sorter.factory')->build($listFields);
 
-        $filters = $this->get('dgtx.filter.factory')->build();
-        $filterForm = $this->get('dgtx.form.factory')->buildFormFilters($filters);
-        $search = $this->get('dgtx.search.factory')->buildSearch($filters, $filterForm);
+        // $filters = $this->get('dgtx.filter.factory')->build();
+        // $filterForm = $this->get('dgtx.form.factory')->buildFormFilters($filters);
+        // $search = $this->get('dgtx.search.factory')->build($filters, $filterForm);
 
-        $dql = $this->get('dgtx.entity.repository')->buildQuery($listFields, $search, $sorter);
+        // $dql = $this->get('dgtx.entity.repository')->buildQuery($listFields, $search, $sorter);
 
-        // Can ->setItemPerPage on paginator : default 50
-        $paginator = $this->get('dgtx.paginator.factory')->build($dql)->paginate();
-        $helperList = $this->get('dgtx.helper.list.factory')->build($fieldConfig, $listFields, $filterForm, $paginator, $sorter, $tplVars);
+
+        // $paginator = $this->get('dgtx.paginator.factory')->build($dql)->paginate();
+
+        $helperList = $this->get('dgtx.helper.list.factory')->build($tplVars);
 
         return $this->display($helperList->generateList());
     }
 
     /**
+     * view for form creation Entity
      *
+     * @param string $entityName
      * @return Response
      */
     public function create(string $entityName)

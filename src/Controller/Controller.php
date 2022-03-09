@@ -12,12 +12,18 @@ class Controller extends AbstractController
 {
 	protected $context;
 
-    public function setContext(Context $context)
+    protected function get(string $id): object
     {
-        $this->context = $context;
+        return $this->container->get($id);
     }
 
-    public function getContext()
+    public function setContext(Context $context): object
+    {
+        $this->context = $context;
+        return $this;
+    }
+
+    protected function getContext()
     {
         return $this->context;
     }

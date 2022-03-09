@@ -2,42 +2,47 @@
 
 namespace Digitix\FrameworkBundle\Factory;
 
+use Digitix\FrameworkBundle\Config\EntityConfigInterface;
 use Digitix\FrameworkBundle\Sorter\SorterInterface;
+use Digitix\FrameworkBundle\Provider\ContextProvider;
 
 class SorterFactory
 {
 	private $sorter;
+	private $context;
+	private $entityConfig;
 
-	public function __construct(SorterInterface $sorter)
+	public function __construct(ContextProvider $contextProvider, EntityConfigInterface $entityConfig, SorterInterface $sorter)
 	{
+		$this->context = $contextProvider->getContext();
+		$this->entityConfig = $entityConfig;
 		$this->sorter = $sorter;
 	}
 
-	public function build($listFields): SorterInterface
+	public function build(): SorterInterface
 	{
 		$orderBy = '';
 		$orderWay = '';
+		$listFields = $this->entityConfig->getListFields();
 
-		if (count($listFields))
-		foreach ($listFields as $fieldName => $value)
-		{
-			if (isset($value['sort']) && $value['sort'] && isset($value['default_sort']))
-			{
-				$orderBy = $fieldName;
-				$orderWay = $value['default_sort'];
-				break;
+		if ($listFields) {
+			foreach ($listFields as $fieldName => $value) {
+				if (isset($value['sort']) && $value['sort'] && isset($value['default_sort'])) {
+					$orderBy = $fieldName;
+					$orderWay = $value['default_sort'];
+					break;
+				}
 			}
 		}
 
-		$request = $this->sorter->getContext()->getRequest();
-		$params = $request->query->all();
+		$params = $this->context->getRequest()->query->all();
 
-		if (isset($params['sortBy']) && in_array($params['sortBy'], array_keys($listFields)))
-		{
+		if (isset($params['sortBy']) && in_array($params['sortBy'], array_keys($listFields))) {
 			$orderBy = $params['sortBy'];
 
-			if (isset($params['sortWay']))
+			if (isset($params['sortWay'])) {
 				$orderWay = $params['sortWay'];
+			}
 		}
 
 		return $this->sorter

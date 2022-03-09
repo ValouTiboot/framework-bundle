@@ -2,14 +2,15 @@
 
 namespace Digitix\FrameworkBundle\Entity;
 
-use Digitix\FrameworkBundle\Entity\Role;
 use Doctrine\ORM\Mapping as ORM;
+use Digitix\FrameworkBundle\Entity\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Entity
  */
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -238,5 +239,15 @@ class User implements UserInterface
         $this->dateUpd = $dateUpd;
 
         return $this;
+    }
+
+    /**
+     * The public representation of the user (e.g. a username, an email address, etc.)
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
     }
 }

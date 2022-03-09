@@ -25,7 +25,8 @@ class Paginator
 		$query = $this->queryBuilder
             ->setFirstResult($offset)
             ->setMaxResults($this->itemPerPage)
-            ->getQuery();
+            ->getQuery()
+		;
 
         if (0 === \count($this->queryBuilder->getDQLPart('join'))) {
             $query->setHint(CountWalker::HINT_DISTINCT, false);

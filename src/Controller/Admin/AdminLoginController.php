@@ -21,12 +21,10 @@ class AdminLoginController extends AdminController
             return $this->redirectToRoute('dgtx_admin_entity_view', ['entityName' => 'dashboard']);
         }
 
-        // get the login error if there is one
-        $error = $authenticationUtils->getLastAuthenticationError();
-        // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        return $this->render('@DigitixFramework/admin/login.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render('@DigitixFramework/admin/login.twig', [
+            'last_username' => $authenticationUtils->getLastUsername(),
+            'error' => $authenticationUtils->getLastAuthenticationError()
+        ]);
     }
 
     /**

@@ -2,35 +2,53 @@
 
 namespace Digitix\FrameworkBundle\Factory;
 
-use Digitix\FrameworkBundle\Config\EntityConfigInterface;
+use Digitix\FrameworkBundle\Factory\FormFactory;
+use Digitix\FrameworkBundle\Factory\SorterFactory;
+use Digitix\FrameworkBundle\Factory\PaginatorFactory;
 use Digitix\FrameworkBundle\Helper\HelperListInterface;
-use Digitix\FrameworkBundle\Orm\Paginator;
-use Digitix\FrameworkBundle\Sorter\Sorter;
-use Symfony\Component\Form\FormInterface;
+use Digitix\FrameworkBundle\Config\EntityConfigInterface;
 
 final class HelperListFactory
 {
-	public function __construct(HelperListInterface $helperList)
+	private $entityConfig;
+	private $formFactory;
+	private $helperList;
+	private $paginatorFactory;
+	private $sorterFactory;
+
+	public function __construct(
+		EntityConfigInterface $entityConfig,
+		FormFactory $formFactory,
+		HelperListInterface $helperList,
+		PaginatorFactory $paginatorFactory,
+		SorterFactory $sorterFactory
+	)
 	{
+		$this->entityConfig = $entityConfig;
+		$this->formFactory = $formFactory;
 		$this->helperList = $helperList;
+		$this->paginatorFactory = $paginatorFactory;
+		$this->sorterFactory = $sorterFactory;
 	}
 
-	public function build(EntityConfigInterface $entityConfig, array $listFields, FormInterface $filters, Paginator $paginator, Sorter $sorter, $tplVars): HelperListInterface
+	public function build($tplVars): HelperListInterface
 	{
+		$paginator = $this->paginatorFactory->build()->paginate();
+
 		$this->helperList
 			->setList($paginator->getResults())
-            ->setSorter($sorter)
-            ->setFieldsList($listFields)
-            ->setToolbar($entityConfig->getToolbar())
-            ->setActions($entityConfig->getActions())
+            ->setSorter($this->sorterFactory->build())
+            ->setFieldsList($this->entityConfig->getListFields())
+            ->setToolbar($this->entityConfig->getToolbar())
+            ->setActions($this->entityConfig->getActions())
             ->setPagination($paginator)
-            ->setFilters($filters->createView())
+            ->setFilters($this->formFactory->buildFormFilters()->createView())
 			->setTotal($paginator->getTotal())
-            ->setHasCreate($entityConfig->hasCreate())
-			->setTemplate($entityConfig->getTemplatelist())
-			->setHeaderLink($entityConfig->getHeaderLink())
-			->setSortable($entityConfig->getSortable())
+            ->setHasCreate($this->entityConfig->hasCreate())
+			->setHeaderLink($this->entityConfig->getHeaderLink())
+			->setSortable($this->entityConfig->getSortable())
             ->setTplVars($tplVars)
+			->setTemplate($this->entityConfig->getTemplatelist())
         ;
 		return $this->helperList;
 	}

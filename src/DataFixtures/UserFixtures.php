@@ -7,21 +7,21 @@ use Doctrine\Persistence\ObjectManager;
 use Digitix\FrameworkBundle\Entity\Role;
 use Digitix\FrameworkBundle\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture
 {
-    private $passwordEncoder;
+    private $passwordHasher;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
     }
 
     public function load(ObjectManager $manager)
     {
         $dateTime = new DateTime();
-        
+
         $role = new Role();
         $role->setName('SuperAdmin');
         $role->setAuthorization([]);
@@ -35,7 +35,7 @@ class UserFixtures extends Fixture
             ->setActive(true)
             ->setDateAdd($dateTime)
             ->setDateUpd($dateTime)
-            ->setPassword($this->passwordEncoder->encodePassword($user,'digitix'));
+            ->setPassword($this->passwordHasher->hashPassword($user,'digitix'));
         ;
 
         $manager->persist($role);

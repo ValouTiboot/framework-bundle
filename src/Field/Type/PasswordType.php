@@ -11,28 +11,28 @@ use Digitix\FrameworkBundle\Provider\ContextProvider;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PasswordType extends AbstractType
 {
-	private $passwordEncoder;
+	private $passwordHasher;
 	private $contextProvider;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder, ContextProvider $contextProvider)
+    public function __construct(UserPasswordHasherInterface $passwordHasher, ContextProvider $contextProvider)
     {
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
         $this->context = $contextProvider->getContext();
     }
 
 	public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-    	$encoder = $this->passwordEncoder;
+    	$hasher = $this->passwordHasher;
     	$entityInstance = $this->context->getEntity()->getInstance();
 
         $builder->addModelTransformer(
         	new CallbackTransformer(
                 function (){ return null; },
-                function ($value) use ($encoder, $entityInstance): ?string {
+                function ($value) use ($hasher, $entityInstance): ?string {
                     if ($value === null) {
                         return null;
                     }
@@ -41,7 +41,7 @@ class PasswordType extends AbstractType
                         throw new TransformationFailedException('Expected string got "' . gettype($value) . '"');
                     }
 
-                    $entityInstance->setPassword($encoder->encodePassword($entityInstance, $value));
+                    $entityInstance->setPassword($hasher->hashPassword($entityInstance, $value));
 
                     return $value;
                 }

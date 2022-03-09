@@ -2,7 +2,6 @@
 
 namespace Digitix\FrameworkBundle\Sorter;
 
-use Digitix\FrameworkBundle\Context\Context;
 use Digitix\FrameworkBundle\Provider\ContextProvider;
 use Digitix\FrameworkBundle\Sorter\SorterInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -14,9 +13,9 @@ final class Sorter implements SorterInterface
 	private $orderBy = 'id';
 	private $orderWay = 'asc';
 
-	public function __construct(ContextProvider $context, UrlGeneratorInterface $urlGenerator)
+	public function __construct(ContextProvider $contextProvider, UrlGeneratorInterface $urlGenerator)
 	{
-		$this->context = $context->getContext();
+		$this->context = $contextProvider->getContext();
 		$this->urlGenerator = $urlGenerator;
 	}
 
@@ -53,10 +52,5 @@ final class Sorter implements SorterInterface
 		$route_query = array_merge($params, ['entityName' => strtolower($this->context->getEntityName()), 'sortBy' => $fieldName, 'sortWay' => $direction]);
 
 		return $this->urlGenerator->generate($route, $route_query, UrlGeneratorInterface::ABSOLUTE_URL);
-	}
-
-	public function getContext(): Context
-	{
-		return $this->context;
 	}
 }

@@ -13,19 +13,26 @@ final class FormFactory
 {
 	private $formFactory;
 	private $context;
+	private $filterFactory;
 
-	public function __construct(FormFactoryInterface $formFactory, ContextProvider $context)
+	public function __construct(ContextProvider $contextProvider, FilterFactory $filterFactory, FormFactoryInterface $formFactory)
 	{
+		$this->context = $contextProvider->getContext();
+		$this->filterFactory = $filterFactory;
 		$this->formFactory = $formFactory;
-		$this->context = $context->getContext();
 	}
 
-	public function buildFormFilters(ArrayCollection $filters): FormInterface
+	public function buildFormFilters(): FormInterface
 	{
-        $filtersForm = $this->formFactory->createNamed('filters', FiltersFormType::class, $this->context->getEntity()->getInstance(), [
-            'method' => 'GET',
-            'filters' => $filters,
-        ]);
+        $filtersForm = $this->formFactory->createNamed(
+			'filters',
+			FiltersFormType::class,
+			$this->context->getEntity()->getInstance(),
+			[
+            	'method' => 'GET',
+            	'filters' => $this->filterFactory->build(),
+			]
+		);
 
         return $filtersForm->handleRequest($this->context->getRequest());
 	}

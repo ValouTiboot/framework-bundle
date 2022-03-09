@@ -7,16 +7,20 @@ use Digitix\FrameworkBundle\Helper\HelperViewInterface;
 
 final class HelperViewFactory
 {
-	public function __construct(HelperViewInterface $helperView)
+	private $helperView;
+	private $viewConfig;
+
+	public function __construct(HelperViewInterface $helperView, ViewConfigInterface $viewConfig)
 	{
 		$this->helperView = $helperView;
+		$this->viewConfig = $viewConfig;
 	}
 
-	public function build(ViewConfigInterface $viewConfig, $tplVars): HelperViewInterface
+	public function build($tplVars): HelperViewInterface
 	{
 		$this->helperView
-			->setTemplate($viewConfig->getTemplate())
-            ->setTplVars([]) // add extra tpl vars;
+			->setTplVars($tplVars)
+			->setTemplate($this->viewConfig->getTemplate())
         ;
 
 		return $this->helperView;

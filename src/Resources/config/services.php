@@ -2,6 +2,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Psr\Container\ContainerInterface;
 use Digitix\FrameworkBundle\Utils\Cache;
 use Digitix\FrameworkBundle\Orm\Paginator;
 use Digitix\FrameworkBundle\Sorter\Sorter;
@@ -13,6 +14,7 @@ use Digitix\FrameworkBundle\Factory\FormFactory;
 use Digitix\FrameworkBundle\Orm\EntityPersister;
 use Symfony\Component\Form\FormFactoryInterface;
 use Digitix\FrameworkBundle\Factory\FieldFactory;
+use Digitix\FrameworkBundle\Controller\Controller;
 use Digitix\FrameworkBundle\Factory\EntityFactory;
 use Digitix\FrameworkBundle\Factory\FilterFactory;
 use Digitix\FrameworkBundle\Factory\SearchFactory;
@@ -41,13 +43,14 @@ use Digitix\FrameworkBundle\EventListener\ContextListener;
 use Digitix\FrameworkBundle\Factory\TranslationFormFactory;
 use Digitix\FrameworkBundle\Provider\ConfigurationProvider;
 use Digitix\FrameworkBundle\EventListener\ControllerListener;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Digitix\FrameworkBundle\EventListener\AdminAccessListener;
 use Digitix\FrameworkBundle\Provider\EntityRepositoryProvider;
 use Digitix\FrameworkBundle\EventListener\AdminControllerListener;
 use Digitix\FrameworkBundle\DependencyInjection\DigitixFrameworkExtension;
+use Digitix\FrameworkBundle\DigitixFrameworkBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ReferenceConfigurator;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -57,7 +60,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, new Reference('doctrine.orm.default_entity_manager'))
             ->arg(1, new Reference('router.default'))
             ->arg(2, new Reference('security.csrf.token_manager'))
-            ->arg(3, new Reference('security.user_password_encoder.generic'))
+            ->arg(3, new Reference('security.password_hasher'))
 
         ->set(AdminControllerListener::class)
             ->arg(0, new Reference('twig'))
@@ -70,7 +73,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_listener', ['event' => ControllerEvent::class])
 
         ->set(Context::class)
-            ->arg(0, new Reference('security.token_storage', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->arg(0, new Reference(service('security.token_storage')->nullOnInvalid()))
             ->arg(1, new Reference('twig'))
             ->arg(2, new Reference('translator'))
 
@@ -94,7 +97,6 @@ return static function (ContainerConfigurator $container) {
             ->arg(1, new Reference(EntityFactory::class))
             ->arg(2, new Reference('dgtx.entity.repository.provider'))
             ->tag('kernel.event_listener', ['event' => ControllerEvent::class])
-        ->alias(ContextListener::class, 'dgtx.listener.context')
 
         ->set(ContextProvider::class)
             ->arg(0, new Reference('request_stack'))
@@ -106,9 +108,15 @@ return static function (ContainerConfigurator $container) {
 
         ->set('dgtx.entity.repository', EntityRepository::class)
             ->arg(0, new Reference('doctrine'))
-            ->arg(1, new Reference(ContextProvider::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
-            ->arg(2, new Reference('', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->arg(1, new Reference(service(ContextProvider::class)->nullOnInvalid()))
+            ->arg(2, null)
             ->tag('doctrine.repository_service')
+            ->public()
+
+        ->set('dgtx.controller', Controller::class)
+            ->call('setContainer', [new ReferenceConfigurator(ContainerInterface::class)])
+            ->tag('container.service_subscriber')
+            ->tag('controller.service_arguments')
             ->public()
 
         ->set('dgtx.helper.view', HelperView::class)
@@ -116,10 +124,14 @@ return static function (ContainerConfigurator $container) {
 
         ->set('dgtx.helper.view.factory', HelperViewFactory::class)
             ->arg(0, new Reference('dgtx.helper.view'))
-            ->public()
+            // ->public()
+        ->alias(HelperViewFactory::class, 'dgtx.helper.view.factory')
+
 
         ->set('dgtx.sorter.factory', SorterFactory::class)
-            ->arg(0, new Reference(SorterInterface::class))
+            ->arg(0, new Reference(ContextProvider::class))
+            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ENTITY_CONFIG))
+            ->arg(2, new Reference(SorterInterface::class))
             ->public()
 
         ->set('dgtx.sorter', Sorter::class)
@@ -136,21 +148,33 @@ return static function (ContainerConfigurator $container) {
             ->public()
 
         ->set('dgtx.form.factory', FormFactory::class)
-            ->arg(0, new Reference(FormFactoryInterface::class))
-            ->arg(1, new Reference(ContextProvider::class))
+            ->arg(0, new Reference(ContextProvider::class))
+            ->arg(1, new Reference('dgtx.filter.factory'))
+            ->arg(2, new Reference(FormFactoryInterface::class))
             ->public()
 
         ->set('dgtx.search.factory', SearchFactory::class)
+            ->arg(0, new Reference('dgtx.filter.factory'))
+            ->arg(1, new Reference('dgtx.form.factory'))
             ->public()
 
         ->set('dgtx.paginator.factory', PaginatorFactory::class)
             ->arg(0, new Reference(ContextProvider::class))
-            ->arg(1, new Reference('router.default'))
+            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ENTITY_CONFIG))
+            ->arg(2, new Reference('dgtx.entity.repository'))
+            ->arg(3, new Reference('dgtx.search.factory'))
+            ->arg(4, new Reference('dgtx.sorter.factory'))
+            ->arg(5, new Reference('router.default'))
             ->public()
 
         ->set('dgtx.helper.list.factory', HelperListFactory::class)
-            ->arg(0, new Reference('dgtx.helper.list'))
-            ->public()
+            ->arg(0, new Reference('dgtx.entity.config'))
+            ->arg(1, new Reference('dgtx.form.factory'))
+            ->arg(2, new Reference('dgtx.helper.list'))
+            ->arg(3, new Reference('dgtx.paginator.factory'))
+            ->arg(4, new Reference('dgtx.sorter.factory'))
+            // ->public()
+        ->alias(HelperListFactory::class, 'dgtx.helper.list.factory')
 
         ->set('dgtx.helper.list', HelperList::class)
             ->arg(0, new Reference(ContextProvider::class))
@@ -197,7 +221,7 @@ return static function (ContainerConfigurator $container) {
             ->public()
 
         ->set(PasswordType::class)
-            ->arg(0, new Reference('security.user_password_encoder.generic'))
+            ->arg(0, new Reference('security.password_hasher'))
             ->arg(1, new Reference(ContextProvider::class))
             ->tag('form.type')
 
@@ -210,10 +234,10 @@ return static function (ContainerConfigurator $container) {
             ->public()
 
         ->set(UserFixtures::class)
-            ->arg(0, new Reference('security.user_password_encoder.generic'))
+            ->arg(0, new Reference('security.password_hasher'))
             ->public()
             ->tag('doctrine.fixture.orm')
-        
+
         ->set(LanguageFixtures::class)
             ->public()
             ->tag('doctrine.fixture.orm')

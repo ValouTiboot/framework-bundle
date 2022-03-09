@@ -23,21 +23,21 @@ final class FilterFactory
 		'text' => TextFilter::class,
 	];
 
-	public function __construct(EntityConfigInterface $config, ContextProvider $contextProvider)
+	public function __construct(EntityConfigInterface $entityConfig, ContextProvider $contextProvider)
 	{
 		$this->context = $contextProvider->getContext();
-		$this->filters = $config->getFiltersFields();
+		$this->filters = $entityConfig->getFiltersFields();
 	}
 
 	public function build()
 	{
 		$buildFilters = [];
 
-		if (count($this->filters))
-		foreach ($this->filters as $key => $filter)
-		{
-			$filterType = $this->findFilterType($filter['type']);
-			$buildFilters[$key] = $filterType::getInstance($key, $filter, $this->context);
+		if ($this->filters) {
+			foreach ($this->filters as $key => $filter) {
+				$filterType = $this->findFilterType($filter['type']);
+				$buildFilters[$key] = $filterType::getInstance($key, $filter, $this->context);
+			}
 		}
 
 		return new ArrayCollection($buildFilters);

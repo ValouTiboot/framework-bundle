@@ -18,6 +18,8 @@ interface HelperListInterface
 
 	public function setHasCreate($hasCreate): HelperList;
 
+	public function setHeaderLink($headerLink): HelperList;
+
 	public function setFieldsList($fieldsList): HelperList;
 
 	public function setFilters($filters): HelperList;

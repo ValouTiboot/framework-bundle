@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Digitix\FrameworkBundle\Config\AdminMenuConfigInterface;
+use Digitix\FrameworkBundle\Controller\Admin\AdminController;
 
 class AdminControllerListener
 {
@@ -72,7 +73,7 @@ class AdminControllerListener
         }
 
         $user = $this->security->getUser();
-
+dump($event);
         // $this->twig->addGlobal( 'dgtx', $results[0]->getName() );
         $this->twig->addGlobal('user', $user);
         $this->twig->addGlobal('adminMenu', $this->adminMenu->getAdminMenuConfig());
@@ -80,7 +81,7 @@ class AdminControllerListener
 
     private function isAdminRequest($currentControllerInstance) : bool
     {
-        return $currentControllerInstance instanceof \Digitix\FrameworkBundle\Controller\AdminController;
+        return $currentControllerInstance instanceof AdminController;
     }
 
     private function getCurrentControllerInstance(ControllerEvent $event)

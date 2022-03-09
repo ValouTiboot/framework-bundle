@@ -45,12 +45,12 @@ class ContextListener
         $congigurations = $configurationRepository->findAll();
         $_globals = new ArrayCollection();
 
-        foreach ($congigurations as $congiguration)
+        foreach ($congigurations as $congiguration) {
             $_globals->set($congiguration->getName(), $congiguration->getValue());
+        }
 
         // creating the context. if the current request already has an AdminContext object, do nothing
-        if (null === $context = $this->getContext($event))
-        {
+        if (null === $context = $this->getContext($event)) {
         	$context = $this->contextFactory->createContext();
             $context
                 ->setEntityName($entityName)
@@ -60,13 +60,13 @@ class ContextListener
                 ->setConfiguration($_globals)
             ;
 
-            if (method_exists($currentControllerInstance, 'setContext'))
+            if (is_object($currentControllerInstance) && method_exists($currentControllerInstance, 'setContext')) {
                 $currentControllerInstance->setContext($context);
+            }
 
         	$this->setContext($event, $context);
 
-            if ($entityName !== null)
-            {
+            if ($entityName !== null) {
                 $entity = $this->entityFactory->build($entityName, $entityId);
                 $context->setEntity($entity);
             }
