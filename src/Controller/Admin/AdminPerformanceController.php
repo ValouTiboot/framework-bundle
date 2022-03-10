@@ -4,17 +4,25 @@ namespace Digitix\FrameworkBundle\Controller\Admin;
 
 use Digitix\FrameworkBundle\Controller\Admin\AdminController;
 use Digitix\FrameworkBundle\Entity\Configuration;
+use Digitix\FrameworkBundle\Utils\Cache;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class AdminPerformanceController extends AdminController
 {
-	/**
-     * @return Response
-     */
-    public function create($entityName)
+    public static function getSubscribedServices(): array
     {
-        if ($this->getContext()->getRequest()->query->get('cacheClear') !== null)
-        {
+        return [
+            'dgtx.configuration.provider' => '?'.ConfigurationProvider::class,
+            'dgtx.cache' => '?'.Cache::class,
+        ] + parent::getSubscribedServices();
+    }
+
+	/**
+     * {@inheritdoc}
+     */
+    public function create()
+    {
+        if ($this->getContext()->getRequest()->query->get('cacheClear') !== null) {
             if (($error = $this->get('dgtx.cache')->cacheClear()) != 0) {
                 $this->addFlash('danger', $this->getContext()->trans('Something goes wrong when clearing cache: '.$error, [], 'Admin.Message.Error'));
             } else {
@@ -24,20 +32,17 @@ class AdminPerformanceController extends AdminController
             return $this->redirectToRoute($this->getContext()->getRequest()->attributes->get('_route'), $this->getContext()->getRequest()->attributes->get('_route_params'));
         }
 
-        $tplVars = [];
         $datas = [];
-
-        $configurationProvider = $this->get('dgtx.configuration.provider');
-        $fieldConfig = $this->get('dgtx.field.config');
-        $fields = $this->get('dgtx.field.factory')->build($fieldConfig);
+        $tplVars = [];
+        $fields = $this->get('dgtx.field.factory')->build();
 
         foreach ($fields as $name => $field) {
-            $configuration = $configurationProvider->get($name);
-            $datas[$name] = $configuration !== null ? $configuration->getValue() : null;
+            $value = $this->getContext()->getConfiguration($name);
+            $datas[$name] = $value;
         }
 
-        $form = $this->get('dgtx.form.factory')->buildForm($fields, ['data' => $datas]);
-        $helperForm = $this->get('dgtx.helper.form.factory')->build($fieldConfig, $form, $tplVars);
+        $form = $this->get('dgtx.form.factory')->buildForm(['data' => $datas]);
+        $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
         $errors = $form->getErrors(true, false);
 
         if (count($errors) > 0) {

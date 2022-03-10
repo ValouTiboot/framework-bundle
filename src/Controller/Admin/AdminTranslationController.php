@@ -3,31 +3,40 @@
 namespace Digitix\FrameworkBundle\Controller\Admin;
 
 use Digitix\FrameworkBundle\Controller\Admin\AdminController;
+use Digitix\FrameworkBundle\Factory\TranslationFormFactory;
+use Digitix\FrameworkBundle\Updater\TranslationUpdater;
 
 class AdminTranslationController extends AdminController
 {
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'dgtx.translation.form.factory' => '?'.TranslationFormFactory::class,
+            'dgtx.translation.updater' => '?'.TranslationUpdater::class
+        ] + parent::getSubscribedServices();
+    }
+
     /**
-     * @return Response
+     * {@inheritDoc}
      */
     public function read()
     {
         $tplVars = [];
-        $fieldConfig = $this->get('dgtx.field.config');
-        $fields = $this->get('dgtx.field.factory')->build($fieldConfig);
+
         $action = $this->generateUrl('dgtx_admin_entity_create', ['entityName' => $this->getContext()->getEntity()->getName()]);
-        $form = $this->get('dgtx.form.factory')->buildForm($fields, ['method' => 'GET', 'action' => $action]);
-        $helperForm = $this->get('dgtx.helper.form.factory')->build($fieldConfig, $form, $tplVars);
+        $form = $this->get('dgtx.form.factory')->buildForm(['method' => 'GET', 'action' => $action]);
+        $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
 
         return $this->display($helperForm->generateForm());
     }
 
     /**
-     * @return Response
+     * {@inheritDoc}
      */
-    public function create(string $entityName)
+    public function create()
     {
         $tplVars = [];
-    	$data = $this->getContext()->getRequest()->query->get('translation');
+    	$data = $this->getContext()->getRequest()->query->all('translation');
 
     	$translationFactory = $this->get('dgtx.translation.form.factory')->build($data);
     	$translationForms = $translationFactory->buildFields()->buildForms();

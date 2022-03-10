@@ -2,7 +2,7 @@
 
 namespace Digitix\FrameworkBundle\Config;
 
-interface FieldConfigInterface
+interface AdminFormConfigInterface
 {
 	public function getFormFieldsConfig(): array;
 

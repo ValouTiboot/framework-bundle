@@ -4,28 +4,34 @@ namespace Digitix\FrameworkBundle\Controller\Admin;
 
 use Digitix\FrameworkBundle\Controller\Admin\AdminController;
 use Digitix\FrameworkBundle\Entity\Configuration;
+use Digitix\FrameworkBundle\Provider\ConfigurationProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class AdminParameterController extends AdminController
 {
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'dgtx.configuration.provider' => '?'.ConfigurationProvider::class,
+        ] + parent::getSubscribedServices();
+    }
+
 	/**
-     * @return Response
+     * {@inheritdoc}
      */
-    public function create($entityName)
+    public function create()
     {
         $datas = [];
         $tplVars = [];
-        $configurationProvider = $this->get('dgtx.configuration.provider');
-        $fieldConfig = $this->get('dgtx.field.config');
-        $fields = $this->get('dgtx.field.factory')->build($fieldConfig);
+        $fields = $this->get('dgtx.field.factory')->build();
 
         foreach ($fields as $name => $field) {
-            $configuration = $configurationProvider->get($name);
-            $datas[$name] = $configuration !== null ? $configuration->getValue() : null;
+            $value = $this->getContext()->getConfiguration($name);
+            $datas[$name] = $value;
         }
 
-        $form = $this->get('dgtx.form.factory')->buildForm($fields, ['data' => $datas]);
-        $helperForm = $this->get('dgtx.helper.form.factory')->build($fieldConfig, $form, $tplVars);
+        $form = $this->get('dgtx.form.factory')->buildForm(['data' => $datas]);
+        $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
         $errors = $form->getErrors(true, false);
 
         if (count($errors) > 0) {
@@ -42,7 +48,7 @@ class AdminParameterController extends AdminController
 
     protected function preparePersistenEntities($data)
     {
-        $objects = [];
+        $entities = [];
         $configurationProvider = $this->get('dgtx.configuration.provider');
 
         foreach ($data as $propertie => $value) {
@@ -52,9 +58,9 @@ class AdminParameterController extends AdminController
             }
 
             $configuration->setValue($value === false ? 0 : $value);
-            $objects[] = $configuration;
+            $entities[] = $configuration;
         }
 
-        return $this->persistEntities(new ArrayCollection($objects, false));
+        return $this->persistEntities(new ArrayCollection($entities, false));
     }
 }

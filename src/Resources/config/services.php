@@ -11,7 +11,7 @@ use Digitix\FrameworkBundle\Helper\HelperForm;
 use Digitix\FrameworkBundle\Helper\HelperList;
 use Digitix\FrameworkBundle\Helper\HelperView;
 use Digitix\FrameworkBundle\Factory\FormFactory;
-use Digitix\FrameworkBundle\Orm\EntityPersister;
+use Digitix\FrameworkBundle\Orm\EntityManager;
 use Symfony\Component\Form\FormFactoryInterface;
 use Digitix\FrameworkBundle\Factory\FieldFactory;
 use Digitix\FrameworkBundle\Controller\Controller;
@@ -48,7 +48,6 @@ use Digitix\FrameworkBundle\EventListener\AdminAccessListener;
 use Digitix\FrameworkBundle\Provider\EntityRepositoryProvider;
 use Digitix\FrameworkBundle\EventListener\AdminControllerListener;
 use Digitix\FrameworkBundle\DependencyInjection\DigitixFrameworkExtension;
-use Digitix\FrameworkBundle\DigitixFrameworkBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ReferenceConfigurator;
 
@@ -124,34 +123,33 @@ return static function (ContainerConfigurator $container) {
 
         ->set('dgtx.helper.view.factory', HelperViewFactory::class)
             ->arg(0, new Reference('dgtx.helper.view'))
-            // ->public()
         ->alias(HelperViewFactory::class, 'dgtx.helper.view.factory')
 
 
         ->set('dgtx.sorter.factory', SorterFactory::class)
             ->arg(0, new Reference(ContextProvider::class))
-            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ENTITY_CONFIG))
+            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_LIST_CONFIG))
             ->arg(2, new Reference(SorterInterface::class))
             ->public()
 
         ->set('dgtx.sorter', Sorter::class)
             ->arg(0, new Reference(ContextProvider::class))
             ->arg(1, new Reference('router.default'))
-
         ->alias(SorterInterface::class, 'dgtx.sorter')
 
         ->set('dgtx.paginator', Paginator::class)
 
         ->set('dgtx.filter.factory', FilterFactory::class)
-            ->arg(0, new Reference(DigitixFrameworkExtension::ALIAS_ENTITY_CONFIG))
+            ->arg(0, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_LIST_CONFIG))
             ->arg(1, new Reference(ContextProvider::class))
             ->public()
 
         ->set('dgtx.form.factory', FormFactory::class)
             ->arg(0, new Reference(ContextProvider::class))
             ->arg(1, new Reference('dgtx.filter.factory'))
-            ->arg(2, new Reference(FormFactoryInterface::class))
-            ->public()
+            ->arg(2, new Reference('dgtx.field.factory'))
+            ->arg(3, new Reference(FormFactoryInterface::class))
+        ->alias(FormFactory::class, 'dgtx.form.factory')
 
         ->set('dgtx.search.factory', SearchFactory::class)
             ->arg(0, new Reference('dgtx.filter.factory'))
@@ -160,7 +158,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('dgtx.paginator.factory', PaginatorFactory::class)
             ->arg(0, new Reference(ContextProvider::class))
-            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ENTITY_CONFIG))
+            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_LIST_CONFIG))
             ->arg(2, new Reference('dgtx.entity.repository'))
             ->arg(3, new Reference('dgtx.search.factory'))
             ->arg(4, new Reference('dgtx.sorter.factory'))
@@ -168,40 +166,40 @@ return static function (ContainerConfigurator $container) {
             ->public()
 
         ->set('dgtx.helper.list.factory', HelperListFactory::class)
-            ->arg(0, new Reference('dgtx.entity.config'))
+            ->arg(0, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_LIST_CONFIG))
             ->arg(1, new Reference('dgtx.form.factory'))
             ->arg(2, new Reference('dgtx.helper.list'))
             ->arg(3, new Reference('dgtx.paginator.factory'))
             ->arg(4, new Reference('dgtx.sorter.factory'))
-            // ->public()
         ->alias(HelperListFactory::class, 'dgtx.helper.list.factory')
 
         ->set('dgtx.helper.list', HelperList::class)
             ->arg(0, new Reference(ContextProvider::class))
-
         ->alias(HelperListInterface::class, 'dgtx.helper.list')
 
         ->set('dgtx.field.factory', FieldFactory::class)
-            ->public()
+        ->alias(FieldFactory::class, 'dgtx.field.factory')
 
         ->set('dgtx.helper.form', HelperForm::class)
             ->arg(0, new Reference(ContextProvider::class))
-
         ->alias(HelperFormInterface::class,'dgtx.helper.form')
 
         ->set('dgtx.helper.form.factory', HelperFormFactory::class)
             ->arg(0, new Reference('dgtx.helper.form'))
-            ->public()
+            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_FORM_CONFIG))
+            ->arg(2, new Reference('dgtx.field.factory'))
+            ->arg(3, new Reference('dgtx.form.factory'))
+        ->alias(HelperFormFactory::class, 'dgtx.helper.form.factory')
 
         ->set('dgtx.mailer', Mailer::class)
             ->arg(0, new Reference('mailer.mailer'))
             ->arg(0, new Reference(ConfigurationProvider::class))
             ->arg(0, new Reference(ContextProvider::class))
 
-        ->set('dgtx.entity.persister', EntityPersister::class)
+        ->set('dgtx.entity.manager', EntityManager::class)
             ->arg(0, new Reference('doctrine'))
             ->arg(1, new Reference(ValidatorInterface::class))
-            ->public()
+        ->alias(EntityManager::class, 'dgtx.entity.manager')
 
         ->set('dgtx.translation.finder', TranslationFinder::class)
             ->arg(0, '%kernel.project_dir%')
@@ -213,12 +211,12 @@ return static function (ContainerConfigurator $container) {
         ->set('dgtx.translation.form.factory', TranslationFormFactory::class)
             ->arg(0, new Reference('dgtx.translation.finder'))
             ->arg(1, new Reference('dgtx.translation.provider'))
-            ->public()
+        ->alias(TranslationFormFactory::class, 'dgtx.translation.form.factory')
 
         ->set('dgtx.translation.updater', TranslationUpdater::class)
             ->arg(0, new Reference('translation.writer'))
             ->arg(1, '%kernel.project_dir%')
-            ->public()
+        ->alias(TranslationUpdater::class, 'dgtx.translation.updater')
 
         ->set(PasswordType::class)
             ->arg(0, new Reference('security.password_hasher'))
@@ -227,11 +225,11 @@ return static function (ContainerConfigurator $container) {
 
         ->set('dgtx.configuration.provider', ConfigurationProvider::class)
             ->arg(0, new Reference('dgtx.entity.repository.provider'))
-            ->public()
+        ->alias(ConfigurationProvider::class, 'dgtx.configuration.provider')
 
         ->set('dgtx.cache', Cache::class)
             ->arg(0, new Reference('kernel'))
-            ->public()
+        ->alias(Cache::class, 'dgtx.cache')
 
         ->set(UserFixtures::class)
             ->arg(0, new Reference('security.password_hasher'))

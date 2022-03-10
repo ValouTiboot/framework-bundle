@@ -32,25 +32,23 @@ final class EntityFactory
 	{
 		$entityInstance = null;
 
-		if ($this->entityPresenter->getName() !== null && class_exists($this->entityPresenter->getFqcn()))
-		{
+		if ($this->entityPresenter->getName() !== null && class_exists($this->entityPresenter->getFqcn())) {
 			$entityFqcn = $this->entityPresenter->getFqcn();
 
-			if ($this->entityPresenter->getPrimaryKeyValue() !== null)
+			if ($this->entityPresenter->getPrimaryKeyValue() !== null) {
 				$entityInstance = $this->repositoryProvider->getRepository($this->entityPresenter->getFqcn())->find($this->entityPresenter->getPrimaryKeyValue());
-			else
+			} else {
 				$entityInstance = new $entityFqcn;
-		}
-		else
+			}
+		} else {
 			$entityInstance = new Magic();
+		}
 
-		if (property_exists($entityInstance, 'translations') && $this->entityPresenter->getPrimaryKeyValue() === null)
-		{
+		if (property_exists($entityInstance, 'translations') && $this->entityPresenter->getPrimaryKeyValue() === null) {
 			$languages = $this->repositoryProvider->getRepository('Digitix\\FrameworkBundle\\Entity\\Language')->findBy(['active' => 1], ['defaultLanguage' => 'ASC']);
 			$fqcnTranslation = $this->entityPresenter->getFqcn().'Translation';
 
-			foreach ($languages as $language)
-			{
+			foreach ($languages as $language) {
 				$entityTranslation = new $fqcnTranslation();
 				$entityTranslation->setLanguage($language);
 				$entityInstance->addTranslation($entityTranslation);

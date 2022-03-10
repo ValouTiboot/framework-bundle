@@ -12,7 +12,6 @@ class Helper
 
 	public function __construct(ContextProvider $context)
 	{
-		dump($context);
 		$this->context = $context->getContext();
 		$this->entityName = $this->context->getEntityName();
 	}

@@ -13,6 +13,8 @@ final class TranslationFinder
 
 	public function findFiles($dir, $type = '', $root = true): array
 	{
+		$dir = str_replace($this->projectDir, '', $dir);
+
 		if ($root) {
 			$dir = $this->projectDir.$dir;
 		}

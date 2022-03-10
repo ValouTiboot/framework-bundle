@@ -2,25 +2,25 @@
 
 namespace Digitix\FrameworkBundle\Factory;
 
-use Digitix\FrameworkBundle\Config\ViewConfigInterface;
+use Digitix\FrameworkBundle\Config\AdminViewConfigInterface;
 use Digitix\FrameworkBundle\Helper\HelperViewInterface;
 
 final class HelperViewFactory
 {
 	private $helperView;
-	private $viewConfig;
+	private $adminViewConfig;
 
-	public function __construct(HelperViewInterface $helperView, ViewConfigInterface $viewConfig)
+	public function __construct(HelperViewInterface $helperView, AdminViewConfigInterface $adminViewConfig)
 	{
 		$this->helperView = $helperView;
-		$this->viewConfig = $viewConfig;
+		$this->adminViewConfig = $adminViewConfig;
 	}
 
 	public function build($tplVars): HelperViewInterface
 	{
 		$this->helperView
 			->setTplVars($tplVars)
-			->setTemplate($this->viewConfig->getTemplate())
+			->setTemplate($this->adminViewConfig->getTemplate())
         ;
 
 		return $this->helperView;

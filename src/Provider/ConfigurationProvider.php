@@ -16,6 +16,7 @@ final class ConfigurationProvider
 
 	public function get(string $name): ?Configuration
 	{
+		dump($this->entityRepositoryProvider->getRepository('Digitix\\FrameworkBundle\\Entity\\Configuration')->findOneBy(['name' => $name]));
 		return $this->entityRepositoryProvider->getRepository('Digitix\\FrameworkBundle\\Entity\\Configuration')->findOneBy(['name' => $name]);
 	}
 

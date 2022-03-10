@@ -3,14 +3,23 @@
 namespace Digitix\FrameworkBundle\Controller;
 
 use Digitix\FrameworkBundle\Context\Context;
+use Digitix\FrameworkBundle\Orm\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
+use Digitix\FrameworkBundle\Factory\FormFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Controller extends AbstractController
 {
 	protected $context;
+
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'dgtx.form.factory' => '?'. FormFactory::class,
+            'dgtx.entity.manager' => '?'. EntityManager::class,
+        ] + parent::getSubscribedServices();
+    }
 
     protected function get(string $id): object
     {
@@ -40,11 +49,11 @@ class Controller extends AbstractController
 
     protected function persistEntity()
     {
-        return $this->get('dgtx.entity.persister')->persistObject($this->getContext()->getEntity()->getInstance());
+        return $this->get('dgtx.entity.manager')->persistEntity($this->getContext()->getEntity()->getInstance());
     }
 
     protected function persistEntities($objects)
     {
-        return $this->get('dgtx.entity.persister')->persistObjects($objects);
+        return $this->get('dgtx.entity.manager')->persistEntities($objects);
     }
 }

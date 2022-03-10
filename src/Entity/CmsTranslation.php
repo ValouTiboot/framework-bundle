@@ -39,11 +39,6 @@ class CmsTranslation
     private $metaTitle;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $metaKeywords;
-
-    /**
      * @ORM\Column(type="text", nullable=true)
      */
     private $metaDescription;
@@ -114,18 +109,6 @@ class CmsTranslation
     public function setMetaTitle(string $metaTitle): self
     {
         $this->metaTitle = $metaTitle;
-
-        return $this;
-    }
-
-    public function getMetaKeywords(): ?string
-    {
-        return $this->metaKeywords;
-    }
-
-    public function setMetaKeywords(?string $metaKeywords): self
-    {
-        $this->metaKeywords = $metaKeywords;
 
         return $this;
     }

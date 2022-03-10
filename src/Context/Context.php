@@ -76,7 +76,7 @@ final class Context
 
 	public function getEntityFqcn()
 	{
-		return 'Digitix\FrameworkBundle\\Entity\\'.$this->getEntityName();
+		return 'Digitix\\FrameworkBundle\\Entity\\'.$this->getEntityName();
 	}
 
 	public function setRequest(Request $request): self
@@ -123,7 +123,7 @@ final class Context
 		return $this;
 	}
 
-	public function getConfiguration($key): string
+	public function getConfiguration($key): string|null
 	{
 		return $this->configuration->get($key);
 	}

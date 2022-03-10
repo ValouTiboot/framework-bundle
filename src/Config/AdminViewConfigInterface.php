@@ -2,7 +2,7 @@
 
 namespace Digitix\FrameworkBundle\Config;
 
-interface ViewConfigInterface
+interface AdminViewConfigInterface
 {
 	public function getTemplate(): ?string;
 }

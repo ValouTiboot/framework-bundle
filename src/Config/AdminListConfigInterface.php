@@ -2,7 +2,7 @@
 
 namespace Digitix\FrameworkBundle\Config;
 
-interface EntityConfigInterface
+interface AdminListConfigInterface
 {
 	public function getConfiguration(): array;
 

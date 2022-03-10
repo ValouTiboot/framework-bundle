@@ -6,25 +6,25 @@ use Digitix\FrameworkBundle\Factory\FormFactory;
 use Digitix\FrameworkBundle\Factory\SorterFactory;
 use Digitix\FrameworkBundle\Factory\PaginatorFactory;
 use Digitix\FrameworkBundle\Helper\HelperListInterface;
-use Digitix\FrameworkBundle\Config\EntityConfigInterface;
+use Digitix\FrameworkBundle\Config\AdminListConfigInterface;
 
 final class HelperListFactory
 {
-	private $entityConfig;
+	private $adminListConfig;
 	private $formFactory;
 	private $helperList;
 	private $paginatorFactory;
 	private $sorterFactory;
 
 	public function __construct(
-		EntityConfigInterface $entityConfig,
+		AdminListConfigInterface $adminListConfig,
 		FormFactory $formFactory,
 		HelperListInterface $helperList,
 		PaginatorFactory $paginatorFactory,
 		SorterFactory $sorterFactory
 	)
 	{
-		$this->entityConfig = $entityConfig;
+		$this->adminListConfig = $adminListConfig;
 		$this->formFactory = $formFactory;
 		$this->helperList = $helperList;
 		$this->paginatorFactory = $paginatorFactory;
@@ -38,17 +38,17 @@ final class HelperListFactory
 		$this->helperList
 			->setList($paginator->getResults())
             ->setSorter($this->sorterFactory->build())
-            ->setFieldsList($this->entityConfig->getListFields())
-            ->setToolbar($this->entityConfig->getToolbar())
-            ->setActions($this->entityConfig->getActions())
+            ->setFieldsList($this->adminListConfig->getListFields())
+            ->setToolbar($this->adminListConfig->getToolbar())
+            ->setActions($this->adminListConfig->getActions())
             ->setPagination($paginator)
             ->setFilters($this->formFactory->buildFormFilters()->createView())
 			->setTotal($paginator->getTotal())
-            ->setHasCreate($this->entityConfig->hasCreate())
-			->setHeaderLink($this->entityConfig->getHeaderLink())
-			->setSortable($this->entityConfig->getSortable())
+            ->setHasCreate($this->adminListConfig->hasCreate())
+			->setHeaderLink($this->adminListConfig->getHeaderLink())
+			->setSortable($this->adminListConfig->getSortable())
             ->setTplVars($tplVars)
-			->setTemplate($this->entityConfig->getTemplatelist())
+			->setTemplate($this->adminListConfig->getTemplatelist())
         ;
 		return $this->helperList;
 	}

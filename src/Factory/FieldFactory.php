@@ -3,23 +3,25 @@
 namespace Digitix\FrameworkBundle\Factory;
 
 use Digitix\FrameworkBundle\Field\BoolField;
+use Digitix\FrameworkBundle\Field\DateField;
+use Digitix\FrameworkBundle\Field\TextField;
+use Digitix\FrameworkBundle\Field\EmailField;
 use Digitix\FrameworkBundle\Field\ButtonField;
 use Digitix\FrameworkBundle\Field\ChoiceField;
-use Digitix\FrameworkBundle\Field\DateField;
-use Digitix\FrameworkBundle\Field\EmailField;
 use Digitix\FrameworkBundle\Field\EntityField;
 use Digitix\FrameworkBundle\Field\HiddenField;
-use Digitix\FrameworkBundle\Field\PasswordField;
 use Digitix\FrameworkBundle\Field\SearchField;
 use Digitix\FrameworkBundle\Field\SubmitField;
-use Digitix\FrameworkBundle\Field\TextField;
+use Digitix\FrameworkBundle\Field\PasswordField;
 use Digitix\FrameworkBundle\Field\TextareaField;
-use Digitix\FrameworkBundle\Field\TranslableCollectionField;
 use Doctrine\Common\Collections\ArrayCollection;
+use Digitix\FrameworkBundle\Config\AdminFormConfigInterface;
+use Digitix\FrameworkBundle\Field\TranslableCollectionField;
 
 final class FieldFactory
 {
 	private $fields;
+	private $adminFormConfig;
 	private static $fieldTypes = [
 		'bool' 		=> BoolField::class,
 		'button' 	=> ButtonField::class,
@@ -36,11 +38,16 @@ final class FieldFactory
 		'translate' => TranslableCollectionField::class,
 	];
 
-	public function build($fieldsConfig)
+	public function __construct(AdminFormConfigInterface $adminFormConfig)
+	{
+		$this->adminFormConfig = $adminFormConfig;
+	}
+
+	public function build()
 	{
 		$buildFields = [];
-		$this->fields = $fieldsConfig->getFormFieldsConfig();
-		$translationDomain = $fieldsConfig->getTranslationDomain();
+		$this->fields = $this->adminFormConfig->getFormFieldsConfig();
+		$translationDomain = $this->adminFormConfig->getTranslationDomain();
 
 		if (count($this->fields)) {
 			foreach ($this->fields as $key => $field) {
@@ -54,7 +61,7 @@ final class FieldFactory
 				$buildFields[$key] = $fieldInstance;
 			}
 
-			if ($fieldsConfig->getHasAutoSubmitButton()) {
+			if ($this->adminFormConfig->getHasAutoSubmitButton()) {
 				$buildFields['save'] = SubmitField::getInstance();
 			}
 		}

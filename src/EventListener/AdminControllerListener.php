@@ -55,8 +55,6 @@ class AdminControllerListener
             $controller = 'dgtx.admin.controller.'.$route_params['entityName'];
         }
 
-        dump($controller);
-
         if ($controller !== null) {
             $request->attributes->set('_controller', $controller.'::'.$xplodeController[1]);
         }
@@ -73,7 +71,6 @@ class AdminControllerListener
         }
 
         $user = $this->security->getUser();
-dump($event);
         // $this->twig->addGlobal( 'dgtx', $results[0]->getName() );
         $this->twig->addGlobal('user', $user);
         $this->twig->addGlobal('adminMenu', $this->adminMenu->getAdminMenuConfig());

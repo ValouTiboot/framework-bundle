@@ -8,5 +8,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 final class DigitixFrameworkBundle extends Bundle
 {
-
+    public static function getPathDir()
+    {
+        return dirname(__FILE__);
+    }
 }

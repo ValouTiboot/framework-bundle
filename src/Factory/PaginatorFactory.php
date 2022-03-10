@@ -7,13 +7,13 @@ use Digitix\FrameworkBundle\Factory\SearchFactory;
 use Digitix\FrameworkBundle\Factory\SorterFactory;
 use Digitix\FrameworkBundle\Provider\ContextProvider;
 use Digitix\FrameworkBundle\Repository\EntityRepository;
-use Digitix\FrameworkBundle\Config\EntityConfigInterface;
+use Digitix\FrameworkBundle\Config\AdminListConfigInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class PaginatorFactory
 {
 	private $context;
-	private $entityConfig;
+	private $adminListConfig;
 	private $entityRepository;
 	private $searchFactory;
 	private $sorterFactory;
@@ -21,7 +21,7 @@ final class PaginatorFactory
 
 	public function __construct(
 		ContextProvider $context,
-		EntityConfigInterface $entityConfig,
+		AdminListConfigInterface $adminListConfig,
 		EntityRepository $entityRepository,
 		SearchFactory $searchFactory,
 		SorterFactory $sorterFactory,
@@ -29,7 +29,7 @@ final class PaginatorFactory
 	)
 	{
 		$this->context = $context->getContext();
-		$this->entityConfig = $entityConfig;
+		$this->adminListConfig = $adminListConfig;
 		$this->entityRepository = $entityRepository;
 		$this->searchFactory = $searchFactory;
 		$this->sorterFactory = $sorterFactory;
@@ -38,9 +38,8 @@ final class PaginatorFactory
 
 	public function build()
 	{
-		dump($this->buildQuery());
 		/**
-		 * TODO Can ->setItemPerPage on paginator : default 50 Fron entityConfig yml
+		 * TODO Can ->setItemPerPage on paginator : default 50 Fron adminListConfig yml
 		 */
 		$paginator = new Paginator();
 		$paginator
@@ -56,7 +55,7 @@ final class PaginatorFactory
 	protected function buildQuery()
 	{
 		return $this->entityRepository->buildQuery(
-			$this->entityConfig->getListFields(),
+			$this->adminListConfig->getListFields(),
 			$this->searchFactory->build(),
 			$this->sorterFactory->build()
 		);

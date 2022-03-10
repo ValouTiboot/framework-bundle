@@ -27,7 +27,7 @@ class RouteLoader extends Loader
             '_controller' => 'dgtx.admin.controller::view',
         ]))->setMethods(['GET','POST']));
 
-        $routeCollection->add('dgtx_admin_entity_read', (new Route('/admin/{entityName}/read', [
+        $routeCollection->add('dgtx_admin_entity_read', (new Route('/admin/{entityName}', [
             '_controller' => 'dgtx.admin.controller::read',
         ]))->setMethods(['GET','POST']));
 
@@ -39,7 +39,7 @@ class RouteLoader extends Loader
             '_controller' => 'dgtx.admin.controller::edit',
         ]))->setMethods(['GET','POST']));
 
-        $routeCollection->add('dgtx_admin_entity_delete', (new Route('/admin/{entityName}/delete', [
+        $routeCollection->add('dgtx_admin_entity_delete', (new Route('/admin/{entityName}/delete/{entityId}', [
             '_controller' => 'dgtx.admin.controller::delete',
         ]))->setMethods(['GET','POST']));
 

@@ -8,7 +8,7 @@ use Digitix\FrameworkBundle\Filter\ChoiceFilter;
 use Digitix\FrameworkBundle\Filter\EntityFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Digitix\FrameworkBundle\Provider\ContextProvider;
-use Digitix\FrameworkBundle\Config\EntityConfigInterface;
+use Digitix\FrameworkBundle\Config\AdminListConfigInterface;
 
 final class FilterFactory
 {
@@ -23,10 +23,10 @@ final class FilterFactory
 		'text' => TextFilter::class,
 	];
 
-	public function __construct(EntityConfigInterface $entityConfig, ContextProvider $contextProvider)
+	public function __construct(AdminListConfigInterface $adminListConfig, ContextProvider $contextProvider)
 	{
 		$this->context = $contextProvider->getContext();
-		$this->filters = $entityConfig->getFiltersFields();
+		$this->filters = $adminListConfig->getFiltersFields();
 	}
 
 	public function build()

@@ -2,24 +2,37 @@
 
 namespace Digitix\FrameworkBundle\Factory;
 
-use Digitix\FrameworkBundle\Config\FieldConfig;
-use Digitix\FrameworkBundle\Helper\HelperFormInterface;
 use Symfony\Component\Form\FormInterface;
+use Digitix\FrameworkBundle\Helper\HelperFormInterface;
+use Digitix\FrameworkBundle\Config\AdminFormConfigInterface;
 
-class HelperFormFactory
+final class HelperFormFactory
 {
-	public function __construct(HelperFormInterface $helperForm)
+	private $helperForm;
+	private $adminFormConfig;
+	private $fieldFactory;
+	private $formFactory;
+
+	public function __construct(
+		HelperFormInterface $helperForm,
+		AdminFormConfigInterface $adminFormConfig,
+		FieldFactory $fieldFactory,
+		FormFactory $formFactory
+	)
 	{
 		$this->helperForm = $helperForm;
+		$this->adminFormConfig = $adminFormConfig;
+		$this->fieldFactory = $fieldFactory;
+		$this->formFactory = $formFactory;
 	}
 
-	public function build(FieldConfig $fieldConfig, FormInterface $form, array $tplVars)
+	public function build(FormInterface $form, array $tplVars)
 	{
 		return $this->helperForm
 			->setForm($form)
 			->setTplVars($tplVars)
-			->setHasReturnLink($fieldConfig->getHasReturnLink())
-			->setTemplate($fieldConfig->getTemplateForm())
+			->setHasReturnLink($this->adminFormConfig->getHasReturnLink())
+			->setTemplate($this->adminFormConfig->getTemplateForm())
 		;
 	}
 

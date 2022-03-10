@@ -5,7 +5,7 @@ namespace Digitix\FrameworkBundle\Config;
 use Digitix\FrameworkBundle\Config\ViewConfigInterface;
 use Digitix\FrameworkBundle\Provider\ContextProvider;
 
-class ViewConfig implements ViewConfigInterface
+class AdminViewConfig implements AdminViewConfigInterface
 {
 	private $context;
 	private $entityName;
@@ -18,8 +18,9 @@ class ViewConfig implements ViewConfigInterface
 		$this->entityName = $this->context->getEntityName();
 		$this->configuration = $params['admin_entities'][$this->entityName];
 
-		if (isset($this->configuration['view']) && count($this->configuration['view']))
+		if (isset($this->configuration['view']) && count($this->configuration['view'])) {
 			$this->_view = $this->configuration['view'];
+		}
 	}
 
 	public function getTemplate(): ?string

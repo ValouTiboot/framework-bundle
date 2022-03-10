@@ -2,6 +2,7 @@
 
 namespace Digitix\FrameworkBundle\Factory;
 
+use Digitix\FrameworkBundle\DigitixFrameworkBundle;
 use Digitix\FrameworkBundle\Field\TextField;
 use Digitix\FrameworkBundle\Field\TextareaField;
 use Digitix\FrameworkBundle\Field\SubmitField;
@@ -16,12 +17,14 @@ final class TranslationFormFactory
 {
 	private $translationFinder;
 	private $translationProvider;
+	private $bundlePath;
 	private $fields;
 
 	public function __construct(TranslationFinder $translationFinder, TranslationProvider $translationProvider)
 	{
 		$this->translationFinder = $translationFinder;
 		$this->translationProvider = $translationProvider;
+		$this->bundlePath = DigitixFrameworkBundle::getPathDir();
 	}
 
 	public function getProvider()
@@ -34,10 +37,10 @@ final class TranslationFormFactory
 		if ($data['type'] == 'bo') {
 			$adminControllerTrads = $this->translationFinder->searchInController('/src/Controller/Admin/', 'Admin');
 			$adminTemplateTrads = $this->translationFinder->searchInTemplate('/templates/admin/', '');
-			$adminFieldsTrads = $this->translationFinder->searchInConfig('/config/dgtx/', 'admin_entities');
+			$adminFieldsTrads = $this->translationFinder->searchInConfig('/config/packages/', 'digitix');
 
 			$translationFiles = $this->translationFinder->findFiles('/translations/', $data['locale'].'/Admin');
-			$bundleTranslationFiles = $this->translationFinder->findFiles('/vendor/digitix/framework-bundle/src/Resources/translations/', $data['locale'].'/Admin');
+			$bundleTranslationFiles = $this->translationFinder->findFiles($this->bundlePath.'/Resources/translations/', $data['locale'].'/Admin');
 			$translationTrads = $this->translationProvider->getTradInFile($translationFiles + $bundleTranslationFiles, $data['locale']);
 
 			$this->translationProvider->setTranslations(
@@ -50,7 +53,7 @@ final class TranslationFormFactory
 			);
 		} else if ($data['type'] == 'fo') {
 			$frontControllerTrads = $this->translationFinder->searchInController('/src/Controller/Front/', '', 'Front.*');
-			$frontFieldsTrads = $this->translationFinder->searchInConfig('/config/dgtx/', 'front_entities', 'Front.Fields.Label');
+			$frontFieldsTrads = $this->translationFinder->searchInConfig('/config/packages/', 'digitix', 'Front.Fields.Label');
 			$translationFiles = $this->translationFinder->findFiles('/translations/', $data['locale'].'/Front');
 			$translationTrads = $this->translationProvider->getTradInFile($translationFiles, $data['locale']);
 
@@ -61,8 +64,7 @@ final class TranslationFormFactory
 					$translationTrads
 				)
 			);
-		}
-		else if ($data['type'] == 'email') {
+		} else if ($data['type'] == 'email') {
 			$frontControllerTrads = $this->translationFinder->searchInController('/src/Controller/', '', 'Email.*');
 			$translationFiles = $this->translationFinder->findFiles('/translations/', $data['locale'].'/Email');
 			$translationTrads = $this->translationProvider->getTradInFile($translationFiles, $data['locale']);
@@ -165,7 +167,7 @@ final class TranslationFormFactory
 	// 	return $tree;
 	// }
 
-	public function findThemes(): array
+	public static function findThemes(): array
     {
         $themes = [];
         $tmpDir = glob('../templates/themes/*', GLOB_ONLYDIR);

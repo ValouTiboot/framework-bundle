@@ -4,9 +4,10 @@ namespace Digitix\FrameworkBundle\Controller\Admin;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Digitix\FrameworkBundle\Controller\Controller;
+use Digitix\FrameworkBundle\Factory\FieldFactory;
+use Digitix\FrameworkBundle\Factory\HelperFormFactory;
 use Digitix\FrameworkBundle\Factory\HelperListFactory;
 use Digitix\FrameworkBundle\Factory\HelperViewFactory;
-// use Symfony\Component\Routing\Annotation\Route;
 
 class AdminController extends Controller
 {
@@ -26,8 +27,10 @@ class AdminController extends Controller
     public static function getSubscribedServices(): array
     {
         return [
-            'dgtx.helper.view.factory' => '?'. HelperViewFactory::class,
-            'dgtx.helper.list.factory' => '?'. HelperListFactory::class,
+            'dgtx.helper.view.factory' => '?'.HelperViewFactory::class,
+            'dgtx.helper.list.factory' => '?'.HelperListFactory::class,
+            'dgtx.helper.form.factory' => '?'.HelperFormFactory::class,
+            'dgtx.field.factory' => '?'.FieldFactory::class,
         ] + parent::getSubscribedServices();
     }
 
@@ -49,20 +52,6 @@ class AdminController extends Controller
     public function read()
     {
         $tplVars = [];
-
-        // $fieldConfig = $this->get('dgtx.entity.config');
-        // $listFields = $fieldConfig->getListFields();
-        // $sorter = $this->get('dgtx.sorter.factory')->build($listFields);
-
-        // $filters = $this->get('dgtx.filter.factory')->build();
-        // $filterForm = $this->get('dgtx.form.factory')->buildFormFilters($filters);
-        // $search = $this->get('dgtx.search.factory')->build($filters, $filterForm);
-
-        // $dql = $this->get('dgtx.entity.repository')->buildQuery($listFields, $search, $sorter);
-
-
-        // $paginator = $this->get('dgtx.paginator.factory')->build($dql)->paginate();
-
         $helperList = $this->get('dgtx.helper.list.factory')->build($tplVars);
 
         return $this->display($helperList->generateList());
@@ -71,17 +60,14 @@ class AdminController extends Controller
     /**
      * view for form creation Entity
      *
-     * @param string $entityName
      * @return Response
      */
-    public function create(string $entityName)
+    public function create()
     {
         $tplVars = [];
+        $form = $this->get('dgtx.form.factory')->buildForm();
+        $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
 
-        $fieldConfig = $this->get('dgtx.field.config');
-        $fields = $this->get('dgtx.field.factory')->build($fieldConfig);
-        $form = $this->get('dgtx.form.factory')->buildForm($fields);
-        $helperForm = $this->get('dgtx.helper.form.factory')->build($fieldConfig, $form, $tplVars);
         $errors = $form->getErrors(true, false);
 
         if (count($errors) > 0) {
@@ -89,10 +75,18 @@ class AdminController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /**
+             * TODO Validator
+             * TODO uplaod files
+             */
+
             $this->persistEntity();
-            // process uploadFiles
             $this->addFlash('success', $this->getContext()->trans('Entity successfuly added.', [], 'Admin.Message.Success'));
-            return $this->redirectToRoute('dgtx_admin_entity_read', ['entityName' => $entityName]);
+
+            return $this->redirectToRoute(
+                'dgtx_admin_entity_read',
+                ['entityName' => $this->getContext()->getEntityName()]
+            );
         }
 
         return $this->display($helperForm->generateForm());
@@ -101,14 +95,12 @@ class AdminController extends Controller
     /**
      * @return Response
      */
-    public function edit(string $entityName)
+    public function edit()
     {
         $tplVars = [];
+        $form = $this->get('dgtx.form.factory')->buildForm();
+        $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
 
-        $fieldConfig = $this->get('dgtx.field.config');
-        $fields = $this->get('dgtx.field.factory')->build($fieldConfig);
-        $form = $this->get('dgtx.form.factory')->buildForm($fields);
-        $helperForm = $this->get('dgtx.helper.form.factory')->build($fieldConfig, $form, $tplVars);
         $errors = $form->getErrors(true, false);
 
         if (count($errors) > 0) {
@@ -116,11 +108,18 @@ class AdminController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // mettre le validator dans le factory pour le retrouver dans le context
+            /**
+             * TODO Validator
+             * TODO uplaod files
+             */
+
             $this->persistEntity();
-            // process uploadFiles dans le persisterAfter
             $this->addFlash('success', $this->getContext()->trans('Entity successfuly updated.', [], 'Admin.Message.Success'));
-            return $this->redirectToRoute('dgtx_admin_entity_read', ['entityName' => $entityName]);
+
+            return $this->redirectToRoute(
+                'dgtx_admin_entity_read',
+                ['entityName' => $this->getContext()->getEntityName()]
+            );
         }
 
         return $this->display($helperForm->generateForm());
@@ -130,32 +129,29 @@ class AdminController extends Controller
      *
      * @return Redirect
      */
-    public function delete(string $entityName, int $entityId)
+    public function delete()
     {
-        $entity = $this->get('dgtx.entity.repository')->find($entityId);
+        $entity = $this->getContext()->getEntity()->getInstance();
 
-        if (is_null($entity)) {
+        if ($entity === null) {
             $this->addFlash('info', $this->getContext()->trans('This entity does not exist anymore.', [], 'Admin.Message.Info'));
         } else {
+            $this->get('dgtx.entity.manager')->removeEntity($entity);
             $this->addFlash('success', $this->getContext()->trans('Entity successfuly deleted.', [], 'Admin.Message.Success'));
         }
 
-        /*
-         *   TODO delete images if have some
-        */
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($entity);
-        $entityManager->flush();
-
-        return $this->redirectToRoute('dgtx_admin_entity_read', ['entityName' => $entityName]);
+        return $this->redirectToRoute(
+            'dgtx_admin_entity_read',
+            ['entityName' => $this->getContext()->getEntityName()]
+        );
     }
 
     /**
      * @return JsonResponse
      */
-    public function ajaxSortable($entityName)
+    public function ajaxSortable()
     {
+        $entityName = $this->getContext()->getEntityName();
         $params = $this->getContext()->getRequest()->request->all();
 
         if (!isset($params[$entityName])) {
@@ -174,7 +170,7 @@ class AdminController extends Controller
             $items->add($item);
         }
 
-        $this->get('dgtx.entity.persister')->persistObjects($items);
+        $this->get('dgtx.entity.manager')->persistObjects($items);
 
         return $this->displayAjax(['success' => true]);
     }

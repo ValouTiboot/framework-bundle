@@ -2,10 +2,10 @@
 
 namespace Digitix\FrameworkBundle\Config;
 
-use Digitix\FrameworkBundle\Config\EntityConfigInterface;
 use Digitix\FrameworkBundle\Provider\ContextProvider;
+use Digitix\FrameworkBundle\Config\AdminListConfigInterface;
 
-class EntityConfig implements EntityConfigInterface
+class AdminListConfig implements AdminListConfigInterface
 {
 	private $context;
 	private $entityName;
@@ -18,8 +18,9 @@ class EntityConfig implements EntityConfigInterface
 		$this->entityName = $this->context->getEntityName();
 		$this->configuration = $params['admin_entities'][$this->entityName];
 
-		if (isset($this->configuration['list']) && count($this->configuration['list']))
+		if (isset($this->configuration['list']) && count($this->configuration['list'])) {
 			$this->_list = $this->configuration['list'];
+		}
 	}
 
 	public function getConfiguration(): array

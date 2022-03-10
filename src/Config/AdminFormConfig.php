@@ -2,10 +2,10 @@
 
 namespace Digitix\FrameworkBundle\Config;
 
-use Digitix\FrameworkBundle\Config\FieldConfigInterface;
 use Digitix\FrameworkBundle\Provider\ContextProvider;
+use Digitix\FrameworkBundle\Config\AdminFormConfigInterface;
 
-class FieldConfig implements FieldConfigInterface
+class AdminFormConfig implements AdminFormConfigInterface
 {
 	private $context;
 	private $entityName;

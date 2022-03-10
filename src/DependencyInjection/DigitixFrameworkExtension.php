@@ -3,19 +3,19 @@
 namespace Digitix\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Digitix\FrameworkBundle\Config\ViewConfig;
+use Digitix\FrameworkBundle\Config\AdminViewConfig;
 use Digitix\FrameworkBundle\Route\RouteLoader;
-use Digitix\FrameworkBundle\Config\FieldConfig;
-use Digitix\FrameworkBundle\Config\EntityConfig;
 use Symfony\Component\DependencyInjection\Alias;
+use Digitix\FrameworkBundle\Config\AdminFormConfig;
+use Digitix\FrameworkBundle\Config\AdminListConfig;
 use Digitix\FrameworkBundle\Config\AdminMenuConfig;
 use Symfony\Component\DependencyInjection\Reference;
 use Digitix\FrameworkBundle\Provider\ContextProvider;
-use Digitix\FrameworkBundle\Config\ViewConfigInterface;
-use Digitix\FrameworkBundle\Config\FieldConfigInterface;
+use Digitix\FrameworkBundle\Config\AdminViewConfigInterface;
 use Digitix\FrameworkBundle\Repository\EntityRepository;
-use Digitix\FrameworkBundle\Config\EntityConfigInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Digitix\FrameworkBundle\Config\AdminFormConfigInterface;
+use Digitix\FrameworkBundle\Config\AdminListConfigInterface;
 use Digitix\FrameworkBundle\Config\AdminMenuConfigInterface;
 use Digitix\FrameworkBundle\Controller\Admin\AdminController;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -25,14 +25,13 @@ use Digitix\FrameworkBundle\Controller\Admin\AdminLoginController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminParameterController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminPerformanceController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminTranslationController;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ReferenceConfigurator;
 
 class DigitixFrameworkExtension extends Extension
 {
     const ALIAS_ADMIN_MENU_CONFIG = 'dgtx.admin.menu.config';
-    const ALIAS_VIEW_CONFIG = 'dgtx.view.config';
-    const ALIAS_ENTITY_CONFIG = 'dgtx.entity.config';
-    const ALIAS_FIELD_CONFIG = 'dgtx.field.config';
+    const ALIAS_ADMIN_VIEW_CONFIG = 'dgtx.admin.view.config';
+    const ALIAS_ADMIN_LIST_CONFIG = 'dgtx.admin.list.config';
+    const ALIAS_ADMIN_FORM_CONFIG = 'dgtx.admin.form.config';
 
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -48,9 +47,9 @@ class DigitixFrameworkExtension extends Extension
 
         // if have interface
         $container->registerForAutoconfiguration(AdminMenuConfigInterface::class)->addTag(self::ALIAS_ADMIN_MENU_CONFIG);
-        $container->registerForAutoconfiguration(ViewConfigInterface::class)->addTag(self::ALIAS_VIEW_CONFIG);
-        $container->registerForAutoconfiguration(FieldConfigInterface::class)->addTag(self::ALIAS_FIELD_CONFIG);
-        $container->registerForAutoconfiguration(EntityConfigInterface::class)->addTag(self::ALIAS_ENTITY_CONFIG);
+        $container->registerForAutoconfiguration(AdminViewConfigInterface::class)->addTag(self::ALIAS_ADMIN_VIEW_CONFIG);
+        $container->registerForAutoconfiguration(AdminFormConfigInterface::class)->addTag(self::ALIAS_ADMIN_FORM_CONFIG);
+        $container->registerForAutoconfiguration(AdminListConfigInterface::class)->addTag(self::ALIAS_ADMIN_LIST_CONFIG);
         $container->registerForAutoconfiguration(EntityRepository::class)->addTag('doctrine.repository_service');
 
         $container->register('digitix.route_loader', RouteLoader::class)
@@ -63,7 +62,7 @@ class DigitixFrameworkExtension extends Extension
             ->setArguments(['$params' => $config])
         ;
 
-        $container->register(self::ALIAS_VIEW_CONFIG, ViewConfig::class)
+        $container->register(self::ALIAS_ADMIN_VIEW_CONFIG, AdminViewConfig::class)
             ->setPublic(true)
             ->setArguments([
                 '$params' => $config,
@@ -71,7 +70,7 @@ class DigitixFrameworkExtension extends Extension
             ]
         );
 
-        $container->register(self::ALIAS_FIELD_CONFIG, FieldConfig::class)
+        $container->register(self::ALIAS_ADMIN_FORM_CONFIG, AdminFormConfig::class)
             ->setPublic(true)
             ->setArguments([
                 '$params' => $config,
@@ -79,7 +78,7 @@ class DigitixFrameworkExtension extends Extension
             ]
         );
 
-        $container->register(self::ALIAS_ENTITY_CONFIG, EntityConfig::class)
+        $container->register(self::ALIAS_ADMIN_LIST_CONFIG, AdminListConfig::class)
             ->setPublic(true)
             ->setArguments([
                 '$params' => $config,
@@ -128,9 +127,9 @@ class DigitixFrameworkExtension extends Extension
         $container->setAlias(AdminPerformanceController::class, new Alias('dgtx.admin.controller.performance'));
         $container->setAlias(AdminParameterController::class, new Alias('dgtx.admin.controller.parameter'));
         $container->setAlias(AdminMenuConfigInterface::class, new Alias(self::ALIAS_ADMIN_MENU_CONFIG));
-        $container->setAlias(ViewConfigInterface::class, new Alias(self::ALIAS_VIEW_CONFIG));
-        $container->setAlias(EntityConfigInterface::class, new Alias(self::ALIAS_ENTITY_CONFIG));
-        $container->setAlias(FieldConfigInterface::class, new Alias(self::ALIAS_FIELD_CONFIG));
+        $container->setAlias(AdminViewConfigInterface::class, new Alias(self::ALIAS_ADMIN_VIEW_CONFIG));
+        $container->setAlias(AdminListConfigInterface::class, new Alias(self::ALIAS_ADMIN_LIST_CONFIG));
+        $container->setAlias(AdminFormConfigInterface::class, new Alias(self::ALIAS_ADMIN_FORM_CONFIG));
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.php');

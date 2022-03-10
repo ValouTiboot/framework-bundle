@@ -2,20 +2,20 @@
 
 namespace Digitix\FrameworkBundle\Factory;
 
-use Digitix\FrameworkBundle\Config\EntityConfigInterface;
 use Digitix\FrameworkBundle\Sorter\SorterInterface;
 use Digitix\FrameworkBundle\Provider\ContextProvider;
+use Digitix\FrameworkBundle\Config\AdminListConfigInterface;
 
 class SorterFactory
 {
 	private $sorter;
 	private $context;
-	private $entityConfig;
+	private $adminListConfig;
 
-	public function __construct(ContextProvider $contextProvider, EntityConfigInterface $entityConfig, SorterInterface $sorter)
+	public function __construct(ContextProvider $contextProvider, AdminListConfigInterface $adminListConfig, SorterInterface $sorter)
 	{
 		$this->context = $contextProvider->getContext();
-		$this->entityConfig = $entityConfig;
+		$this->adminListConfig = $adminListConfig;
 		$this->sorter = $sorter;
 	}
 
@@ -23,7 +23,7 @@ class SorterFactory
 	{
 		$orderBy = '';
 		$orderWay = '';
-		$listFields = $this->entityConfig->getListFields();
+		$listFields = $this->adminListConfig->getListFields();
 
 		if ($listFields) {
 			foreach ($listFields as $fieldName => $value) {

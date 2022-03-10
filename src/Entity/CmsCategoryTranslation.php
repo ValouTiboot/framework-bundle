@@ -36,11 +36,6 @@ class CmsCategoryTranslation
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $metaKeywords;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
     private $rewrite;
 
     /**
@@ -97,18 +92,6 @@ class CmsCategoryTranslation
     public function setMetaDescription(?string $metaDescription): self
     {
         $this->metaDescription = $metaDescription;
-
-        return $this;
-    }
-
-    public function getMetaKeywords(): ?string
-    {
-        return $this->metaKeywords;
-    }
-
-    public function setMetaKeywords(?string $metaKeywords): self
-    {
-        $this->metaKeywords = $metaKeywords;
 
         return $this;
     }
