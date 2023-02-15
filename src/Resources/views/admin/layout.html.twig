@@ -12,7 +12,7 @@
     <title>DgtxAdmin - {% block seo_title %}{% endblock %}</title>
 
     {% block head_stylesheets %}
-	<link rel="stylesheet" href="{{ asset('bundles/digitixframework/assets/style.css') }}">
+	<link rel="stylesheet" href="{{ asset('bundles/digitixframework/css/theme.css') }}">
     {% endblock %}
 
     {% block configured_stylesheets %}
@@ -24,9 +24,7 @@
     {% endblock %}
 
     {% block head_javascript %}
-	<script src="{{ asset('bundles/digitixframework/assets/runtime.js') }}"></script>
-	<script src="{{ asset('bundles/digitixframework/assets/vendors~admin.js') }}"></script>
-	<script src="{{ asset('bundles/digitixframework/assets/admin.js') }}"></script>
+	<script src="{{ asset('bundles/digitixframework/assets/theme.js') }}"></script>
     {% endblock head_javascript %}
 
     {#
@@ -46,13 +44,15 @@
 		<nav class="nav-header">
 			<div class="w-100 row justify-content-between align-items-center">
 				<div class="col-auto">
-					<div class="logo"></div>
+					<a href="{{ path('dgtx_admin_entity_view', {entityName: 'dashboard'}) }}">
+						<div class="logo"></div>
+					</a>
 				</div>
 				<div class="col-auto">
 					<div class="row align-items-center justify-content-center">
 						<div class="col-auto">
 							<a class="nav-header-links d-flex align-items-center" href="{{ path('dgtx_admin_entity_edit', {entityName: 'user', entityId: app.user.id}) }}">
-								<i class="material-icons">account_circle</i> {{ app.user.firstname|capitalize }} {{ app.user.lastname|capitalize }}
+								<i class="material-icons me-1">account_circle</i> {{ app.user.firstname|capitalize }} {{ app.user.lastname|capitalize }}
 							</a>
 						</div>
 						<div class="col-auto">
@@ -109,10 +109,10 @@
 					<div class="row">
 						<div class="col">
 							{% block toolbar %}{% endblock %}
-							<div class="bg-white margin-b-60 padding-20 content-container">
-							{% block content%}
-								HTML HERE
-							{% endblock%}
+							<div class="bg-white mb-5 px-3 py-4">
+								{% block content%}
+									HTML HERE
+								{% endblock%}
 							</div>
 						</div>
 					</div>

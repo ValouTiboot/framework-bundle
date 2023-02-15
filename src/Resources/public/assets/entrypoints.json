@@ -2,15 +2,11 @@
   "entrypoints": {
     "admin": {
       "js": [
-        "/bundles/digitixframework/assets/runtime.js",
         "/bundles/digitixframework/assets/vendors~admin.js",
         "/bundles/digitixframework/assets/admin.js"
       ]
     },
     "style": {
-      "js": [
-        "/bundles/digitixframework/assets/runtime.js"
-      ],
       "css": [
         "/bundles/digitixframework/assets/style.css"
       ]

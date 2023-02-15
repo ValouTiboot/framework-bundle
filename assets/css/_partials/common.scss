@@ -1,33 +1,16 @@
 /*common*/
 
 .bg-white {background-color:$white;}
-.padding-20 {padding: 20px;}
-.padding-30 {padding: 30px;}
-.padding-40 {padding: 40px;}
-.margin-b-10 {margin-bottom: 10px;}
-.margin-b-20 {margin-bottom: 20px;}
-.margin-b-40 {margin-bottom: 40px;}
-.margin-b-60 {margin-bottom: 60px;}
-.margin-t-10 {margin-top: 10px;}
-.margin-t-20 {margin-top: 20px;}
-.margin-t-40 {margin-top: 40px;}
-.margin-t-60 {margin-top: 60px;}
-
-.alt-bg-primary {@extend .bg-primary}
-.alt-bg-success {@extend .bg-success}
-.alt-bg-info {@extend .bg-info}
-.alt-bg-warning {@extend .bg-warning}
-.alt-bg-danger {@extend .bg-danger}
 
 .t-bg-success {color:$bg-success-color;}
 .t-bg-info {color:$bg-info-color;}
 .t-bg-warning {color:$bg-warning-color;}
 .t-bg-danger {color:$bg-danger-color;}
 
-.t-success {color: $success-color;}
-.t-warning {color: $warning-color;}
-.t-info {color: $info-color;}
-.t-danger {color: $danger-color;}
+.t-success, .t-success:hover {color: $success;}
+.t-warning {color: $warning;}
+.t-info {color: $info;}
+.t-danger {color: $danger;}
 
 /* Rules for sizing the icon. */
 .material-icons.md-18 { font-size: 18px; }
@@ -43,14 +26,35 @@
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
 
+.btn:focus,
+a.page-link:focus {
+	box-shadow: none !important;
+}
+
 .cursor-p {cursor: pointer;}
 .hide {display: none;}
 .no-radius {border-radius: 0;}
-.btn {@extend .no-radius;}
 .alert {@extend .no-radius;}
 
+.btn {
+	@extend .no-radius;
+	align-items: center;
+	display: inline-flex;
+	i {
+		font-size: 21px;
+		margin-right: 4px;
+	}
+	&[class^=btn-outline] {
+		background-color: $white;
+	}
+}
+
 a {
+	text-decoration: none;
 	transition: ease all .2s;
+	&:hover {
+		color: $primary;
+	}
 }
 
 i.material-icons {
@@ -64,34 +68,42 @@ i.material-icons {
 		tr {
 			th {
 				padding: 0.3rem;
-				.form-control {
-					height: calc(1.5em + 0.4rem);
-			    padding: 0.2rem 0.5rem;
-			    font-size: 13px;
-			    line-height: 1;
-			    border-radius: 0;
-			    &::placeholder {
-			    	font-size:13px;
-			    }
-				}
 				.btn {
-					padding: 0.1rem 0.75rem;
     			font-size: 14px;
 				}
 			}
 			&:first-child {
 				th {
 					border-top: none;
-					color: $dark-blue;
-					font-weight: normal;
-					i.material-icons {
-						line-height:0.4;
-						&:hover, &.active_sort {color:$blue-t;}
+					.head {
+						span {font-weight: 600;}
+						.sorter {
+							a {
+								color: $gray-400;
+								display: flex;
+								opacity: 0;
+								width: 10px;
+								&:hover,
+								&.active {
+									color:$primary;
+									opacity: 1;
+								}
+								i.material-icons {
+									font-size: 16px;
+									line-height:0.4;
+								}
+							}
+						}
+					}
+					&:hover {
+						.sorter {
+							a {opacity: 1;}
+						}
 					}
 				}
 			}
 			&:nth-child(even) {
-				background-color: $font-light-grey;
+				background-color: rgba($gray-100, 0.5);
 			}
 		}
 	}
@@ -103,7 +115,11 @@ i.material-icons {
 				}
 			}
 			&:last-child {
-				border-bottom: 1px solid #dee2e6;
+				td {
+					background-color: transparent;
+					border-bottom: 1px solid $gray-300;
+					box-shadow: none;
+				}
 			}
 		}
 	}
@@ -111,19 +127,21 @@ i.material-icons {
 		tbody {
 			tr {
 				&:hover {
-					background-color:$tr-hover;
-					td.sortable-cell {
-						.sortable-item {display: inline-block;}
+					background-color: rgba($yellow, 0.05);
+					td {
+						box-shadow: none;
+						&.sortable-cell {
+							.sortable-item {display: inline-block;}
+						}
 					}
 				}
 				td {
-					padding: 0.4rem 0.75rem;
 					vertical-align: middle;
 					&.sortable-cell {
-						padding: 0.4rem 0.2rem;
+						padding: 0.75rem 0.2rem;
 						min-width: 29px;
 						.sortable-item {
-							color: #17a2b8;
+							color: $yellow;
 							cursor: pointer;
 							display: none;
 						}
@@ -149,28 +167,32 @@ i.material-icons {
 }
 
 form {
-	.form-group {
-		.form-control {
+		.form-control, .form-select {
 			@extend .no-radius;
+			&:focus {
+				border-color: $gray-200;
+				box-shadow: 0 0 0 1px rgba($yellow, 0.25);
+			}
+			&::placeholder {
+				color: $gray-400;
+				font-size:13px;
+			}
 		}
-		&.submit {
+		.submit {
 			justify-content: flex-end;
 		}
-	}
 }
 .dgtx-form {
 	position: relative;
-	.form-group {
-		.date-select {
-			.form-control {margin-right: 10px;}
-		}
-		&.submit {
-			border-top: 1px solid #eee;
-			justify-content: flex-end;
-			margin-bottom:0;
-			margin-top: 45px;
-			padding-top: 20px;
-		}
+	.date-select {
+		.form-control {margin-right: 10px;}
+	}
+	.submit {
+		border-top: 1px solid #eee;
+		justify-content: flex-end;
+		margin-bottom:0;
+		margin-top: 45px;
+		padding-top: 20px;
 	}
 	.form-return-link {
 		bottom:0;
@@ -181,7 +203,7 @@ form {
 
 .dgtx-switch {
 	align-items: center;
-	background:$grey;
+	background:$gray-100;
 	display: inline-flex;
 	height: 100%;
 	position: relative;
@@ -192,7 +214,7 @@ form {
 		input[type="radio"] {display: none;}
 		label {
 			align-items: center;
-			color: $grey4;
+			color: $gray-400;
 			cursor: pointer;
 			display: flex;
 			justify-content: center;
@@ -214,7 +236,7 @@ form {
 		z-index: 2;
 	}
 	&.dgtx-switch-yes::before {
-		@extend .bg-primary;
+		background-color: $primary;
 	}
 	&.dgtx-switch-no::before {
 		@extend .bg-danger;

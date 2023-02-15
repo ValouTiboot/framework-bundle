@@ -1,86 +1,78 @@
-var Encore = require('@symfony/webpack-encore');
+const webpack = require('webpack');
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-// Manually configure the runtime environment if not already configured yet by the "encore" command.
-// It's useful when you use tools that rely on webpack.config.js file.
-if (!Encore.isRuntimeEnvironmentConfigured()) {
-    Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
+let config = {
+  entry: {
+    theme: ['./js/admin.js', './css/style.scss'],
+  },
+  output: {
+    path: path.resolve(__dirname, '../src/Resources/public/assets'),
+    filename: '[name].js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js/,
+        loader: 'babel-loader',
+      },
+      {
+        test: /\.scss$/,
+        use:[
+            MiniCssExtractPlugin.loader,
+            'css-loader',
+            'postcss-loader',
+            'sass-loader',
+          ],
+      },
+      {
+        test: /.(png|woff(2)?|eot|otf|ttf|svg|gif)(\?[a-z0-9=\.]+)?$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '../css/[hash].[ext]',
+            },
+          },
+        ],
+      },
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, 'style-loader', 'css-loader', 'postcss-loader'],
+      },
+    ],
+  },
+  externals: {
+    $: '$',
+    // jquery: 'jQuery',
+  },
+  plugins: [
+    new MiniCssExtractPlugin({filename: path.join('..', 'css', '[name].css')}),
+  ]
+};
+
+if (process.env.NODE_ENV === 'production') {
+  config.optimization = {
+    minimizer: [
+      new UglifyJsPlugin({
+        sourceMap: false,
+        uglifyOptions: {
+          compress: {
+            sequences: true,
+            conditionals: true,
+            booleans: true,
+            if_return: true,
+            join_vars: true,
+            drop_console: true,
+          },
+          output: {
+            comments: false,
+          },
+        }
+      })
+    ]
+  }
 }
 
-Encore
-    // directory where compiled assets will be stored
-    .setOutputPath('../src/Resources/public/assets/')
-    // public path used by the web server to access the output path
-    .setPublicPath('/bundles/digitixframework/assets')
-    // only needed for CDN's or sub-directory deploy
-    .setManifestKeyPrefix('bundles/digitixframework/assets/')
-
-    /*
-     * ENTRY CONFIG
-     *
-     * Add 1 entry for each "page" of your app
-     * (including one that's included on every page - e.g. "app")
-     *
-     * Each entry will result in one JavaScript file (e.g. app.js)
-     * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
-     */
-    .addEntry('admin', './js/admin.js')
-    //.addEntry('page1', './assets/page1.js')
-    .addStyleEntry('style', './css/style.scss')
-
-    // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
-    .splitEntryChunks()
-
-    // will require an extra script tag for runtime.js
-    // but, you probably want this, unless you're building a single-page app
-    .enableSingleRuntimeChunk()
-
-    /*
-     * FEATURE CONFIG
-     *
-     * Enable & configure other features below. For a full
-     * list of features, see:
-     * https://symfony.com/doc/current/frontend.html#adding-more-features
-     */
-    .cleanupOutputBeforeBuild()
-    .enableBuildNotifications()
-    .enableSourceMaps(!Encore.isProduction())
-    // enables hashed filenames (e.g. app.abc123.css)
-    .enableVersioning(Encore.isProduction())
-
-    // enables @babel/preset-env polyfills
-    .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = 'usage';
-        config.corejs = 3;
-    })
-
-    // enables Sass/SCSS support
-    .enableSassLoader()
-
-    // uncomment if you use TypeScript
-    // .enableTypeScriptLoader()
-
-    // uncomment to get integrity="..." attributes on your script & link tags
-    // requires WebpackEncoreBundle 1.4 or higher
-    //.enableIntegrityHashes(Encore.isProduction())
-
-    // uncomment if you're having problems with a jQuery plugin
-    //.autoProvidejQuery()
-
-    // uncomment if you use API Platform Admin (composer require api-admin)
-    //.enableReactPreset()
-
-    .copyFiles({
-        from: './images',
-
-        // optional target path, relative to the output dir
-        to: 'images/[path][name].[ext]',
-
-        // if versioning is enabled, add the file hash too
-        //to: 'images/[path][name].[hash:8].[ext]',
-
-        // only copy files matching this pattern
-        //pattern: /\.(png|jpg|jpeg)$/
-    })
-;
-
-module.exports = Encore.getWebpackConfig();
+module.exports = config;

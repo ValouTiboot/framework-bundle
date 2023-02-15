@@ -8,19 +8,21 @@
 	> embarquer les themes au bunble - si theme classic
 	> faire un doc avec la procedure d'install et de config et l'utilisation du FRAMEWORK
 
-# backEnd #
-	> switch to debug
+# backOffice #
+	> revoir totalement les configs
+	> robots.txt in config
+	> regles d'opti apache
 	> menu section avec widget
-	> design revoir les boutons et mettre bootstrap 5 et viré les js inutiles
+	> faire l'export
+	> switch to debug
+	> force hhtps on controllerRequest si https ok
+	> force https administrable
 
-# Frontend #
+# FrontOffice #
 	> menu en widget
 	> add js via controller
-	> robots.txt in config
 
 # FRAMEWORK #
-	force hhtps on controllerRequest si https ok
-	force https administrable
 	form_themes not ok for front
 
 

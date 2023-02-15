@@ -25,6 +25,7 @@ use Digitix\FrameworkBundle\Controller\Admin\AdminLoginController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminParameterController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminPerformanceController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminTranslationController;
+use Digitix\FrameworkBundle\Factory\DigitixParameterFactory;
 
 class DigitixFrameworkExtension extends Extension
 {
@@ -32,6 +33,7 @@ class DigitixFrameworkExtension extends Extension
     const ALIAS_ADMIN_VIEW_CONFIG = 'dgtx.admin.view.config';
     const ALIAS_ADMIN_LIST_CONFIG = 'dgtx.admin.list.config';
     const ALIAS_ADMIN_FORM_CONFIG = 'dgtx.admin.form.config';
+    const ALIAS_DGTX_PARAMETER_FACTORY = 'dgtx.parameter.factory';
 
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -55,6 +57,14 @@ class DigitixFrameworkExtension extends Extension
         $container->register('digitix.route_loader', RouteLoader::class)
             ->setPublic(false)
             ->addTag('routing.loader')
+        ;
+
+        $container->register(self::ALIAS_DGTX_PARAMETER_FACTORY, DigitixParameterFactory::class)
+            ->setPublic(false)
+            ->setArguments([
+                '$params' => $config,
+                '$contextProvider' => new Reference(ContextProvider::class)
+            ])
         ;
 
         $container->register(self::ALIAS_ADMIN_MENU_CONFIG, AdminMenuConfig::class)
@@ -130,6 +140,8 @@ class DigitixFrameworkExtension extends Extension
         $container->setAlias(AdminViewConfigInterface::class, new Alias(self::ALIAS_ADMIN_VIEW_CONFIG));
         $container->setAlias(AdminListConfigInterface::class, new Alias(self::ALIAS_ADMIN_LIST_CONFIG));
         $container->setAlias(AdminFormConfigInterface::class, new Alias(self::ALIAS_ADMIN_FORM_CONFIG));
+
+        $container->setAlias(DigitixParameterFactory::class, new Alias(self::ALIAS_DGTX_PARAMETER_FACTORY));
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.php');

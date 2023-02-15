@@ -3,34 +3,33 @@
 namespace Digitix\FrameworkBundle\Helper;
 
 use Digitix\FrameworkBundle\Sorter\Sorter;
-use Digitix\FrameworkBundle\ORM\Paginator;
 use Digitix\FrameworkBundle\Helper\HelperList;
 
 interface HelperListInterface
 {
 	public function generateList();
 
-	public function setActions(array $actions): HelperList;
+	public function setParameters(array $digitixParameters): HelperList;
 
-	public function setTotal($total): HelperList;
+	public function setPaginator($paginator): HelperList;
 
-	public function setToolbar(array $toolbar): HelperList;
+	public function setFormFilters($filters): HelperList;
 
-	public function setHasCreate($hasCreate): HelperList;
+	public function setSorter($sorter): HelperList;
 
-	public function setHeaderLink($headerLink): HelperList;
+	public function getActions(): array;
 
-	public function setFieldsList($fieldsList): HelperList;
+	public function getListFields(): array;
 
-	public function setFilters($filters): HelperList;
+	public function getToolbar(): array;
 
-	public function setList($list): HelperList;
+	public function getHasCreate(): bool;
 
-	public function setPagination(Paginator $pagination): HelperList;
+	public function getHeaderLink(): array;
 
-	public function setSorter(Sorter $sorter): HelperList;
+	public function getTotal(): int;
 
 	public function getSorter(): Sorter;
 
-	public function setSortable(bool $sortable = false): HelperList;
+	public function isDraggable(): bool;
 }

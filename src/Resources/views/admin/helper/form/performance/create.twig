@@ -2,7 +2,7 @@
 {% form_theme form '@DigitixFramework/admin/_partials/form_theme.twig' %}
 
 {% block content_header %}
-<div class="content-header bg-white padding-30 margin-b-20">
+<div class="content-header bg-white">
 	<div class="d-flex align-items-center justify-content-between">
 		<div class="content-header-title">{{ controller_name }}</div>
 	</div>
@@ -43,10 +43,10 @@
 		{{ form_row(form.compileCss) }}
 		{{ form_row(form.compileJs) }}
 		{{ form_row(form.debug) }}
-		<div class="form-group row">
-			<label class="col-sm-2 text-right col-form-label"></label>
+		<div class="mb-3 row">
+			<label class="col-sm-2 text-end col-form-label"></label>
 			<div class="col-sm-9">
-				<a href="{{ path(app.request.get('_route'), {entityName: entity_name}) }}?cacheClear" class="btn btn-info">{{ 'form.default.delCache'|trans({}, 'Admin.Form.Default') }}</a>
+				<a href="{{ path(app.request.get('_route'), {entityName: entity_name}) }}?cacheClear" class="btn btn-success">{{ 'form.default.delCache'|trans({}, 'Admin.Form.Default') }}</a>
 			</div>
 		</div>
 

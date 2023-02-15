@@ -6,9 +6,11 @@ use Digitix\FrameworkBundle\Provider\ContextProvider;
 
 class Helper
 {
+	protected $context;
 	protected $entityName;
-	protected $tplVars = [];
+	protected $parameters = [];
 	protected $template;
+	protected $tplVars = [];
 
 	public function __construct(ContextProvider $context)
 	{
@@ -18,21 +20,32 @@ class Helper
 
 	public function generate()
 	{
-		return $this->context->getTwig()->render($this->template.'.twig', $this->tplVars);
+		return $this->context->getTwig()
+			->render(
+				$this->getTemplate().'.twig', $this->getTemplateVars()
+			)
+		;
 	}
 
-	public function setTplVars(array $tplVars = []): self
+	public function setTplVars(array $tplVars): self
 	{
 		$this->tplVars = $tplVars;
 		return $this;
 	}
 
-	public function setTemplate($template = null): self
+	public function getTemplateVars()
 	{
-		if (!is_null($template)) {
-			$this->template = $template;
+		return $this->tplVars;
+	}
+
+	public function getTemplate(): string
+	{
+		if (isset($this->parameters['template'])
+			&& $this->parameters['template'] !== null
+		) {
+			$this->template = $this->parameters['template'];
 		}
 
-		return $this;
+		return $this->template;
 	}
 }

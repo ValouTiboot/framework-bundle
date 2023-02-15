@@ -32,7 +32,9 @@ final class HelperFormFactory
 			->setForm($form)
 			->setTplVars($tplVars)
 			->setHasReturnLink($this->adminFormConfig->getHasReturnLink())
+			->setFormFields($fieldConfig->getFormFieldsConfig())
 			->setTemplate($this->adminFormConfig->getTemplateForm())
+			->setUploadFields($fieldConfig->getFilesName())
 		;
 	}
 

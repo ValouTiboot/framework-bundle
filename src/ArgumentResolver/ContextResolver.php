@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-/**
- * @author Javier Eguiluz <javier.eguiluz@gmail.com>
- */
 final class ContextResolver implements ArgumentValueResolverInterface
 {
     private $contextProvider;
@@ -20,12 +17,12 @@ final class ContextResolver implements ArgumentValueResolverInterface
         $this->contextProvider = $contextProvider;
     }
 
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         return Context::class === $argument->getType();
     }
 
-    public function resolve(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield $this->contextProvider->getContext();
     }

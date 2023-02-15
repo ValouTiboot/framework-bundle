@@ -11,7 +11,6 @@ use Doctrine\Persistence\ManagerRegistry;
 class EntityRepository extends ServiceEntityRepository
 {
 	private $context;
-	private $entityName;
 	private $entityFqcn;
 
 	public function __construct(ManagerRegistry $registry, ?ContextProvider $context = null, string $fqcn = null)

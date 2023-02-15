@@ -4,6 +4,7 @@ namespace Digitix\FrameworkBundle\Controller\Admin;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Digitix\FrameworkBundle\Controller\Controller;
+use Digitix\FrameworkBundle\Factory\DigitixParameterFactory;
 use Digitix\FrameworkBundle\Factory\FieldFactory;
 use Digitix\FrameworkBundle\Factory\HelperFormFactory;
 use Digitix\FrameworkBundle\Factory\HelperListFactory;
@@ -31,6 +32,7 @@ class AdminController extends Controller
             'dgtx.helper.list.factory' => '?'.HelperListFactory::class,
             'dgtx.helper.form.factory' => '?'.HelperFormFactory::class,
             'dgtx.field.factory' => '?'.FieldFactory::class,
+            'dgtx.parameter.factory' => '?'.DigitixParameterFactory::class,
         ] + parent::getSubscribedServices();
     }
 
@@ -52,7 +54,12 @@ class AdminController extends Controller
     public function read()
     {
         $tplVars = [];
-        $helperList = $this->get('dgtx.helper.list.factory')->build($tplVars);
+        $helperList = $this->get('dgtx.helper.list.factory')
+            ->build(
+                $this->get('dgtx.parameter.factory')->build()->getParameters(),
+                $tplVars
+            )
+        ;
 
         return $this->display($helperList->generateList());
     }
@@ -64,6 +71,8 @@ class AdminController extends Controller
      */
     public function create()
     {
+
+        dump($this->get('dgtx.parameter.factory')->build());
         $tplVars = [];
         $form = $this->get('dgtx.form.factory')->buildForm();
         $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
@@ -97,6 +106,7 @@ class AdminController extends Controller
      */
     public function edit()
     {
+        dump($this->get('dgtx.parameter.factory')->build()->getParameters());
         $tplVars = [];
         $form = $this->get('dgtx.form.factory')->buildForm();
         $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);

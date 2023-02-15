@@ -1,16 +1,15 @@
 /*Colors*/
 $main:#000000;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
 $white:#FFFFFF;
-$grey:#efefef;
-$grey1:#111111;
-$grey2:#222222;
-$grey3:#333333;
-$grey4:#444444;
-$grey5:#555555;
-$grey6:#666666;
-$grey7:#777777;
-$grey8:#888888;
-$grey-border:#ced4da;
 $yellow:#ffd900;
 
 $dark-blue:#1e3253;
@@ -29,13 +28,10 @@ $bg-warning-color:#fff3cd;
 $bg-danger-color:#f8d7da;
 $bg-info-color:#d1ecf1;
 
-$primary-color:#004085;
-$success-color:#155724;
-$warning-color:#856404;
-$danger-color:#721c24;
-$info-color:#0c5460;
-
-$tr-hover:#fafbfc;
+$primary:#004085;
+$secondary: $yellow;
+$info:#0c5460;
+$light: $gray-200;
 
 /*Fonts*/
 $font-ico:'Material Icons';

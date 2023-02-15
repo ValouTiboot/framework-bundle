@@ -23,7 +23,10 @@ final class FilterFactory
 		'text' => TextFilter::class,
 	];
 
-	public function __construct(AdminListConfigInterface $adminListConfig, ContextProvider $contextProvider)
+	public function __construct(
+		AdminListConfigInterface $adminListConfig,
+		ContextProvider $contextProvider
+	)
 	{
 		$this->context = $contextProvider->getContext();
 		$this->filters = $adminListConfig->getFiltersFields();

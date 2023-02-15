@@ -55,7 +55,10 @@ final class FormFactory
             'allow_file_upload' => true,
         ];
 
-        if (is_null($data) && !is_null($this->context->getEntity()) && is_object($this->context->getEntity()->getInstance())) {
+        if (is_null($data)
+			&& !is_null($this->context->getEntity())
+			&& is_object($this->context->getEntity()->getInstance())
+		) {
         	$data = $this->context->getEntity()->getInstance();
 		}
 

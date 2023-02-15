@@ -29,3 +29,6 @@
         assets:
             # json_manifest_path: '%kernel.project_dir%/public/build/manifest.json'
     ```
+
+    translation.yaml > change locale to fr_FR
+    

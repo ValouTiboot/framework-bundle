@@ -9,23 +9,23 @@
 				{% endif %}
 				{% for field in list_fields %}
 				<th scope="col" width="{% if field.name == 'id' %}4%{% elseif field.name == 'dateAdd' %}10%{% elseif field.type == 'sortable' %}2%{% elseif field.name == 'active' %}4%{% else %}auto{% endif %}">
-					<div class="d-flex align-items-end {% if field.type == 'bool' %}justify-content-center{% endif %}">
-						{% if field.sort is defined %}
-						<div>
-							<a href="{{ sorter.generateLink(field.name, 'asc') }}" class="d-flex">
-								<i class="material-icons {% if sorter.orderBy == field.name and sorter.orderWay == 'asc' %}active_sort{% endif %}">arrow_drop_up</i>
-							</a>
-							<a href="{{ sorter.generateLink(field.name, 'desc') }}" class="d-flex">
-								<i class="material-icons {% if sorter.orderBy == field.name and sorter.orderWay == 'desc' %}active_sort{% endif %}">arrow_drop_down</i>
-							</a>
-						</div>
-						{% endif %}
+					<div class="head d-flex align-items-center">
 						<span>{{ field.label|trans({}, 'Admin.Fields.Label') }}</span>
+						{% if field.sort is defined %}
+							<div class="sorter ms-1 d-flex">
+								<a href="{{ sorter.generateLink(field.name, 'asc') }}" class="{% if sorter.orderBy == field.name and sorter.orderWay == 'asc' %}active{% endif %}">
+									<i class="material-icons">expand_less</i>
+								</a>
+								<a href="{{ sorter.generateLink(field.name, 'desc') }}" class="{% if sorter.orderBy == field.name and sorter.orderWay == 'desc' %}active{% endif %}">
+									<i class="material-icons">expand_more</i>
+								</a>
+							</div>
+						{% endif %}
 					</div>
 				</th>
 				{% endfor %}
 
-				<th scope="col" class="text-right" width="8%">{{ 'list.default.actions'|trans({}, 'Admin.List.Default') }}</th>
+				<th scope="col" class="text-end" width="8%">{{ 'list.default.actions'|trans({}, 'Admin.List.Default') }}</th>
 			</tr>
 			{% endblock %}
 			{% block filters %}
@@ -44,8 +44,8 @@
 							<th></th>
 						{% endif %}
 					{% endfor %}
-					<th class="text-right">
-						<button type="submit" class="btn btn-primary">{{ 'list.default.filter'|trans({}, 'Admin.List.Default') }}</button>
+					<th class="text-end">
+						<button type="submit" class="btn btn-outline-primary">{{ 'list.default.filter'|trans({}, 'Admin.List.Default') }}</button>
 					</th>
 				</tr>
 				{% endif %}
@@ -91,7 +91,7 @@
 					{% endif %}
 
 				{% endfor %}
-				<td class="text-right">
+				<td class="text-end">
 					{% for action in actions %}
 					<a class="item-{{ action }}" href="{{ path('dgtx_admin_entity_'~action, {entityName: entity_name, entityId: entity.id}) }}">
 						<i class="material-icons">{{ action }}</i>

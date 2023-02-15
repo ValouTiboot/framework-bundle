@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class Paginator
 {
 	private $queryBuilder;
-	private $itemPerPage = 50;
+	private $itemPerPage = 30;
 	private $currentPage = 1;
 	private $total = 0;
 	private $results;
@@ -91,13 +91,22 @@ class Paginator
 		return $this->generatePageLink($pageNumber);
 	}
 
-	public function generatePageLink($pageNumber)
+	public function generatePageLink($pageNumber, array $routeParams = [])
 	{
 		$route = $this->context->getRequest()->attributes->get('_route');
 		$params = $this->context->getRequest()->query->all();
-		$route_query = array_merge($params, ['entityName' => strtolower($this->context->getEntityName()), 'page' => $pageNumber]);
 
-		return $this->urlGenerator->generate($route, $route_query, UrlGeneratorInterface::ABSOLUTE_URL);
+		if (!count($routeParams)) {
+			if ($this->context->getEntityName() != '') {
+				$routeParams = [
+					'entityName' => lcfirst($this->context->getEntityName())
+				];
+			}
+		}
+
+		$routeQuery = array_merge($params, $routeParams, ['page' => $pageNumber]);
+
+		return $this->urlGenerator->generate($route, $routeQuery, UrlGeneratorInterface::ABSOLUTE_URL);
 	}
 
 	public function setQueryBuilder(QueryBuilder $queryBuilder): self

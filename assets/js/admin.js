@@ -9,14 +9,13 @@
 // import './css/style.scss';
 
 import $ from "jquery";
-import 'bootstrap/dist/js/bootstrap.min';
+require('bootstrap');
+// import 'bootstrap/dist/js/bootstrap.min';
 import 'jquery-ui/ui/widgets/sortable';
 import Tagify from '@yaireo/tagify';
-// import '@yaireo/tagify/dist/tagify.min';
-// import '@yaireo/tagify/dist/jQuery.tagify.min';
 
 // Import TinyMCE
-import 'tinymce/tinymce.min';
+import tinymce from 'tinymce';
 // Default icons are required for TinyMCE 5.3 or above
 import 'tinymce/icons/default/icons.min';
 // A theme is also required
@@ -69,7 +68,7 @@ $(document).ready(function(){
 	$('.menu-items a[href^="#"]').click(function(e){
 		e.preventDefault();
 		$('.menu-items a[href^="#"]').removeClass('expand').parent().find('.sub-menu').slideUp('fast');
-		
+
 		if ($(this).parent().find('.sub-menu').is(':visible'))
 			$(this).removeClass('expand').parent().find('.sub-menu').slideUp('fast');
 		else
@@ -84,7 +83,7 @@ $(document).ready(function(){
 		});
 	});
 
-	// DGTX-switch 
+	// DGTX-switch
 	$('.dgtx-switch').each(function(){
 		var check = $('input[type="radio"]:checked', $(this));
 
@@ -98,9 +97,9 @@ $(document).ready(function(){
 	});
 
 	$('.dgtx-switch label').on('click', function(){
-		
+
 		var parent = $(this).parent().parent();
-		
+
 		$('label', parent).removeClass('checked');
 		$(this).addClass('checked');
 
@@ -138,7 +137,7 @@ $(document).ready(function(){
 		}
 	});
 
-	// copyright 
+	// copyright
 	$(window).on('scroll', showfooter);
 	showfooter();
 
@@ -213,8 +212,8 @@ $(document).ready(function(){
 		noneditable_noneditable_class: 'mceNonEditable',
 		toolbar_mode: 'sliding',
 		contextmenu: 'link image imagetools table',
-		skin: 'oxide',
-		content_css: 'default',
+		skin: false,
+		content_css: false,
 		// content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
 	});
 
@@ -224,11 +223,11 @@ $(document).ready(function(){
 function toRewriteUrl(str) {
   var encodedUrl = str.toString().toLowerCase(); // make the url lowercase
   encodedUrl = encodedUrl.split(/\&+/).join("-and-"); // replace & with and
-  encodedUrl = encodedUrl.split(/[^a-z0-9]/).join("-"); // remove invalid characters 
-  encodedUrl = encodedUrl.split(/-+/).join("-"); // remove duplicates 
-  encodedUrl = encodedUrl.trim('-'); // trim leading & trailing characters 
+  encodedUrl = encodedUrl.split(/[^a-z0-9]/).join("-"); // remove invalid characters
+  encodedUrl = encodedUrl.split(/-+/).join("-"); // remove duplicates
+  encodedUrl = encodedUrl.trim('-'); // trim leading & trailing characters
 
-  return encodedUrl; 
+  return encodedUrl;
 }
 
 function showfooter() {

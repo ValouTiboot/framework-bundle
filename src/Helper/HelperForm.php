@@ -29,7 +29,7 @@ class HelperForm extends Helper implements HelperFormInterface
 		return $this->generate();
 	}
 
-	public function setForm(FormInterface $form): self
+	public function setForm(FormInterface $form): HelperForm
 	{
 		$this->form = $form->createView();
 		return $this;
@@ -41,7 +41,7 @@ class HelperForm extends Helper implements HelperFormInterface
 		return $this;
 	}
 
-	public function setForms(array $forms): self
+	public function setForms(array $forms): HelperForm
 	{
 		foreach ($forms as  $key => $form) {
 			$this->forms[$key] = $form->createView();

@@ -1,13 +1,14 @@
 <?php
 
 return array (
-  'list' => 
+  'list' =>
   array (
-    'default' => 
+    'default' =>
     array (
       'actions' => 'Actions',
       'filter' => 'Filtrer',
       'add' => 'Ajouter',
+      'total' => 'Total',
     ),
   ),
 );

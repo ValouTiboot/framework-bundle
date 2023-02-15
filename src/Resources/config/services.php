@@ -128,8 +128,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('dgtx.sorter.factory', SorterFactory::class)
             ->arg(0, new Reference(ContextProvider::class))
-            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_LIST_CONFIG))
-            ->arg(2, new Reference(SorterInterface::class))
+            ->arg(1, new Reference(SorterInterface::class))
             ->public()
 
         ->set('dgtx.sorter', Sorter::class)
@@ -143,6 +142,11 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_LIST_CONFIG))
             ->arg(1, new Reference(ContextProvider::class))
             ->public()
+
+        ->set('dgtx.filter.form.factory', FilterFormFactory::class)
+            ->arg(0, new Reference(ContextProvider::class))
+            ->arg(3, new Reference(FormFactoryInterface::class))
+        ->alias(FilterFormFactory::class, 'dgtx.filter.form.factory')
 
         ->set('dgtx.form.factory', FormFactory::class)
             ->arg(0, new Reference(ContextProvider::class))
@@ -158,19 +162,16 @@ return static function (ContainerConfigurator $container) {
 
         ->set('dgtx.paginator.factory', PaginatorFactory::class)
             ->arg(0, new Reference(ContextProvider::class))
-            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_LIST_CONFIG))
-            ->arg(2, new Reference('dgtx.entity.repository'))
-            ->arg(3, new Reference('dgtx.search.factory'))
-            ->arg(4, new Reference('dgtx.sorter.factory'))
-            ->arg(5, new Reference('router.default'))
+            ->arg(1, new Reference('dgtx.entity.repository'))
+            ->arg(2, new Reference('dgtx.search.factory'))
+            ->arg(4, new Reference('router.default'))
             ->public()
 
         ->set('dgtx.helper.list.factory', HelperListFactory::class)
-            ->arg(0, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_LIST_CONFIG))
-            ->arg(1, new Reference('dgtx.form.factory'))
-            ->arg(2, new Reference('dgtx.helper.list'))
-            ->arg(3, new Reference('dgtx.paginator.factory'))
-            ->arg(4, new Reference('dgtx.sorter.factory'))
+            ->arg(0, new Reference('dgtx.form.factory'))
+            ->arg(1, new Reference('dgtx.helper.list'))
+            ->arg(2, new Reference('dgtx.paginator.factory'))
+            ->arg(3, new Reference('dgtx.sorter.factory'))
         ->alias(HelperListFactory::class, 'dgtx.helper.list.factory')
 
         ->set('dgtx.helper.list', HelperList::class)
