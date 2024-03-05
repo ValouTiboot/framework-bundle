@@ -18,7 +18,6 @@
 
 # backOffice #
 	> revoir totalement les configs
-	> robots.txt in config
 	> regles d'opti apache
 	> menu section avec widget
 	> faire l'export

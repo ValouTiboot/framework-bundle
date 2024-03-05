@@ -45,7 +45,7 @@ let config = {
   },
   externals: {
     $: '$',
-    jquery: 'jQuery',
+    // jquery: 'jQuery',
   },
   plugins: [
     new MiniCssExtractPlugin({filename: path.join('..', 'css', '[name].css')}),
