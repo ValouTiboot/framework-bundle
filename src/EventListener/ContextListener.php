@@ -8,7 +8,6 @@ use Digitix\FrameworkBundle\Entity\Configuration;
 use Digitix\FrameworkBundle\Factory\ContextFactory;
 use Digitix\FrameworkBundle\Factory\EntityFactory;
 use Digitix\FrameworkBundle\Provider\EntityRepositoryProvider;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -18,8 +17,11 @@ class ContextListener
     private $entityFactory;
     private $entityRepository;
 
-	public function __construct(ContextFactory $contextFactory, EntityFactory $entityFactory, EntityRepositoryProvider $entityRepository)
-	{
+	public function __construct(
+        ContextFactory $contextFactory,
+        EntityFactory $entityFactory,
+        EntityRepositoryProvider $entityRepository
+    ) {
 		$this->contextFactory = $contextFactory;
         $this->entityFactory = $entityFactory;
         $this->entityRepository = $entityRepository;
@@ -31,7 +33,7 @@ class ContextListener
 	 */
 	public function onKernelController(ControllerEvent $event) : void
     {
-        $currentControllerInstance = $this->getCurrentControllerInstance($event);
+        $controllerInstance = $this->getCurrentControllerInstance($event);
         $routeParams = $event->getRequest()->attributes->get('_route_params');
 
         $entityName = isset($routeParams['entityName']) ? $routeParams['entityName'] : null;
@@ -41,8 +43,8 @@ class ContextListener
         $language = $languageRepository->findOneBy(['defaultLanguage' => 1]);
         $event->getRequest()->setLocale($language->getLocale());
 
-        $configurationRepository = $this->entityRepository->getRepository(Configuration::class);
-        $congigurations = $configurationRepository->findAll();
+        $configRepository = $this->entityRepository->getRepository(Configuration::class);
+        $congigurations = $configRepository->findAll();
         $_globals = new ArrayCollection();
 
         foreach ($congigurations as $congiguration) {
@@ -55,13 +57,13 @@ class ContextListener
             $context
                 ->setEntityName($entityName)
                 ->setRequest($event->getRequest())
-                ->setController($currentControllerInstance)
+                ->setController($controllerInstance)
                 ->setLanguage($language)
                 ->setConfiguration($_globals)
             ;
 
-            if (is_object($currentControllerInstance) && method_exists($currentControllerInstance, 'setContext')) {
-                $currentControllerInstance->setContext($context);
+            if (is_object($controllerInstance) && method_exists($controllerInstance, 'setContext')) {
+                $controllerInstance->setContext($context);
             }
 
         	$this->setContext($event, $context);

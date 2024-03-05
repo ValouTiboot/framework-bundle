@@ -48,11 +48,6 @@ class CmsTranslation
      */
     private $rewrite;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getTranslatable(): ?Cms
     {
         return $this->translatable;

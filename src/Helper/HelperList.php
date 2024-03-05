@@ -13,21 +13,23 @@ class HelperList extends Helper implements HelperListInterface
 	private $filters;
 	private $paginator;
 	private $sorter;
-	private $defaultActions = ['view', 'edit', 'delete'];
+	private $defaultActions = ['view', 'view_entity', 'edit', 'delete'];
 	private $defaultToolbar = ['add','backup'];
 	protected $template = '@DigitixFramework/admin/helper/list/list';
 
 	public function generateList()
 	{
-		$this->setTemplateVars();
-		return $this->generate();
+		return $this
+			->setTemplateVars()
+			->generate()
+		;
 	}
 
 	public function setTemplateVars()
 	{
     	$vars = [
-            'controller_name' => $this->entityName,
-            'entity_name' => ToolString::camelToNurl($this->entityName),
+            'controllerName' => $this->entityName,
+            'entityName' => ToolString::camelToNurl($this->entityName),
             'entities' => $this->paginator->getResults(),
             'sorter' => $this->getSorter(),
             'actions' => $this->getActions(),

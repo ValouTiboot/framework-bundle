@@ -43,11 +43,6 @@ class CmsCategoryTranslation
      */
     private $name;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getTranslatable(): ?CmsCategory
     {
         return $this->translatable;

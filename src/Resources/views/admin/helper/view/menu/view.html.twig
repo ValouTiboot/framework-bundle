@@ -1,0 +1,300 @@
+{% extends '@DigitixFramework/admin/helper/view/view.html.twig' %}
+
+{% block content_header %}
+<div class="content-header bg-white padding-30 margin-b-20">
+	<div class="d-flex align-items-center justify-content-between">
+		<div class="content-header-title">{{ controllerName }} : {{ menuEntity.name }}</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="menu-container" class="row">
+    <div class="col-3">
+        <div class="bg-white padding-20">
+            {% for key, page in pages %}
+            <div class="page-container">
+                <div class="d-flex justify-content-between align-items-center page-container-title">
+                    <span>{{ key }}</span>
+                    <i class="material-icons">add</i>
+                </div>
+                <div class="page-list">
+                {% for pageName, pageData in page %}
+                    <div class="page-item draggable" data-item-id="0" data-level="0">
+                        <div class="page-item-title">
+                            <span>{{ pageData.label }} <strong></strong></span>
+                            <div>
+                                <i class="collapse-btn material-icons me-2">add</i>
+                                <i class="delete-btn material-icons">delete</i>
+                            </div>
+                        </div>
+                        <div class="page-item-fields">
+                            <input type="hidden" name="menu_item[0][itemId]" value="0" />
+                            <input type="hidden" name="menu_item[0][depth]" value="0" />
+                            <input type="hidden" name="menu_item[0][idParent]" value="0" />
+                            <input type="hidden" name="menu_item[0][label]" value="{{ pageData.label }}" />
+                            {% if key != 'link' %}
+                            <input type="hidden" name="menu_item[0][link]" value="" />
+                            {% endif %}
+                            <input type="hidden" name="menu_item[0][route]" value="{{ pageData.route }}" />
+                            {% if pageData.idEntity is defined %}
+                                <input type="hidden" name="menu_item[0][idEntity]" value="{{ pageData.idEntity }}" />
+                            {% else %}
+                                <input type="hidden" name="menu_item[0][idEntity]" value="0" />
+                            {% endif %}
+                            <div class="form-group">
+                                <label class="col-form-label">Title</label>
+                                <input class="form-control" type="text" name="menu_item[0][name]" value="" />
+                            </div>
+                            {% if key == 'link' %}
+                            <div class="form-group">
+                                <label class="col-form-label">Lien</label>
+                                <input class="form-control" type="text" name="menu_item[0][link]" value="" />
+                            </div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label class="col-form-label">Class CSS</label>
+                                <input class="form-control" type="text" name="menu_item[0][class]" value="" />
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-9">
+        <div class="bg-white padding-20">
+            <form id="menu-form" action="" method="post" enctype="multipart/form-data">
+                <div id="menu-tree">
+                    {% for menuItem in menuEntity.menuItems %}
+                        <div class="page-item" data-item-id="{{ menuItem.id }}" data-level="{{ menuItem.depth }}" style="margin-left: {{ menuItem.depth * 40}}px;">
+                            <div class="page-item-title">
+                                <span>{{ menuItem.label }} : <strong>{{ menuItem.name }}</strong></span>
+                                <div>
+                                    <i class="collapse-btn material-icons me-2">add</i>
+                                    <i class="delete-btn material-icons">delete</i>
+                                </div>
+                            </div>
+                            <div class="page-item-fields">
+                                <input type="hidden" name="menu_item[{{ menuItem.id }}][itemId]" value="{{ menuItem.id }}" />
+                                <input type="hidden" name="menu_item[{{ menuItem.id }}][depth]" value="{{ menuItem.depth }}" />
+                                <input type="hidden" name="menu_item[{{ menuItem.id }}][label]" value="{{ menuItem.label }}" />
+
+                                {% if menuItem.parent is not null %}
+                                    <input type="hidden" name="menu_item[{{ menuItem.id }}][idParent]" value="{{ menuItem.parent.id }}" />
+                                {% else %}
+                                    <input type="hidden" name="menu_item[{{ menuItem.id }}][idParent]" value="0" />
+                                {% endif %}
+
+                                {% if menuItem.link == '' %}
+                                <input type="hidden" name="menu_item[{{ menuItem.id }}][link]" value="" />
+                                {% endif %}
+
+                                <input type="hidden" name="menu_item[{{ menuItem.id }}][route]" value="{{ menuItem.route }}" />
+
+                                {% if menuItem.idEntity is defined %}
+                                    <input type="hidden" name="menu_item[{{ menuItem.id }}][idEntity]" value="{{ menuItem.idEntity }}" />
+                                {% else %}
+                                    <input type="hidden" name="menu_item[{{ menuItem.id }}][idEntity]" value="0" />
+                                {% endif %}
+
+                                <div class="form-group">
+                                    <label class="col-form-label">Title</label>
+                                    <input class="form-control" type="text" name="menu_item[{{ menuItem.id }}][name]" value="{{ menuItem.name }}" />
+                                </div>
+
+                                {% if menuItem.link != '' %}
+                                <div class="form-group">
+                                    <label class="col-form-label">Lien</label>
+                                    <input class="form-control" type="text" name="menu_item[{{ menuItem.id }}][link]" value="{{ menuItem.link }}" />
+                                </div>
+                                {% endif %}
+
+                                <div class="form-group">
+                                    <label class="col-form-label">Class CSS</label>
+                                    <input class="form-control" type="text" name="menu_item[{{ menuItem.id }}][class]" value="{{ menuItem.class }}" />
+                                </div>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                </div>
+                <div class="buttons d-flex justify-content-between align-items-center mt-2">
+                    <button type="submit" class="delete-all-btn btn-light btn">{{ 'form.default.reinit'|trans({}, 'Admin.Form.Default') }}</button>
+                    <button type="submit" class="btn-primary btn">{{ 'form.default.save'|trans({}, 'Admin.Form.Default') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var leftOffset = 40;
+
+    $(document).ready(function(){
+        $('.page-container-title').on('click', function(){
+            if ($(this).next().is(':visible')) {
+                $(this).next().slideUp('fast');
+                $('i', $(this)).removeClass('open');
+            } else {
+                $(this).next().slideDown('fast');
+                $('i', $(this)).addClass('open');
+            }
+        });
+
+        $('body').on('click', '#menu-tree .page-item i.collapse-btn', function(){
+            if ($(this).parent().parent().next().is(':visible')) {
+                $(this).parent().parent().next().slideUp('fast');
+                $(this).removeClass('open');
+            } else {
+                $(this).parent().parent().next().slideDown('fast');
+                $(this).addClass('open');
+            }
+        });
+
+        $("#menu-tree").sortable({
+            //cursor: "move",
+            grid: [ 40, 1 ],
+            scroll: true,
+            //revert: true,
+            placeholder: "portlet-placeholder ui-corner-all",
+            sort : function(event, ui){
+                indentPortlet(event, ui);
+            },
+            stop: function(event, ui){
+                indentFirst();
+                indentCheck();
+                updateList();
+            },
+            update: function(event, ui) {
+                // updateList();
+            }
+        });
+
+        $(".draggable").draggable({
+            connectToSortable: '#menu-tree',
+            helper: 'clone',
+            revert: 'invalid',
+            grid: [ 40, 1 ],
+            scroll: true,
+            drag: function(e, ui) {
+                indentPortlet(e, ui);
+            },
+        });
+
+        $('body').on('click', 'i.delete-btn', function(){
+            if (confirm('Supprimer ce lien ?')) {
+                delPortlet($(this));
+            }
+        });
+
+        $('.delete-all-btn').on('click', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            if (confirm('Supprimer tous les liens ?')) {
+                delAll();
+            }
+        });
+
+        $(document).on('keyup change', '#menu-tree .page-item input[name*=name]', function(){
+            $(this).parents('.page-item').find('.page-item-title strong').html($(this).val());
+        });
+    });
+
+    function indentFirst() {
+        $('#menu-tree .page-item:first')
+            .css({marginLeft: 0})
+            .attr('data-level', 0)
+            .find('[name*=depth]')
+            .val(0)
+        ;
+    }
+
+    function indentPortlet(e, ui) {
+        if (e.type == 'drag') {
+            item = ui.helper[0];
+        } else {
+            item = ui.item[0];
+        }
+
+        offsetReceive = $('#menu-tree').offset();
+        currentLeftOffset = ui.offset.left - (offsetReceive.left - 15);
+
+        level = parseInt(currentLeftOffset / leftOffset);
+
+        $(item, '.portlet-placeholder')
+            .css({marginLeft: level*leftOffset})
+            .attr('data-level', level)
+            .find('[name*=depth]')
+            .val(level)
+        ;
+    }
+
+    function indentCheck() {
+        $('#menu-tree .page-item').each(function(){
+            var currentLevel = parseInt($(this).data('level'));
+            var prevLevel = parseInt($(this).prev().data('level'));
+
+            if (currentLevel == 0) {
+                return;
+            }
+
+            if (prevLevel < currentLevel && currentLevel > prevLevel+1  ) {
+                let newLevel = prevLevel+1;
+                $(this)
+                    .css({marginLeft: newLevel*leftOffset})
+                    .attr('data-level', newLevel)
+                    .find('[name*=depth]')
+                    .val(newLevel)
+                ;
+            }
+        });
+    }
+
+    function updateList() {
+        item = $('#menu-tree .page-item');
+        ids = {};
+
+        for (var i = 0; i < item.length; i++) {
+            itemId = i+1;
+
+            $(item[i]).attr('data-item-id', itemId);
+            $('input[name*=itemId]', item[i]).val(itemId);
+
+            $('input', item[i]).each(function(){
+                var name = $(this).attr('name');
+                name = name.replace(/([0-9]+)/, itemId);
+                $(this).attr('name', name);
+            });
+
+            for (j = 0; j < 10; j++) {
+                if ($(item[i]).data('level') == j) {
+                    ids[j] = itemId;
+                    item_parent = j-1;
+
+                    if ($(item[i]).data('level') > 0) {
+                        $('input[name*=idParent]', item[i]).val(ids[item_parent]);
+                    } else {
+                        $('input[name*=idParent]', item[i]).val(0);
+                    }
+                }
+            }
+        }
+    }
+
+    function delAll() {
+        $('#menu-tree .page-item').remove();
+    }
+
+    function delPortlet(s) {
+        $(s).parent().parent().parent().remove();
+        indentCheck();
+        updateList();
+
+        return;
+    }
+</script>
+{% endblock %}

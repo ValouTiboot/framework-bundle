@@ -1,0 +1,4 @@
+*.lock
+assets/node_modules
+assets/yarn-error.log
+vendor/

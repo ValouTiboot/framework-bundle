@@ -1,3 +1,11 @@
+# TODO #
+	revoir le systeme de digitixParameters avec un iterable countable avec des has et get
+	virer les adminconfig|fieldconfig etc...
+	revoir l'entity presenter et le context
+	faire un vrai buildFilterForm
+	revoir les style des traductions
+	revoir les templates de l'admin include|extends|layout
+
 # BUNDLE #
 	> fichiers de config
 		- builds dans webpack_encore.yaml pacakge apporteurImmo: '%kernel.project_dir%/public/themes/apporteurimmo/assets'

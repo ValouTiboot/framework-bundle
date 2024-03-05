@@ -36,7 +36,10 @@ final class EntityFactory
 			$entityFqcn = $this->entityPresenter->getFqcn();
 
 			if ($this->entityPresenter->getPrimaryKeyValue() !== null) {
-				$entityInstance = $this->repositoryProvider->getRepository($this->entityPresenter->getFqcn())->find($this->entityPresenter->getPrimaryKeyValue());
+				$entityInstance = $this->repositoryProvider
+					->getRepository($this->entityPresenter->getFqcn())
+					->find($this->entityPresenter->getPrimaryKeyValue())
+				;
 			} else {
 				$entityInstance = new $entityFqcn;
 			}
@@ -44,9 +47,18 @@ final class EntityFactory
 			$entityInstance = new Magic();
 		}
 
-		if (property_exists($entityInstance, 'translations') && $this->entityPresenter->getPrimaryKeyValue() === null) {
-			$languages = $this->repositoryProvider->getRepository('Digitix\\FrameworkBundle\\Entity\\Language')->findBy(['active' => 1], ['defaultLanguage' => 'ASC']);
+		if (is_object($entityInstance)
+			&& property_exists($entityInstance, 'translations')
+			&& $this->entityPresenter->getPrimaryKeyValue() === null
+		) {
 			$fqcnTranslation = $this->entityPresenter->getFqcn().'Translation';
+			$languages = $this->repositoryProvider
+				->getRepository('Digitix\\FrameworkBundle\\Entity\\Language')
+				->findBy(
+					['active' => 1],
+					['defaultLanguage' => 'ASC']
+				)
+			;
 
 			foreach ($languages as $language) {
 				$entityTranslation = new $fqcnTranslation();

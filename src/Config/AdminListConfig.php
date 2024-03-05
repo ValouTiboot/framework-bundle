@@ -7,16 +7,12 @@ use Digitix\FrameworkBundle\Config\AdminListConfigInterface;
 
 class AdminListConfig implements AdminListConfigInterface
 {
-	private $context;
-	private $entityName;
 	private $configuration;
 	private $_list = [];
 
 	public function __construct(array $params, ContextProvider $context)
 	{
-		$this->context = $context->getContext();
-		$this->entityName = $this->context->getEntityName();
-		$this->configuration = $params['admin_entities'][$this->entityName];
+		$this->configuration = $params['admin_entities'][(string) $context->getContext()->getEntityName()];
 
 		if (isset($this->configuration['list']) && count($this->configuration['list'])) {
 			$this->_list = $this->configuration['list'];

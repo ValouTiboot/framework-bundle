@@ -9,38 +9,25 @@ use Digitix\FrameworkBundle\Config\AdminFormConfigInterface;
 final class HelperFormFactory
 {
 	private $helperForm;
-	private $adminFormConfig;
-	private $fieldFactory;
-	private $formFactory;
 
-	public function __construct(
-		HelperFormInterface $helperForm,
-		AdminFormConfigInterface $adminFormConfig,
-		FieldFactory $fieldFactory,
-		FormFactory $formFactory
-	)
+	public function __construct(HelperFormInterface $helperForm)
 	{
 		$this->helperForm = $helperForm;
-		$this->adminFormConfig = $adminFormConfig;
-		$this->fieldFactory = $fieldFactory;
-		$this->formFactory = $formFactory;
 	}
 
-	public function build(FormInterface $form, array $tplVars)
+	public function build(array $digitixParameters, FormInterface $form, array $tplVars)
 	{
 		return $this->helperForm
+			->setParameters($digitixParameters)
 			->setForm($form)
 			->setTplVars($tplVars)
-			->setHasReturnLink($this->adminFormConfig->getHasReturnLink())
-			->setFormFields($fieldConfig->getFormFieldsConfig())
-			->setTemplate($this->adminFormConfig->getTemplateForm())
-			->setUploadFields($fieldConfig->getFilesName())
 		;
 	}
 
-	public function buildMulti(array $forms, array $tplVars)
+	public function buildMulti(array $digitixParameters, array $forms, array $tplVars)
 	{
 		return $this->helperForm
+			->setParameters($digitixParameters)
 			->setForms($forms)
 			->setTplVars($tplVars)
 		;

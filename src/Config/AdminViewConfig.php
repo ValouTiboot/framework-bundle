@@ -16,7 +16,7 @@ class AdminViewConfig implements AdminViewConfigInterface
 	{
 		$this->context = $context->getContext();
 		$this->entityName = $this->context->getEntityName();
-		$this->configuration = $params['admin_entities'][$this->entityName];
+		$this->configuration = $params['admin_entities'][(string) $this->entityName];
 
 		if (isset($this->configuration['view']) && count($this->configuration['view'])) {
 			$this->_view = $this->configuration['view'];

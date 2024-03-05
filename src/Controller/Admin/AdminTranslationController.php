@@ -19,21 +19,37 @@ class AdminTranslationController extends AdminController
     /**
      * {@inheritDoc}
      */
-    public function read()
+    public function read(string $entityName)
     {
         $tplVars = [];
 
-        $action = $this->generateUrl('dgtx_admin_entity_create', ['entityName' => $this->getContext()->getEntity()->getName()]);
-        $form = $this->get('dgtx.form.factory')->buildForm(['method' => 'GET', 'action' => $action]);
-        $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
+        $action = $this->generateUrl(
+            'dgtx_admin_entity_create',
+            [
+                'entityName' => $this->getContext()->getEntity()->getName()
+            ]
+        );
 
-        return $this->display($helperForm->generateForm());
+        $form = $this->get('dgtx.form.factory')->buildForm(['method' => 'GET', 'action' => $action]);
+
+        $helperForm = $this->get('dgtx.helper.form.factory')
+            ->build(
+                $this->get('dgtx.parameter.factory')->build()->getParameters(),
+                $form,
+                $tplVars
+            )
+        ;
+
+        return $this->display($helperForm
+            ->setTemplateOverride('@DigitixFramework/admin/helper/form/create')
+            ->generateForm()
+        );
     }
 
     /**
      * {@inheritDoc}
      */
-    public function create()
+    public function create(string $entityName)
     {
         $tplVars = [];
     	$data = $this->getContext()->getRequest()->query->all('translation');
@@ -42,8 +58,11 @@ class AdminTranslationController extends AdminController
     	$translationForms = $translationFactory->buildFields()->buildForms();
 
         $helperForm = $this->get('dgtx.helper.form.factory')
-        	->buildMulti($translationForms, $tplVars)
-        	->setTemplate('@DigitixFramework/admin/helper/form/translation/create')
+        	->buildMulti(
+                $this->get('dgtx.parameter.factory')->build()->getParameters(),
+                $translationForms,
+                $tplVars
+            )
         ;
 
 		foreach ($translationForms as $form) {
@@ -54,14 +73,16 @@ class AdminTranslationController extends AdminController
             }
 
 	        if ($form->isSubmitted() && $form->isValid()) {
-	        	$data = $this->getContext()->getRequest()->query->get('translation');
 	        	$orignalTranslations = $translationFactory->getProvider()->getTranslations();
 
                 $updater = $this->get('dgtx.translation.updater');
 	        	$updater->prepare($orignalTranslations, $form);
 	        	$updater->write($data['locale']);
 
-                $this->addFlash('success', $this->getContext()->trans('Translations successfuly updated.', [], 'Admin.Message.Success'));
+                $this->addFlash(
+                    'success',
+                    $this->getContext()->trans('Translations successfuly updated.', [], 'Admin.Message.Success')
+                );
 	        }
 		}
 

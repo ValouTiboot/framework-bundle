@@ -40,7 +40,7 @@ a.page-link:focus {
 	@extend .no-radius;
 	align-items: center;
 	display: inline-flex;
-	i {
+	i.material-icons {
 		font-size: 21px;
 		margin-right: 4px;
 	}

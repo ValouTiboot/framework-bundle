@@ -8,9 +8,9 @@ interface HelperFormInterface
 {
 	public function generateForm();
 
-	public function setForm(FormInterface $form): HelperForm;
+	public function hasReturnLink(): bool;
 
-	public function setHasReturnLink($hasReturnLink);
+	public function setForm(FormInterface $form): HelperForm;
 
 	public function setForms(array $forms): HelperForm;
 }

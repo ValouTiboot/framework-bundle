@@ -38,11 +38,6 @@ class MetaTranslation
      */
     private $rewrite;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     public function getTranslatable(): ?Meta
     {
         return $this->translatable;

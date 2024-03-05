@@ -86,6 +86,7 @@ return static function (ContainerConfigurator $container) {
         ->set('dgtx.entity.repository.provider', EntityRepositoryProvider::class)
             ->arg(0, new Reference('doctrine'))
             ->public()
+        ->alias(EntityRepositoryProvider::class, 'dgtx.entity.repository.provider')
 
         ->set(EntityFactory::class)
             ->arg(0, new Reference(EntityPresenter::class))
@@ -179,6 +180,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(HelperListInterface::class, 'dgtx.helper.list')
 
         ->set('dgtx.field.factory', FieldFactory::class)
+            ->public()
         ->alias(FieldFactory::class, 'dgtx.field.factory')
 
         ->set('dgtx.helper.form', HelperForm::class)
@@ -187,9 +189,6 @@ return static function (ContainerConfigurator $container) {
 
         ->set('dgtx.helper.form.factory', HelperFormFactory::class)
             ->arg(0, new Reference('dgtx.helper.form'))
-            ->arg(1, new Reference(DigitixFrameworkExtension::ALIAS_ADMIN_FORM_CONFIG))
-            ->arg(2, new Reference('dgtx.field.factory'))
-            ->arg(3, new Reference('dgtx.form.factory'))
         ->alias(HelperFormFactory::class, 'dgtx.helper.form.factory')
 
         ->set('dgtx.mailer', Mailer::class)

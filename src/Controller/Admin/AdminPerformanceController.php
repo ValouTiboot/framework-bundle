@@ -20,7 +20,7 @@ class AdminPerformanceController extends AdminController
 	/**
      * {@inheritdoc}
      */
-    public function create()
+    public function create(string $entityName)
     {
         if ($this->getContext()->getRequest()->query->get('cacheClear') !== null) {
             if (($error = $this->get('dgtx.cache')->cacheClear()) != 0) {
@@ -41,8 +41,15 @@ class AdminPerformanceController extends AdminController
             $datas[$name] = $value;
         }
 
-        $form = $this->get('dgtx.form.factory')->buildForm(['data' => $datas]);
-        $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
+        $form = $this->get('dgtx.form.factory')->buildForm([], $datas);
+        $helperForm = $this->get('dgtx.helper.form.factory')
+            ->build(
+                $this->get('dgtx.parameter.factory')->build()->getParameters(),
+                $form,
+                $tplVars
+            )
+        ;
+
         $errors = $form->getErrors(true, false);
 
         if (count($errors) > 0) {
@@ -51,7 +58,10 @@ class AdminPerformanceController extends AdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->preparePersistenEntities($form->getData());
-            $this->addFlash('success', $this->getContext()->trans('Succesfully updated.', [], 'Admin.Message.Success'));
+            $this->addFlash(
+                'success',
+                $this->getContext()->trans('Succesfully updated.', [], 'Admin.Message.Success')
+            );
         }
 
         return $this->display($helperForm->generateForm());

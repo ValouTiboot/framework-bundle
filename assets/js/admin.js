@@ -8,10 +8,13 @@
 // any CSS you import will output into a single css file (app.css in this case)
 // import './css/style.scss';
 
-import $ from "jquery";
+// import $ from "jquery";
+window.$ = window.jQuery = require("jquery");
+global.$ = global.jQuery = jQuery = $;
 require('bootstrap');
 // import 'bootstrap/dist/js/bootstrap.min';
 import 'jquery-ui/ui/widgets/sortable';
+import 'jquery-ui/ui/widgets/draggable';
 import Tagify from '@yaireo/tagify';
 
 // Import TinyMCE
@@ -221,13 +224,14 @@ $(document).ready(function(){
 
 
 function toRewriteUrl(str) {
-  var encodedUrl = str.toString().toLowerCase(); // make the url lowercase
-  encodedUrl = encodedUrl.split(/\&+/).join("-and-"); // replace & with and
-  encodedUrl = encodedUrl.split(/[^a-z0-9]/).join("-"); // remove invalid characters
-  encodedUrl = encodedUrl.split(/-+/).join("-"); // remove duplicates
-  encodedUrl = encodedUrl.trim('-'); // trim leading & trailing characters
+	var encodedUrl = str.toString().toLowerCase(); // make the url lowercase
+	encodedUrl = encodedUrl.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+	encodedUrl = encodedUrl.split(/\&+/).join("-and-"); // replace & with and
+	encodedUrl = encodedUrl.split(/[^a-z0-9]/).join("-"); // remove invalid characters
+	encodedUrl = encodedUrl.split(/-+/).join("-"); // remove duplicates
+	encodedUrl = encodedUrl.trim('-'); // trim leading & trailing characters
 
-  return encodedUrl;
+	return encodedUrl;
 }
 
 function showfooter() {

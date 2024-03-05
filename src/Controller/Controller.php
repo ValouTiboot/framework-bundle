@@ -49,11 +49,31 @@ class Controller extends AbstractController
 
     protected function persistEntity()
     {
-        return $this->get('dgtx.entity.manager')->persistEntity($this->getContext()->getEntity()->getInstance());
+        return $this->get('dgtx.entity.manager')
+            ->persistEntity($this->getContext()->getEntity()->getInstance())
+        ;
     }
 
     protected function persistEntities($objects)
     {
         return $this->get('dgtx.entity.manager')->persistEntities($objects);
+    }
+
+    protected function getFileUploadDir(): string
+    {
+        if (!file_exists($this->get('parameter_bag')->get('kernel.project_dir').'/public/uploads/')) {
+            mkdir($this->get('parameter_bag')->get('kernel.project_dir').'/public/uploads/', 0755, true);
+        }
+
+        return $this->get('parameter_bag')->get('kernel.project_dir').'/public/uploads/';
+    }
+
+    protected function createFileUploadDir(string $dir): string
+    {
+        if (!file_exists($this->getFileUploadDir().$dir)) {
+            mkdir($this->getFileUploadDir().$dir, 0755, true);
+        }
+
+        return $this->getFileUploadDir().$dir;
     }
 }

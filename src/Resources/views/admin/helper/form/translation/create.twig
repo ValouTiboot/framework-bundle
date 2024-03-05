@@ -1,46 +1,34 @@
-{% extends '@DigitixFramework/admin/layout.html.twig' %}
+{% extends '@DigitixFramework/admin/helper/form/create.twig' %}
 
-{% block content_header %}
-<div class="content-header bg-white">
-	<div class="d-flex align-items-center justify-content-between">
-		<div class="content-header-title">{{ controller_name }}</div>
-	</div>
-</div>
-{% endblock %}
-
-{% block content_container %}
-<div class="row">
-	<div class="col">
-		{% block toolbar %}{% endblock %}
-		{% block content%}
-			{% for domain, form in forms %}
-			{% form_theme form '@DigitixFramework/admin/_partials/form_theme.twig' %}
-			<div class="bg-white mb-2 content-container">
-				<h5
-					class="translationForm-title mb-0"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapse{{ loop.index }}"
-					aria-expanded="false"
-					aria-controls="collapse{{ loop.index }}"
-				>
-					{{ domain }}
-				</h5>
-				<div class="collaspe-form collapse" id="collapse{{ loop.index }}" aria-labelledby="headingOne">
-					<div class="container-form">
-						<div class="dgtx-form">
-							{{ form(form) }}
-							{% if has_return_link %}
-								<div class="form-return-link">
-									<a class="btn btn-light" href="{{ path('dgtx_admin_entity_read', {entityName: entity_name}) }}">{{ 'form.default.back'|trans({}, 'Admin.Form.Default') }}</a>
-								</div>
-							{% endif %}
-						</div>
+{% block toolbar %}{% endblock %}
+{% block content%}
+	{% for domain, form in forms %}
+		{% form_theme form '@DigitixFramework/admin/_partials/form_theme.twig' %}
+		<div class="bg-white mb-2 content-container">
+			<h5
+				class="translationForm-title mb-0"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapse{{ loop.index }}"
+				aria-expanded="false"
+				aria-controls="collapse{{ loop.index }}"
+			>
+				{{ domain }}
+			</h5>
+			<div class="collaspe-form collapse" id="collapse{{ loop.index }}" aria-labelledby="headingOne">
+				<div class="container-form">
+					<div class="dgtx-form">
+						{{ form(form) }}
+						{% if hasReturnLink %}
+							<div class="form-return-link">
+								<a class="btn btn-light" href="{{ path('dgtx_admin_entity_read', {entityName: entityName}) }}">
+									{{ 'form.default.back'|trans({}, 'Admin.Form.Default') }}
+								</a>
+							</div>
+						{% endif %}
 					</div>
 				</div>
 			</div>
-		    {% endfor %}
-		{% endblock %}
-	</div>
-</div>
-{% endblock%}
+		</div>
+	{% endfor %}
+{% endblock %}
 

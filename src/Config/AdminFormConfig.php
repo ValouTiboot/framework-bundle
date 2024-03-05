@@ -15,7 +15,7 @@ class AdminFormConfig implements AdminFormConfigInterface
 	public function __construct(array $params, ContextProvider $context)
 	{
 		$this->context = $context->getContext();
-		$this->entityName = $this->context->getEntityName();
+		$this->entityName = (string) $this->context->getEntityName();
 		$this->configuration = $params['admin_entities'][$this->entityName];
 
 		if (isset($this->configuration['form']) && count($this->configuration['form'])) {

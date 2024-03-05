@@ -2,6 +2,7 @@
 
 namespace Digitix\FrameworkBundle\Context;
 
+use function Symfony\Component\String\u;
 use Twig\Environment;
 use Digitix\FrameworkBundle\Entity\Language;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,8 +25,11 @@ final class Context
 	private $request;
 	public $twig;
 
-	public function __construct(?UserInterface $user, Environment $twig, TranslatorInterface $translator)
-	{
+	public function __construct(
+		?UserInterface $user,
+		Environment $twig,
+		TranslatorInterface $translator
+	) {
 		$this->user = $user ?? null;
 		$this->twig = $twig;
 		$this->translator = $translator;
@@ -65,7 +69,7 @@ final class Context
 
 	public function setEntityName($entityName): self
 	{
-		$this->entityName = ucfirst($entityName);
+		$this->entityName = u($entityName)->camel()->title();
 		return $this;
 	}
 
@@ -101,8 +105,12 @@ final class Context
 		return $this->translator;
 	}
 
-	public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null)
-	{
+	public function trans(
+		string $id,
+		array $parameters = [],
+		string $domain = null,
+		string $locale = null
+	) {
 		return $this->getTranslator()->trans($id, $parameters, $domain, $locale);
 	}
 

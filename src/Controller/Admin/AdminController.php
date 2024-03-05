@@ -3,12 +3,14 @@
 namespace Digitix\FrameworkBundle\Controller\Admin;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Digitix\FrameworkBundle\Controller\Controller;
-use Digitix\FrameworkBundle\Factory\DigitixParameterFactory;
 use Digitix\FrameworkBundle\Factory\FieldFactory;
+use Digitix\FrameworkBundle\Controller\Controller;
 use Digitix\FrameworkBundle\Factory\HelperFormFactory;
 use Digitix\FrameworkBundle\Factory\HelperListFactory;
 use Digitix\FrameworkBundle\Factory\HelperViewFactory;
+use Digitix\FrameworkBundle\Factory\DigitixParameterFactory;
+use Digitix\FrameworkBundle\Provider\EntityRepositoryProvider;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class AdminController extends Controller
 {
@@ -19,8 +21,11 @@ class AdminController extends Controller
      * @param string|string $message
      * @return void|Execption
      */
-    public function checkAccess($attributes, $subject = null, string $message = 'Access Denied toto.')
-    {
+    public function checkAccess(
+        $attributes,
+        $subject = null,
+        string $message = 'Access Denied toto.'
+    ) {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
     	$this->denyAccessUnlessGranted($attributes, $subject, $message);
     }
@@ -33,6 +38,7 @@ class AdminController extends Controller
             'dgtx.helper.form.factory' => '?'.HelperFormFactory::class,
             'dgtx.field.factory' => '?'.FieldFactory::class,
             'dgtx.parameter.factory' => '?'.DigitixParameterFactory::class,
+            'dgtx.entity.repository.provider' => '?'.EntityRepositoryProvider::class,
         ] + parent::getSubscribedServices();
     }
 
@@ -40,9 +46,14 @@ class AdminController extends Controller
      *
      * @return Response
      */
-    public function view()
+    public function view(string $entityName)
     {
-        $helperView = $this->get('dgtx.helper.view.factory')->build([]);
+        $helperView = $this->get('dgtx.helper.view.factory')
+            ->build(
+                $this->get('dgtx.parameter.factory')->build()->getParameters(),
+                []
+            )
+        ;
 
         return $this->display($helperView->generateView());
     }
@@ -51,7 +62,23 @@ class AdminController extends Controller
      *
      * @return Response
      */
-    public function read()
+    public function viewEntity(string $entityName, int $entityId)
+    {
+        $helperView = $this->get('dgtx.helper.view.factory')
+            ->build(
+                $this->get('dgtx.parameter.factory')->build()->getParameters(),
+                []
+            )
+        ;
+
+        return $this->display($helperView->generateView());
+    }
+
+    /**
+     *
+     * @return Response
+     */
+    public function read(string $entityName)
     {
         $tplVars = [];
         $helperList = $this->get('dgtx.helper.list.factory')
@@ -69,13 +96,24 @@ class AdminController extends Controller
      *
      * @return Response
      */
-    public function create()
+    public function create(string $entityName)
     {
-
-        dump($this->get('dgtx.parameter.factory')->build());
         $tplVars = [];
-        $form = $this->get('dgtx.form.factory')->buildForm();
-        $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
+        $form = $this->get('dgtx.form.factory')
+            ->buildForm(
+                [
+                    'validation_groups' => ['Default','Create']
+                ]
+            )
+        ;
+
+        $helperForm = $this->get('dgtx.helper.form.factory')
+            ->build(
+                $this->get('dgtx.parameter.factory')->build()->getParameters(),
+                $form,
+                $tplVars
+            )
+        ;
 
         $errors = $form->getErrors(true, false);
 
@@ -84,17 +122,47 @@ class AdminController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /**
-             * TODO Validator
-             * TODO uplaod files
-             */
+            if (true === $helperForm->hasUploadFields()) {
+                $filesName = $helperForm->getUploadFields();
+                $entity = $this->getContext()->getEntity()->getInstance();
+
+                foreach ($filesName as $fileName) {
+                    $file = $form->get($fileName)->getData();
+
+                    if (null === $file) {
+                        continue;
+                    }
+
+                    $fileUplaodDir = $this->createFileUploadDir(
+                        lcfirst(
+                            $this->getContext()->getEntityName()
+                        ).'/'.$fileName.'/'
+                    );
+
+                    // FileName
+                    $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                    $slug = $this->get('slugger')->slug($originalFilename);
+                    $newFileName = $slug.'.'.$file->guessExtension();
+
+                    // Move the file to the directory where brochures are stored
+                    try {
+                        $file->move($fileUplaodDir,$newFileName);
+                        $entity->{'set'.ucFirst($fileName)}($newFileName);
+                    } catch (FileException $exception) {
+                        $errors[] = 'File Exception : '.$exception->getMessage();
+                    }
+                }
+            }
 
             $this->persistEntity();
-            $this->addFlash('success', $this->getContext()->trans('Entity successfuly added.', [], 'Admin.Message.Success'));
+            $this->addFlash(
+                'success',
+                $this->getContext()->trans('Entity successfuly added.', [], 'Admin.Message.Success')
+            );
 
             return $this->redirectToRoute(
                 'dgtx_admin_entity_read',
-                ['entityName' => $this->getContext()->getEntityName()]
+                ['entityName' => $entityName]
             );
         }
 
@@ -104,12 +172,17 @@ class AdminController extends Controller
     /**
      * @return Response
      */
-    public function edit()
+    public function edit(string $entityName, int $entityId)
     {
-        dump($this->get('dgtx.parameter.factory')->build()->getParameters());
         $tplVars = [];
         $form = $this->get('dgtx.form.factory')->buildForm();
-        $helperForm = $this->get('dgtx.helper.form.factory')->build($form, $tplVars);
+        $helperForm = $this->get('dgtx.helper.form.factory')
+            ->build(
+                $this->get('dgtx.parameter.factory')->build()->getParameters(),
+                $form,
+                $tplVars
+            )
+        ;
 
         $errors = $form->getErrors(true, false);
 
@@ -118,17 +191,47 @@ class AdminController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /**
-             * TODO Validator
-             * TODO uplaod files
-             */
+            if (true === $helperForm->hasUploadFields()) {
+                $filesName = $helperForm->getUploadFields();
+                $entity = $this->getContext()->getEntity()->getInstance();
+
+                foreach ($filesName as $fileName) {
+                    $file = $form->get($fileName)->getData();
+
+                    if (null === $file) {
+                        continue;
+                    }
+
+                    $fileUplaodDir = $this->createFileUploadDir(
+                        lcfirst(
+                            $this->getContext()->getEntityName()
+                        ).'/'.$fileName.'/'
+                    );
+
+                    // FileName
+                    $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                    $slug = $this->get('slugger')->slug($originalFilename);
+                    $newFileName = $slug.'.'.$file->guessExtension();
+
+                    // Move the file to the directory where brochures are stored
+                    try {
+                        $file->move($fileUplaodDir,$newFileName);
+                        $entity->{'set'.ucFirst($fileName)}($newFileName);
+                    } catch (FileException $exception) {
+                        $errors[] = 'File Exception : '.$exception->getMessage();
+                    }
+                }
+            }
 
             $this->persistEntity();
-            $this->addFlash('success', $this->getContext()->trans('Entity successfuly updated.', [], 'Admin.Message.Success'));
+            $this->addFlash(
+                'success',
+                $this->getContext()->trans('Entity successfuly updated.', [], 'Admin.Message.Success')
+            );
 
             return $this->redirectToRoute(
                 'dgtx_admin_entity_read',
-                ['entityName' => $this->getContext()->getEntityName()]
+                ['entityName' => $entityName]
             );
         }
 
@@ -139,29 +242,34 @@ class AdminController extends Controller
      *
      * @return Redirect
      */
-    public function delete()
+    public function delete(string $entityName, int $entityId)
     {
         $entity = $this->getContext()->getEntity()->getInstance();
 
         if ($entity === null) {
-            $this->addFlash('info', $this->getContext()->trans('This entity does not exist anymore.', [], 'Admin.Message.Info'));
+            $this->addFlash(
+                'info',
+                $this->getContext()->trans('This entity does not exist anymore.', [], 'Admin.Message.Info')
+            );
         } else {
             $this->get('dgtx.entity.manager')->removeEntity($entity);
-            $this->addFlash('success', $this->getContext()->trans('Entity successfuly deleted.', [], 'Admin.Message.Success'));
+            $this->addFlash(
+                'success',
+                $this->getContext()->trans('Entity successfuly deleted.', [], 'Admin.Message.Success')
+            );
         }
 
         return $this->redirectToRoute(
             'dgtx_admin_entity_read',
-            ['entityName' => $this->getContext()->getEntityName()]
+            ['entityName' => $entityName]
         );
     }
 
     /**
      * @return JsonResponse
      */
-    public function ajaxSortable()
+    public function ajaxSortable(string $entityName)
     {
-        $entityName = $this->getContext()->getEntityName();
         $params = $this->getContext()->getRequest()->request->all();
 
         if (!isset($params[$entityName])) {
@@ -190,4 +298,3 @@ class AdminController extends Controller
         return;
     }
 }
-

@@ -3,6 +3,8 @@
     "description": "DIGITX extra framework for Admin generator",
     "keywords": ["backend", "admin", "generator"],
     "type": "symfony-bundle",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "homepage": "https://www.digitix.agency",
     "license": "DIGITIX",
     "authors": [
@@ -13,7 +15,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0",
+        "php": ">=8.2",
         "ext-json": "*",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.5",

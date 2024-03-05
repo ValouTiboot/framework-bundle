@@ -3,29 +3,30 @@
 namespace Digitix\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Digitix\FrameworkBundle\Config\AdminViewConfig;
 use Digitix\FrameworkBundle\Route\RouteLoader;
 use Symfony\Component\DependencyInjection\Alias;
 use Digitix\FrameworkBundle\Config\AdminFormConfig;
 use Digitix\FrameworkBundle\Config\AdminListConfig;
 use Digitix\FrameworkBundle\Config\AdminMenuConfig;
+use Digitix\FrameworkBundle\Config\AdminViewConfig;
 use Symfony\Component\DependencyInjection\Reference;
 use Digitix\FrameworkBundle\Provider\ContextProvider;
-use Digitix\FrameworkBundle\Config\AdminViewConfigInterface;
 use Digitix\FrameworkBundle\Repository\EntityRepository;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Digitix\FrameworkBundle\Config\AdminFormConfigInterface;
 use Digitix\FrameworkBundle\Config\AdminListConfigInterface;
 use Digitix\FrameworkBundle\Config\AdminMenuConfigInterface;
+use Digitix\FrameworkBundle\Config\AdminViewConfigInterface;
+use Digitix\FrameworkBundle\Factory\DigitixParameterFactory;
 use Digitix\FrameworkBundle\Controller\Admin\AdminController;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Digitix\FrameworkBundle\Controller\Admin\AdminMenuController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminLoginController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminParameterController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminPerformanceController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminTranslationController;
-use Digitix\FrameworkBundle\Factory\DigitixParameterFactory;
 
 class DigitixFrameworkExtension extends Extension
 {
@@ -131,11 +132,19 @@ class DigitixFrameworkExtension extends Extension
             ->addTag('controller.service_arguments')
         ;
 
+        $container->register('dgtx.admin.controller.menu', AdminMenuController::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+            ->addTag('container.service_subscriber')
+            ->addTag('controller.service_arguments')
+        ;
+
         $container->setAlias(AdminController::class, new Alias('dgtx.admin.controller'));
         $container->setAlias(AdminLoginController::class, new Alias('dgtx.admin.controller.login'));
         $container->setAlias(AdminTranslationController::class, new Alias('dgtx.admin.controller.translation'));
         $container->setAlias(AdminPerformanceController::class, new Alias('dgtx.admin.controller.performance'));
         $container->setAlias(AdminParameterController::class, new Alias('dgtx.admin.controller.parameter'));
+        $container->setAlias(AdminMenuController::class, new Alias('dgtx.admin.controller.menu'));
         $container->setAlias(AdminMenuConfigInterface::class, new Alias(self::ALIAS_ADMIN_MENU_CONFIG));
         $container->setAlias(AdminViewConfigInterface::class, new Alias(self::ALIAS_ADMIN_VIEW_CONFIG));
         $container->setAlias(AdminListConfigInterface::class, new Alias(self::ALIAS_ADMIN_LIST_CONFIG));
@@ -145,7 +154,5 @@ class DigitixFrameworkExtension extends Extension
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.php');
-
-
     }
 }
