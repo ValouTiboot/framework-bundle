@@ -10,6 +10,9 @@ use Digitix\FrameworkBundle\Admin\Field\FieldTypeRegistry;
 use Digitix\FrameworkBundle\Admin\Filter\FilterTypeRegistry;
 use Digitix\FrameworkBundle\Admin\Persistence\EntityClassResolver;
 use Digitix\FrameworkBundle\Admin\Routing\AdminRouteLoader;
+use Digitix\FrameworkBundle\Translation\TranslationCompiler;
+use Digitix\FrameworkBundle\Translation\TranslationExtractor;
+use Digitix\FrameworkBundle\Translation\TranslationSynchronizer;
 
 return static function (ContainerConfigurator $container): void {
     $services = $container->services()
@@ -51,10 +54,29 @@ return static function (ContainerConfigurator $container): void {
     $services->load('Digitix\\FrameworkBundle\\EventListener\\', '../src/EventListener/');
     $services->load('Digitix\\FrameworkBundle\\Security\\', '../src/Security/');
 
-    // --- Content kit: translations, mailer, cache, fixtures, validators --------------
-    $services->load('Digitix\\FrameworkBundle\\Finder\\', '../src/Finder/');
-    $services->load('Digitix\\FrameworkBundle\\Updater\\', '../src/Updater/');
-    $services->load('Digitix\\FrameworkBundle\\Factory\\', '../src/Factory/');
+    // --- Translations: extraction from the code, database sync, catalogue files ------
+    $services->load('Digitix\\FrameworkBundle\\Translation\\', '../src/Translation/')
+        ->exclude([
+            '../src/Translation/RuntimeTranslator.php',
+            '../src/Translation/SyncReport.php',
+            '../src/Translation/TranslationStatus.php',
+        ]);
+    $services->load('Digitix\\FrameworkBundle\\Repository\\', '../src/Repository/');
+    $services->load('Digitix\\FrameworkBundle\\Command\\', '../src/Command/');
+
+    $services->set(TranslationExtractor::class)
+        ->arg('$extractor', service('translation.extractor'))
+        ->arg('$paths', param('digitix_framework.translation.paths'));
+
+    $services->set(TranslationSynchronizer::class)
+        ->arg('$translator', service('translator'));
+
+    $services->set(TranslationCompiler::class)
+        ->arg('$outputDir', param('digitix_framework.translation.output_dir'))
+        ->arg('$translatorCacheDir', '%kernel.cache_dir%/translations')
+        ->arg('$translator', service('translator.default'));
+
+    // --- Content kit: mailer, cache, fixtures, validators ------------------------------
     $services->load('Digitix\\FrameworkBundle\\Utils\\', '../src/Utils/')
         ->exclude(['../src/Utils/ToolString.php', '../src/Utils/Tools.php']);
     $services->load('Digitix\\FrameworkBundle\\Validator\\', '../src/Validator/')

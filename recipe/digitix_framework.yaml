@@ -260,29 +260,72 @@ digitix_framework:
       list:
         template: null
         has_create: false
-        fields: ~
-      form:
-        has_return_link: false
-        template: '@DigitixFramework/admin/helper/form/translation/create'
+        items_per_page: 50
+        toolbar: []
+        actions: ['edit']
         fields:
-          type:
-            label: label.translation.type
-            name: type
-            type: choice
-            choice: {'label.translation.bo': 'bo', 'label.translation.fo': 'fo', 'label.translation.theme': 'theme', 'label.translation.email': 'email'}
-            required: true
-          theme:
-            label: label.translation.theme
-            name: theme
-            type: choice
-            callback: 'Digitix\FrameworkBundle\Factory\TranslationFormFactory::findThemes'
-            required: false
+          domain:
+            label: label.translation.domain
+            name: domain
+            type: text
+            sort: true
+            default_sort: 'asc'
+          key:
+            label: label.translation.key
+            name: key
+            type: text
+            sort: true
           locale:
             label: label.translation.locale
             name: locale
-            type: entity
-            collection: {name: Language, value: locale}
-            required: true
+            type: text
+            sort: true
+          value:
+            label: label.translation.value
+            name: value
+            type: text
+          status:
+            label: label.translation.status
+            name: statusValue
+            type: text
+        filters:
+          domain:
+            label: label.translation.domain
+            type: text
+          key:
+            label: label.translation.key
+            type: text
+          locale:
+            label: label.translation.locale
+            type: text
+          status:
+            label: label.translation.status
+            type: choice
+            choice: {'label.translation.missing': missing, 'label.translation.translated': translated, 'label.translation.obsolete': obsolete}
+      form:
+        fields:
+          domain:
+            label: label.translation.domain
+            name: domain
+            type: text
+            disabled: true
+          key:
+            label: label.translation.key
+            name: key
+            type: textarea
+            rows: 3
+            disabled: true
+          locale:
+            label: label.translation.locale
+            name: locale
+            type: text
+            disabled: true
+          value:
+            label: label.translation.value
+            name: value
+            type: textarea
+            rows: 4
+            required: false
     Parameter:
       list:
       form:

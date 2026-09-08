@@ -6,6 +6,7 @@ namespace Digitix\FrameworkBundle;
 
 use Digitix\FrameworkBundle\Admin\Config\AdminConfig;
 use Digitix\FrameworkBundle\DependencyInjection\AdminConfigResolver;
+use Digitix\FrameworkBundle\DependencyInjection\Compiler\RuntimeTranslatorPass;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -22,6 +23,13 @@ final class DigitixFrameworkBundle extends AbstractBundle
         $definition->import('../config/definition.php');
     }
 
+    public function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new RuntimeTranslatorPass());
+    }
+
     /**
      * @param array<string, mixed> $config
      */
@@ -29,7 +37,15 @@ final class DigitixFrameworkBundle extends AbstractBundle
     {
         $config = AdminConfigResolver::resolve($config);
 
-        $container->parameters()->set('digitix_framework.entity_namespaces', $config['entity_namespaces']);
+        $parameters = $container->parameters();
+        $parameters->set('digitix_framework.entity_namespaces', $config['entity_namespaces']);
+        // the bundle's own sources and templates are always scanned for translation keys
+        $parameters->set('digitix_framework.translation.paths', array_values(array_unique(array_merge(
+            [self::getPathDir().'/src', self::getPathDir().'/templates'],
+            $config['translation']['paths']
+        ))));
+        $parameters->set(RuntimeTranslatorPass::OUTPUT_DIR_PARAMETER, $config['translation']['output_dir']);
+
         $container->import('../config/services.php');
 
         // The whole configuration is baked into the container: AdminConfig is

@@ -38,7 +38,7 @@ class AdminMenuController extends AdminController
 
         if ($request->isMethod('POST') && $request->request->has('menu_item')) {
             $this->replaceItems($menu, (array) $request->request->all('menu_item'));
-            $this->addFlash('success', $this->trans('Entity successfuly updated.'));
+            $this->addFlash('success', $this->trans('Entity successfuly updated.', [], 'Admin.Message.Success'));
 
             return $this->redirectToRoute('dgtx_admin_entity_view_entity', [
                 'entityName' => $context->getEntitySlug(),
@@ -79,7 +79,7 @@ class AdminMenuController extends AdminController
         }
 
         $pages['link'] = [
-            'link' => ['route' => '', 'label' => $this->trans('Link', 'Menu.Label')],
+            'link' => ['route' => '', 'label' => $this->trans('Link', [], 'Menu.Label')],
         ];
 
         return $pages;

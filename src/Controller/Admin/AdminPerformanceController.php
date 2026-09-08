@@ -28,9 +28,9 @@ final class AdminPerformanceController extends AdminParameterController
             $exitCode = $this->container->get(Cache::class)->cacheClear();
 
             if (0 !== $exitCode) {
-                $this->addFlash('danger', $this->trans('Something goes wrong when clearing cache: %code%', 'Admin.Message.Error', ['%code%' => $exitCode]));
+                $this->addFlash('danger', $this->trans('Something goes wrong when clearing cache: %code%', ['%code%' => $exitCode], 'Admin.Message.Error'));
             } else {
-                $this->addFlash('success', $this->trans('Clearing cache Ok'));
+                $this->addFlash('success', $this->trans('Clearing cache Ok', [], 'Admin.Message.Success'));
             }
 
             return $this->redirectToRoute('dgtx_admin_entity_create', ['entityName' => $context->getEntitySlug()]);

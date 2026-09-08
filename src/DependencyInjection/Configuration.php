@@ -45,11 +45,35 @@ final class Configuration implements ConfigurationInterface
                     ->scalarPrototype()->end()
                     ->defaultValue(['App\\Controller\\Admin\\', 'Digitix\\FrameworkBundle\\Controller\\Admin\\'])
                 ->end()
+                ->append(self::translationNode())
                 ->append(self::menuNode())
                 ->append(self::adminEntitiesNode())
                 ->append(self::frontEntitiesNode())
             ->end()
         ;
+    }
+
+    private static function translationNode(): NodeDefinition
+    {
+        $node = (new TreeBuilder('translation'))->getRootNode();
+
+        $node
+            ->info('Translation editor: where keys are searched and where the catalogue files are generated.')
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->arrayNode('paths')
+                    ->info('Directories scanned for translation keys, in addition to the bundle itself.')
+                    ->scalarPrototype()->end()
+                    ->defaultValue(['%kernel.project_dir%/src', '%kernel.project_dir%/templates'])
+                ->end()
+                ->scalarNode('output_dir')
+                    ->info('Directory where the catalogue files are generated from the database. Do not commit it.')
+                    ->defaultValue('%kernel.project_dir%/var/translations')
+                ->end()
+            ->end()
+        ;
+
+        return $node;
     }
 
     private static function menuNode(): NodeDefinition

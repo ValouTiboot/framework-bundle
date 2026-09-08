@@ -23,7 +23,7 @@ class AdminParameterController extends AdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->saveConfiguration($form->getData());
-            $this->addFlash('success', $this->trans('Succesfully updated.'));
+            $this->addFlash('success', $this->trans('Succesfully updated.', [], 'Admin.Message.Success'));
 
             return $this->redirectToRoute('dgtx_admin_entity_create', ['entityName' => $context->getEntitySlug()]);
         }

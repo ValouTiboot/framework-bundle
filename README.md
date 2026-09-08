@@ -94,6 +94,37 @@ Twig templates (@DigitixFramework/admin/...)
 - Permissions: `AdminVoter` grants everything to `ROLE_SUPERADMIN`, otherwise reads `Role::authorization`, e.g. `{"*": ["read"], "cms": ["read", "create", "edit"]}`.
 - Delete is a POST with a CSRF token.
 
+## Translations
+
+Everything written in the code is English; back-office users translate it
+from `/admin/translation`. The database is the source of truth, the
+translator keeps reading files:
+
+```
+code ──(dgtx:translation:extract)──> translation table ──(compile)──> var/translations/<locale>/<Domain>.<locale>.php
+                                            ▲                                   │
+                                     admin editor                       RuntimeTranslator (translator.default)
+```
+
+- **Extraction**: Symfony's PHP (AST) and Twig extractors scan the bundle,
+  `src/` and `templates/` of the project (`digitix_framework.translation.paths`),
+  plus the labels declared in the digitix YAML. Keys must be literal strings,
+  with the domain passed as a literal string too. One entry is created per
+  key and per active language; new entries are pre-filled with the value the
+  translator already knows (bundle defaults, legacy `translations/` files of
+  the project). Keys that left the code are flagged `obsolete`, never deleted.
+- **Compilation**: after every save the translated values are dumped into
+  `digitix_framework.translation.output_dir` (default `var/translations`,
+  never commit it) and the translator cache is invalidated. `RuntimeTranslator`
+  loads those files even when they did not exist at container compile time,
+  so no `cache:clear` is needed.
+- Console: `dgtx:translation:extract [--locale=fr_FR] [--no-compile]`,
+  `dgtx:translation:compile [locale]`. Run `extract` after each deployment
+  (or click "refresh" in the admin) so that new keys show up.
+
+Themes: give their templates a domain of their own (`'Theme.MyTheme'`) and
+filter on it in the editor.
+
 ## Tests
 
 The bundle ships its own test application (`tests/App`, SQLite in memory,
@@ -131,3 +162,5 @@ final class ProductController extends AdminController
 ```
 
 Helpers available in a controller: `forms()`, `listView()`, `formView()`, `templates()`, `persister()`, `uploads()`, `configuration()`, `doctrine()`, `handleForm()`, `renderAdmin()`, `redirectToList()`, `trans()`.
+
+`trans()` has the translator's signature, `trans($id, $parameters, $domain)`: always pass the domain as a literal string so that the translation extractor finds the key.

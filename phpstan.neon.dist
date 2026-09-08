@@ -13,3 +13,9 @@ parameters:
     doctrine:
         # NOT NULL columns are typed "?string = null" until the row is persisted (Symfony maker style)
         allowNullablePropertyForRequiredField: true
+    ignoreErrors:
+        # RuntimeTranslator extends the framework translator (marked @final, not final) to load
+        # the catalogue files generated from the database; covered by TranslationWorkflowTest.
+        -
+            message: '#extends @final class Symfony\\Bundle\\FrameworkBundle\\Translation\\Translator#'
+            path: src/Translation/RuntimeTranslator.php

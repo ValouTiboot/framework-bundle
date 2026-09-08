@@ -39,12 +39,14 @@ return array (
     ),
     'translation' =>
     array (
-      'type' => 'Type',
-      'bo' => 'Back-Office',
-      'fo' => 'Front-Office',
-      'theme' => 'Thème',
-      'email' => 'Emails',
-      'locale' => 'Locale',
+      'domain' => 'Domaine',
+      'key' => 'Texte source',
+      'locale' => 'Langue',
+      'value' => 'Traduction',
+      'status' => 'Statut',
+      'missing' => 'À traduire',
+      'translated' => 'Traduite',
+      'obsolete' => 'Obsolète',
     ),
     'parameter' =>
     array (

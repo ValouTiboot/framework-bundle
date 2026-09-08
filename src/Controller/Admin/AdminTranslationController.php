@@ -6,70 +6,58 @@ namespace Digitix\FrameworkBundle\Controller\Admin;
 
 use Digitix\FrameworkBundle\Admin\Context\AdminContext;
 use Digitix\FrameworkBundle\Admin\Security\AdminPermission;
-use Digitix\FrameworkBundle\Admin\View\TemplateResolver;
-use Digitix\FrameworkBundle\Factory\TranslationFormFactory;
-use Digitix\FrameworkBundle\Updater\TranslationUpdater;
+use Digitix\FrameworkBundle\Entity\Translation;
+use Digitix\FrameworkBundle\Translation\TranslationCompiler;
+use Digitix\FrameworkBundle\Translation\TranslationSynchronizer;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Translation editor.
- *
- *  read:   selection form (type, theme, locale), submitted in GET to create()
- *  create: one form per translation domain, written back to translations/
+ * Translation entries: the generic list and form, plus the catalogue
+ * regeneration after every save and a "refresh keys" action.
  */
-final class AdminTranslationController extends AdminController
+class AdminTranslationController extends AdminController
 {
     public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
-            TranslationFormFactory::class,
-            TranslationUpdater::class,
+            TranslationCompiler::class,
+            TranslationSynchronizer::class,
         ]);
     }
 
+    /**
+     * "?refresh" re-extracts the keys from the code before listing.
+     */
     public function read(AdminContext $context): Response
     {
-        $this->assertGranted(AdminPermission::READ, $context);
+        if ($context->getRequest()->query->has('refresh')) {
+            $this->assertGranted(AdminPermission::EDIT, $context);
 
-        $form = $this->forms()->createForm($context, [
-            'method' => 'GET',
-            'action' => $this->generateUrl('dgtx_admin_entity_create', ['entityName' => $context->getEntitySlug()]),
-            'csrf_protection' => false,
-        ]);
+            $report = $this->container->get(TranslationSynchronizer::class)->synchronize();
+            $this->container->get(TranslationCompiler::class)->compile();
 
-        // the entity "form.template" is the multi-form page used by create()
-        return $this->renderAdmin(TemplateResolver::FORM, $this->formView()->build($context, $form));
-    }
+            $this->addFlash('success', $this->trans(
+                'Translation keys refreshed: %added% added, %obsoleted% obsolete.',
+                ['%added%' => $report->added, '%obsoleted%' => $report->obsoleted],
+                'Admin.Message.Success'
+            ));
 
-    public function create(AdminContext $context): Response
-    {
-        $this->assertGranted(AdminPermission::EDIT, $context);
-
-        $request = $context->getRequest();
-        $selection = $request->query->all('translation');
-
-        if (empty($selection['type']) || empty($selection['locale'])) {
             return $this->redirectToList($context);
         }
 
-        $factory = $this->container->get(TranslationFormFactory::class)->build($selection);
-        $forms = $factory->buildForms($request);
+        return parent::read($context);
+    }
 
-        foreach ($forms as $form) {
-            if ($form->isSubmitted() && $form->isValid()) {
-                $updater = $this->container->get(TranslationUpdater::class);
-                $updater->prepare($factory->getProvider()->getTranslations(), $form);
-                $updater->write((string) $selection['locale']);
+    public function edit(AdminContext $context): Response
+    {
+        $response = parent::edit($context);
 
-                $this->addFlash('success', $this->trans('Translations successfuly updated.'));
-
-                return $this->redirect($request->getUri());
-            }
+        // saved: regenerate the catalogue of that locale
+        if ($response instanceof RedirectResponse && ($entity = $context->getEntity()) instanceof Translation) {
+            $this->container->get(TranslationCompiler::class)->compile($entity->getLocale());
         }
 
-        return $this->renderAdmin(
-            $this->templates()->form($context->getEntityConfig()),
-            $this->formView()->buildMulti($context, $forms)
-        );
+        return $response;
     }
 }

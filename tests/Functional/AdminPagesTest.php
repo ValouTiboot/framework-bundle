@@ -26,8 +26,8 @@ final class AdminPagesTest extends AdminTestCase
         yield 'cms create' => ['/admin/cms/create'];
         yield 'cms category list' => ['/admin/cmsCategory'];
         yield 'meta list' => ['/admin/meta'];
-        yield 'translation selection' => ['/admin/translation'];
-        yield 'translation editor' => ['/admin/translation/create?translation[type]=bo&translation[locale]=fr_FR'];
+        yield 'translation list' => ['/admin/translation'];
+        yield 'translation list filtered' => ['/admin/translation?filters[domain]=Admin&filters[status]=missing'];
         yield 'parameter' => ['/admin/parameter/create'];
         yield 'performance' => ['/admin/performance/create'];
         yield 'user list filtered' => ['/admin/user?filters[email]=valentin&filters[active]=1'];

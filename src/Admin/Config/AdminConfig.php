@@ -62,6 +62,12 @@ final class AdminConfig
         return $this->frontForms[self::key($name)] ?? throw new UnknownEntityException($name, array_keys($this->frontForms));
     }
 
+    /** @return array<string, FormConfig> */
+    public function getFrontForms(): array
+    {
+        return $this->frontForms;
+    }
+
     /**
      * Entity names are matched case-insensitively so that the URL slug
      * ("cmsCategory"), the config key ("CmsCategory") and any other spelling
