@@ -1,98 +1,102 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Finder;
 
+/**
+ * Scans PHP controllers, Twig templates and the bundle YAML for translation
+ * keys, so the translation editor can list what needs translating.
+ */
 final class TranslationFinder
 {
-	private $projectDir;
+    public function __construct(private readonly string $projectDir)
+    {
+    }
 
-	public function __construct($projectDir)
-	{
-		$this->projectDir = $projectDir;
-	}
+    /**
+     * Files under $dir whose name starts with $type, recursively.
+     * $dir is relative to the project directory unless it is an existing absolute path.
+     *
+     * @return string[]
+     */
+    public function findFiles(string $dir, string $type = '', bool $root = true): array
+    {
+        if ($root && !is_dir($dir)) {
+            $dir = $this->projectDir.'/'.ltrim(str_replace($this->projectDir, '', $dir), '/');
+        }
 
-	public function findFiles($dir, $type = '', $root = true): array
-	{
-		$dir = str_replace($this->projectDir, '', $dir);
+        $dir = rtrim($dir, '/').'/';
+        $files = [];
 
-		if ($root) {
-			$dir = $this->projectDir.$dir;
-		}
+        foreach (glob($dir.$type.'*', \GLOB_MARK) ?: [] as $path) {
+            if (str_ends_with($path, '/')) {
+                $files = array_merge($files, $this->findFiles($path, $type, false));
+            } else {
+                $files[] = $path;
+            }
+        }
 
-		$files = [];
-		if (empty($dir)) {
-			return [];
-		}
+        return $files;
+    }
 
-		$tmpFiles = glob($dir.$type.'*', GLOB_MARK);
+    /**
+     * Keys used through "trans('key', [], 'Domain')" in PHP files.
+     *
+     * @return array<string, array<string, string>> domain => key => ''
+     */
+    public function searchInController(string $dir, string $type = '', string $pattern = '.*'): array
+    {
+        return $this->searchInFiles($this->findFiles($dir, $type), '@trans[(](.*),(?:[\s])(?:.*),(?:[\s])\'('.$pattern.')\'[)]@');
+    }
 
-		if (count($tmpFiles) && $tmpFiles !== false) {
-			foreach ($tmpFiles as $f) {
-				if (substr($f, -1) == '/') {
-					$files = array_merge($files, $this->findFiles($f, $type, false));
-				} else {
-					$files[] = $f;
-				}
-			}
-		}
+    /**
+     * Keys used through "'key'|trans({}, 'Domain')" in Twig templates.
+     *
+     * @return array<string, array<string, string>> domain => key => ''
+     */
+    public function searchInTemplate(string $dir, string $type = ''): array
+    {
+        return $this->searchInFiles($this->findFiles($dir, $type), '@\'([0-9A-za-z\s?!.,\'\"_\%-)(]+)\'(?:[|]{1})trans[(][{](?:.*)[}],(?:[\s])\'(.*)\'[)]@m');
+    }
 
-		return $files;
-	}
+    /**
+     * "label.*" and "help.*" keys declared in the digitix YAML files.
+     *
+     * @return array<string, array<string, string>> domain => key => ''
+     */
+    public function searchInConfig(string $dir, string $type = '', string $domain = 'Admin.Fields.Label'): array
+    {
+        $keys = [];
 
-	public function searchInController($dir, $type = '', $pattern = '.*'): array
-	{
-		$files = $this->findFiles($dir, $type);
-		return $this->searchInFiles($files, '@trans[(](.*),(?:[\s])(?:.*),(?:[\s])\'('.$pattern.')\'[)]@');
-	}
+        foreach ($this->findFiles($dir, $type) as $file) {
+            preg_match_all('@((label|help)\.[a-zA-Z._]+)@', (string) file_get_contents($file), $matches);
 
-	public function searchInTemplate($dir, $type = ''): array
-	{
-		$files = $this->findFiles($dir, $type);
-		return $this->searchInFiles($files, '@\'([0-9A-za-z\s?!.,\'\"_\%-)(]+)\'(?:[|]{1})trans[(][{](?:.*)[}],(?:[\s])\'(.*)\'[)]@m');
-	}
+            foreach ($matches[1] as $key) {
+                $keys[$domain][trim(str_replace("'", '', $key))] = '';
+            }
+        }
 
-	public function searchInConfig($dir, $type = '', $domain = 'Admin.Fields.Label'): array
-	{
-		$files = $this->findFiles($dir, $type);
-		$matches = $this->searchInYaml($files, '@((label|help)\.[a-zA-Z._]+)@', $domain);
-		// $choices = $this->searchInYaml($files, '@(?:label|help):(?:[\s])(.*)@');
+        return $keys;
+    }
 
-		return $matches;
-	}
+    /**
+     * @param string[] $files
+     *
+     * @return array<string, array<string, string>> domain => key => ''
+     */
+    private function searchInFiles(array $files, string $regex): array
+    {
+        $keys = [];
 
-	private function searchInYaml(array $files, string $regex, $domain): array
-	{
-		$trads = [];
-		foreach ($files as $file) {
-			$content = file_get_contents($file);
-			preg_match_all($regex, $content, $matches);
+        foreach ($files as $file) {
+            preg_match_all($regex, (string) file_get_contents($file), $matches);
 
-			if (count($matches[0])) {
-				for ($i=0; $i < count($matches[0]) ; $i++) {
-					$key = trim(str_replace("'", '', $matches[1][$i]));
-					$trads[$domain][$key] = '';
-				}
-			}
-		}
+            foreach ($matches[1] as $index => $key) {
+                $keys[$matches[2][$index]][trim(str_replace("'", '', $key))] = '';
+            }
+        }
 
-		return $trads;
-	}
-
-	private function searchInFiles(array $files, string $regex): array
-	{
-		$trads = [];
-		foreach ($files as $file) {
-			$content = file_get_contents($file);
-			preg_match_all($regex, $content, $matches);
-
-			if (count($matches[0])) {
-				for ($i=0; $i < count($matches[0]) ; $i++) {
-					$key = trim(str_replace("'", '', $matches[1][$i]));
-					$trads[$matches[2][$i]][$key] = '';
-				}
-			}
-		}
-
-		return $trads;
-	}
+        return $keys;
+    }
 }

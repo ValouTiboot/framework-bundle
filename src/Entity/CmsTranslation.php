@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 class CmsTranslation
@@ -20,18 +21,24 @@ class CmsTranslation
     private ?Language $language = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $content = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $metaTitle = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $metaDescription = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $rewrite = null;
 
     public function getTranslatable(): ?Cms

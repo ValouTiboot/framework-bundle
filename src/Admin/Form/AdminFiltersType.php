@@ -10,6 +10,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * List filters: a GET form, never bound to an entity, without CSRF.
+ *
+ * @extends AbstractType<mixed>
  */
 final class AdminFiltersType extends AbstractType
 {

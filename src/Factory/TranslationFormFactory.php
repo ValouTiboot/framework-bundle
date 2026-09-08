@@ -74,7 +74,7 @@ final class TranslationFormFactory
     /**
      * One form per domain, keyed by domain, bound to the request.
      *
-     * @return array<string, FormInterface>
+     * @return array<string, FormInterface<mixed>>
      */
     public function buildForms(Request $request): array
     {

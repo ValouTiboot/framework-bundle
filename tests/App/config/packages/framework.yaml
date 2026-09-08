@@ -1,0 +1,24 @@
+framework:
+    secret: 'digitix-test-secret'
+    test: true
+    http_method_override: false
+    handle_all_throwables: true
+    csrf_protection: true
+    default_locale: fr_FR
+    php_errors:
+        log: true
+    session:
+        handler_id: null
+        storage_factory_id: session.storage.factory.mock_file
+        cookie_secure: auto
+        cookie_samesite: lax
+    router:
+        utf8: true
+    translator:
+        default_path: '%kernel.project_dir%/translations'
+        fallbacks: [fr_FR]
+    mailer:
+        dsn: 'null://null'
+    property_info:
+        with_constructor_extractor: true
+    assets: ~

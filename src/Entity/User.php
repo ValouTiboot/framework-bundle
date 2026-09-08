@@ -7,6 +7,7 @@ namespace Digitix\FrameworkBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -17,6 +18,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    #[Assert\Length(max: 180)]
     private ?string $email = null;
 
     #[ORM\ManyToOne(targetEntity: Role::class)]
@@ -27,15 +31,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     /** Not persisted: used to set a new password through the admin form. */
+    #[Assert\NotBlank(groups: ['Create'])]
+    #[Assert\Length(min: 8, max: 4096)]
     private ?string $plainPassword = null;
 
     #[ORM\Column(type: 'string')]
     private ?string $password = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $lastname = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $firstname = null;
 
     #[ORM\Column(type: 'boolean')]

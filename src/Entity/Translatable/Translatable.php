@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Digitix\FrameworkBundle\Entity\Translatable;
 
-use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ReadableCollection;
 
 /**
  * Base class for entities whose text fields live in a sibling
@@ -25,8 +25,8 @@ abstract class Translatable
 
     private int $currentLanguageId = 1;
 
-    /** @return Collection<int, object> */
-    abstract public function getTranslations(): Collection;
+    /** @return ReadableCollection<int, object> */
+    abstract public function getTranslations(): ReadableCollection;
 
     public function setCurrentLanguageId(int $languageId): void
     {

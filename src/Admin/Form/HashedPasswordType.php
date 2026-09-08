@@ -20,6 +20,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  * option (the entity being edited) while leaving the plain value on the
  * mapped property (typically "plainPassword"). An empty submit keeps the
  * current password.
+ *
+ * @extends AbstractType<string|null>
  */
 final class HashedPasswordType extends AbstractType
 {

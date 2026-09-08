@@ -6,11 +6,13 @@ namespace Digitix\FrameworkBundle\Provider;
 
 use Digitix\FrameworkBundle\Entity\Language;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * Access to the site languages, memoised for the duration of the request.
+ * Access to the site languages, memoised for the duration of the request
+ * (the container resets it between requests in long-running runtimes).
  */
-final class LanguageProvider
+final class LanguageProvider implements ResetInterface
 {
     private ?Language $default = null;
     /** @var Language[]|null */

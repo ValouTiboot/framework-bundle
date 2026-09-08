@@ -13,6 +13,10 @@ namespace Digitix\FrameworkBundle\Admin\Config;
  */
 final class EntityConfig
 {
+    /**
+     * @param class-string|null $class
+     * @param class-string      $controller
+     */
     public function __construct(
         /** Canonical name, as written in the YAML key (e.g. "CmsCategory"). */
         public readonly string $name,
@@ -37,7 +41,11 @@ final class EntityConfig
         return null === $this->class;
     }
 
-    /** Convention: a translatable entity has a sibling "<Class>Translation" entity. */
+    /**
+     * Convention: a translatable entity has a sibling "<Class>Translation" entity.
+     *
+     * @return class-string|null
+     */
     public function getTranslationClass(): ?string
     {
         if (null === $this->class) {

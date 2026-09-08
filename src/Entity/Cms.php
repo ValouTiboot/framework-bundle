@@ -8,7 +8,17 @@ use Digitix\FrameworkBundle\Entity\Translatable\Translatable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Translated fields, resolved in the current language (see Translatable):
+ *
+ * @method string|null getName()
+ * @method string|null getContent()
+ * @method string|null getMetaTitle()
+ * @method string|null getMetaDescription()
+ * @method string|null getRewrite()
+ */
 #[ORM\Entity]
 class Cms extends Translatable
 {
@@ -31,6 +41,7 @@ class Cms extends Translatable
 
     /** @var Collection<int, CmsTranslation> */
     #[ORM\OneToMany(targetEntity: CmsTranslation::class, mappedBy: 'translatable', cascade: ['all'], orphanRemoval: true)]
+    #[Assert\Valid]
     private Collection $translations;
 
     public function __construct()

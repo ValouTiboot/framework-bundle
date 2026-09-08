@@ -1,45 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Updater;
 
-use Symfony\Component\Translation\Util\ArrayConverter;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Dumper\PhpFileDumper;
+use Symfony\Component\Translation\Util\ArrayConverter;
 use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 
+/**
+ * Writes the translations submitted by the translation editor into
+ * "translations/<locale>/<Domain>.<locale>.php".
+ */
 final class TranslationUpdater
 {
-	private $writer;
-	private $translations = [];
-	private $domain;
+    private readonly string $translationDir;
 
-	public function __construct(TranslationWriterInterface $writer, $projectDir)
-	{
-		$this->writer = $writer;
-		$this->translationDir = $projectDir.'/translations/';
-	}
+    /** @var array<string, string> key => translated value */
+    private array $translations = [];
 
-	public function prepare($oldTranslations, $form)
-	{
-		$data = $form->getData();
-		$this->domain = str_replace('_', '.', $form->getName());
+    private string $domain = 'messages';
 
-		foreach ($oldTranslations[$this->domain] as $key => $value) {
-			if (isset($data[md5($key)])) {
-				$this->translations[$key] = $data[md5($key)];
-			}
-		}
+    public function __construct(
+        private readonly TranslationWriterInterface $writer,
+        string $projectDir,
+    ) {
+        $this->translationDir = $projectDir.'/translations/';
+    }
 
-		return true;
-	}
+    /**
+     * Keeps, from the submitted form, the values of the keys known for the
+     * form's domain (form children are named after the md5 of the key).
+     *
+     * @param array<string, array<string, string>> $oldTranslations domain => key => value
+     * @param FormInterface<mixed>                 $form
+     */
+    public function prepare(array $oldTranslations, FormInterface $form): void
+    {
+        $data = (array) $form->getData();
+        $this->domain = str_replace('_', '.', $form->getName());
+        $this->translations = [];
 
-	public function write($locale = 'fr_FR')
-	{
-		$messages = ArrayConverter::expandToTree($this->translations);
-		$catalog = new MessageCatalogue($locale);
-		$catalog->add($messages, $this->domain);
+        foreach ($oldTranslations[$this->domain] ?? [] as $key => $value) {
+            if (isset($data[md5($key)])) {
+                $this->translations[$key] = (string) $data[md5($key)];
+            }
+        }
+    }
 
-		$this->writer->addDumper('php', (new PhpFileDumper()));
-		$this->writer->write($catalog, 'php', ['path' => $this->translationDir.$catalog->getLocale()]);
-	}
+    public function write(string $locale = 'fr_FR'): void
+    {
+        $catalogue = new MessageCatalogue($locale);
+        $catalogue->add(ArrayConverter::expandToTree($this->translations), $this->domain);
+
+        // the "php" dumper is registered on the framework's translation writer
+        $this->writer->write($catalogue, 'php', ['path' => $this->translationDir.$locale]);
+    }
 }

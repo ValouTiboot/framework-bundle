@@ -94,6 +94,20 @@ Twig templates (@DigitixFramework/admin/...)
 - Permissions: `AdminVoter` grants everything to `ROLE_SUPERADMIN`, otherwise reads `Role::authorization`, e.g. `{"*": ["read"], "cms": ["read", "create", "edit"]}`.
 - Delete is a POST with a CSRF token.
 
+## Tests
+
+The bundle ships its own test application (`tests/App`, SQLite in memory,
+the shipped recipe as configuration) so it is tested independently of any
+project:
+
+```bash
+composer install          # in the bundle directory
+composer test             # PHPStan (level 6) then PHPUnit (unit + functional)
+composer phpunit -- --filter CmsCrudTest
+```
+
+The GitHub Actions workflow runs the same command on PHP 8.2 and 8.4.
+
 ## Custom controller
 
 ```php

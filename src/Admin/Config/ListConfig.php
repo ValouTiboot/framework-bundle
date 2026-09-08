@@ -9,7 +9,7 @@ final class ListConfig
     /**
      * @param string[]                    $toolbar
      * @param string[]                    $actions
-     * @param array<int, array>           $headerLinks
+     * @param array<int, array<string, mixed>> $headerLinks
      * @param array<string, FieldConfig>  $fields   keyed by field name
      * @param array<string, FilterConfig> $filters  keyed by filter name
      */

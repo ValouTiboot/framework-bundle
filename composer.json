@@ -22,6 +22,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.18|^3.0",
         "doctrine/persistence": "^3.1|^4.0",
+        "symfony/asset": "^6.4|^7.0",
         "symfony/config": "^6.4|^7.0",
         "symfony/console": "^6.4|^7.0",
         "symfony/dependency-injection": "^6.4|^7.0",
@@ -39,21 +40,51 @@
         "symfony/routing": "^6.4|^7.0",
         "symfony/security-bundle": "^6.4|^7.0",
         "symfony/security-core": "^6.4|^7.0",
+        "symfony/security-csrf": "^6.4|^7.0",
         "symfony/security-http": "^6.4|^7.0",
         "symfony/string": "^6.4|^7.0",
         "symfony/translation": "^6.4|^7.0",
         "symfony/twig-bridge": "^6.4|^7.0",
         "symfony/twig-bundle": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
+        "symfony/var-exporter": "^6.4|^7.0",
         "symfony/yaml": "^6.4|^7.0",
         "twig/twig": "^3.0"
+    },
+    "require-dev": {
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^11.5",
+        "symfony/browser-kit": "^6.4|^7.0",
+        "symfony/css-selector": "^6.4|^7.0",
+        "symfony/dom-crawler": "^6.4|^7.0",
+        "symfony/error-handler": "^6.4|^7.0"
     },
     "autoload": {
         "psr-4": {
             "Digitix\\FrameworkBundle\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Digitix\\FrameworkBundle\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "phpstan": "phpstan analyse --memory-limit=1G",
+        "phpunit": "phpunit",
+        "test": [
+            "@phpstan",
+            "@phpunit"
+        ]
+    },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "process-timeout": 0,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     }
 }

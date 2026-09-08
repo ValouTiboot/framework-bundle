@@ -1,4 +1,9 @@
-{{ form_start(filters_form) }}
+{# The filters form is rendered empty outside the table: its inputs live in the
+   table header and reference it through the HTML "form" attribute, so that the
+   per-row delete forms are never nested inside it (nested forms are invalid). #}
+{% set filters_form_id = 'dgtx-filters-' ~ entityName %}
+{{ form_start(filters_form, {attr: {id: filters_form_id}}) }}{{ form_end(filters_form, {render_rest: false}) }}
+
 <div class="table-responsive">
 	<table class="table table-hover {% if sortable %}sortable{% endif %}" {% if sortable %}data-sortable-action="{{ url('dgtx_admin_entity_ajax_sortable', {entityName: entityName}) }}"{% endif %}>
 		<thead>
@@ -38,14 +43,14 @@
 					{% for field in list_fields %}
 						{% if attribute(filters_form.children, field.property) is defined %}
 							<th>
-								{{ form_widget(attribute(filters_form.children, field.property)) }}
+								{{ form_widget(attribute(filters_form.children, field.property), {attr: {form: filters_form_id}}) }}
 							</th>
 						{% else %}
 							<th></th>
 						{% endif %}
 					{% endfor %}
 					<th class="text-end">
-						<button type="submit" class="btn btn-outline-primary">{{ 'list.default.filter'|trans({}, 'Admin.List.Default') }}</button>
+						<button type="submit" form="{{ filters_form_id }}" class="btn btn-outline-primary">{{ 'list.default.filter'|trans({}, 'Admin.List.Default') }}</button>
 					</th>
 				</tr>
 				{% endif %}
@@ -115,4 +120,3 @@
 		</tbody>
 	</table>
 </div>
-{{ form_end(filters_form) }}

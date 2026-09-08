@@ -20,7 +20,7 @@ interface FieldTypeInterface
     /** Name used in the YAML "type" key. */
     public static function getTypeName(): string;
 
-    /** @return class-string<\Symfony\Component\Form\FormTypeInterface> */
+    /** @return class-string<\Symfony\Component\Form\FormTypeInterface<mixed>> */
     public function getFormType(FieldConfig $field, FieldTypeContext $context): string;
 
     /** @return array<string, mixed> */

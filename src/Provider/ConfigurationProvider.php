@@ -6,12 +6,14 @@ namespace Digitix\FrameworkBundle\Provider;
 
 use Digitix\FrameworkBundle\Entity\Configuration;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Access to the global "Configuration" rows (mailFrom, gtm, ssl, ...),
- * memoised for the duration of the request.
+ * memoised for the duration of the request (the container resets it between
+ * requests in long-running runtimes).
  */
-final class ConfigurationProvider
+final class ConfigurationProvider implements ResetInterface
 {
     /** @var array<string, Configuration>|null */
     private ?array $rows = null;

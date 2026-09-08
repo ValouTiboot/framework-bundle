@@ -263,6 +263,7 @@ digitix_framework:
         fields: ~
       form:
         has_return_link: false
+        template: '@DigitixFramework/admin/helper/form/translation/create'
         fields:
           type:
             label: label.translation.type
@@ -272,10 +273,10 @@ digitix_framework:
             required: true
           theme:
             label: label.translation.theme
-            name: type
+            name: theme
             type: choice
             callback: 'Digitix\FrameworkBundle\Factory\TranslationFormFactory::findThemes'
-            required: true
+            required: false
           locale:
             label: label.translation.locale
             name: locale
@@ -385,13 +386,6 @@ digitix_framework:
             type: translate
             collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
             required: false
-          translatableMetaKeywords:
-            label: label.meta.metaKeywords
-            name: metaKeyword
-            type: translate
-            class: tag
-            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
-            required: false
           translatableRewrite:
             label: label.meta.rewrite
             name: rewrite
@@ -462,13 +456,6 @@ digitix_framework:
             name: metaDescription
             type: translate
             collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
-            required: false
-          translatableMetaKeywords:
-            label: label.cmsCategory.metaKeywords
-            name: metaKeyword
-            type: translate
-            class: tag
-            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
             required: false
           translatableRewrite:
             label: label.cmsCategory.rewrite
@@ -557,13 +544,6 @@ digitix_framework:
             name: metaDescription
             type: translate
             collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
-            required: false
-          translatableMetaKeywords:
-            label: label.cms.metaKeywords
-            name: metaKeyword
-            type: translate
-            class: tag
-            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
             required: false
           translatableRewrite:
             label: label.cms.rewrite

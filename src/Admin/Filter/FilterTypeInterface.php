@@ -17,7 +17,7 @@ interface FilterTypeInterface
     /** Name used in the YAML "type" key. */
     public static function getTypeName(): string;
 
-    /** @return class-string<\Symfony\Component\Form\FormTypeInterface> */
+    /** @return class-string<\Symfony\Component\Form\FormTypeInterface<mixed>> */
     public function getFormType(FilterConfig $filter): string;
 
     /** @return array<string, mixed> */

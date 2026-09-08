@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Admin role. The Symfony role is derived from the name
@@ -20,6 +21,8 @@ class Role
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 80)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 80)]
     private ?string $name = null;
 
     /** @var array<string, string[]> */

@@ -165,6 +165,8 @@ class AdminController extends AbstractController
     /**
      * Saves the entity when the form is valid and redirects to the list,
      * otherwise renders the form page.
+     *
+     * @param FormInterface<mixed> $form
      */
     protected function handleForm(AdminContext $context, FormInterface $form, string $successMessage): Response
     {

@@ -1,0 +1,4 @@
+# The test application runs the recipe shipped with the bundle, untouched:
+# this keeps the recipe itself under test.
+imports:
+    - { resource: '../../../../recipe/digitix_framework.yaml' }

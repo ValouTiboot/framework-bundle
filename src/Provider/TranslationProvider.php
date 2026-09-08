@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Provider;
 
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Holds the translations being edited: domain => key => value.
  */
-final class TranslationProvider
+final class TranslationProvider implements ResetInterface
 {
+    public function reset(): void
+    {
+        $this->translations = [];
+    }
+
     /** @var array<string, array<string, string>> */
     private array $translations = [];
 

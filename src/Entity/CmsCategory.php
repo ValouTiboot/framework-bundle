@@ -9,6 +9,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Translated fields, resolved in the current language (see Translatable):
+ *
+ * @method string|null getName()
+ * @method string|null getMetaTitle()
+ * @method string|null getMetaDescription()
+ * @method string|null getRewrite()
+ */
 #[ORM\Entity]
 class CmsCategory extends Translatable
 {

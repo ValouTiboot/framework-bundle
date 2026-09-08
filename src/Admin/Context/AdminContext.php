@@ -52,6 +52,7 @@ final class AdminContext
         return $this->entityConfig->getSlug();
     }
 
+    /** @return class-string|null */
     public function getEntityClass(): ?string
     {
         return $this->entityConfig->class;

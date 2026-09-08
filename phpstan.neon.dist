@@ -1,0 +1,15 @@
+parameters:
+    level: 6
+    tmpDir: var/phpstan
+    paths:
+        - src
+        - tests
+    excludePaths:
+        - tests/App/var (?)
+    treatPhpDocTypesAsCertain: false
+    # Translatable entities expose translated fields through __get/__set/__call
+    universalObjectCratesClasses:
+        - Digitix\FrameworkBundle\Entity\Translatable\Translatable
+    doctrine:
+        # NOT NULL columns are typed "?string = null" until the row is persisted (Symfony maker style)
+        allowNullablePropertyForRequiredField: true
