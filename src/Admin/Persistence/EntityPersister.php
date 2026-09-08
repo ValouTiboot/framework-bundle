@@ -57,7 +57,8 @@ final class EntityPersister
 
     private function touch(object $entity, bool $isManaged): void
     {
-        $now = new \DateTimeImmutable();
+        // Doctrine "datetime" columns (DBAL 4) only accept mutable DateTime instances.
+        $now = new \DateTime();
 
         if (!$isManaged && method_exists($entity, 'setDateAdd') && (!method_exists($entity, 'getDateAdd') || null === $entity->getDateAdd())) {
             $entity->setDateAdd($now);

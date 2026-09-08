@@ -1,63 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\DataFixtures;
 
-use Doctrine\Persistence\ObjectManager;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Digitix\FrameworkBundle\Entity\Configuration;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
 
+/**
+ * Default rows of the global configuration (Parameter / Performance pages).
+ */
 class ConfigurationFixtures extends Fixture
 {
-    const DATAS = [
-        [
-            'name' => 'cache',
-            'value' => 0,
-        ],
-        [
-            'name' => 'compile',
-            'value' => 0,
-        ],
-        [
-            'name' => 'compileCss',
-            'value' => 0,
-        ],
-        [
-            'name' => 'comppileJs',
-            'value' => 0,
-        ],
-        [
-            'name' => 'debug',
-            'value' => 1,
-        ],
-        [
-            'name' => 'mailFrom',
-            'value' => null,
-        ],
-        [
-            'name' => 'maiFromName',
-            'value' => null,
-        ],
-        [
-            'name' => 'ssl',
-            'value' => 1,
-        ],
-        [
-            'name' => 'gtm',
-            'value' => null,
-        ],
-        [
-            'name' => 'tag',
-            'value' => null,
-        ]
+    public const DATAS = [
+        'cache' => '0',
+        'compile' => '0',
+        'compileCss' => '0',
+        'compileJs' => '0',
+        'debug' => '1',
+        'mailFrom' => null,
+        'mailFromName' => null,
+        'ssl' => '1',
+        'gtm' => null,
+        'tag' => null,
+        'robots' => null,
     ];
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        foreach (self::DATAS as $config) {
-            $configuration = new Configuration();
-            $configuration->setName($config['name']);
-            $configuration->setValue($config['value']);
-            $manager->persist($configuration);
+        foreach (self::DATAS as $name => $value) {
+            $manager->persist((new Configuration())->setName($name)->setValue($value));
         }
 
         $manager->flush();

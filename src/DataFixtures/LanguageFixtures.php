@@ -9,7 +9,7 @@ use Digitix\FrameworkBundle\Entity\Language;
 
 class LanguageFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $dateTime = new DateTime();
         $language = new Language();

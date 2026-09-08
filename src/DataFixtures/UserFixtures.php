@@ -11,14 +11,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture
 {
-    private $passwordHasher;
-
-    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
     {
-        $this->passwordHasher = $passwordHasher;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $dateTime = new DateTime();
 
@@ -35,8 +32,7 @@ class UserFixtures extends Fixture
             ->setActive(true)
             ->setDateAdd($dateTime)
             ->setDateUpd($dateTime)
-            ->setPassword($this->passwordHasher->hashPassword($user,'digitix'));
-        ;
+            ->setPassword($this->passwordHasher->hashPassword($user, 'digitix'));
 
         $manager->persist($role);
         $manager->persist($user);
