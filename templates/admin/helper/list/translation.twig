@@ -1,0 +1,135 @@
+{% extends '@DigitixFramework/admin/layout.html.twig' %}
+{% trans_default_domain 'Admin.Translation' %}
+
+{% block content_header %}
+	<div class="content-header bg-white">
+		<div class="d-flex align-items-center justify-content-between">
+			<div class="content-header-title">{{ controllerName }}</div>
+			<div class="content-header-btn">
+				{% if can_edit %}
+					<form method="post" action="{{ path('dgtx_admin_entity_action_collection', {entityName: entityName, action: 'refresh', locale: locale}) }}" class="d-inline">
+						<input type="hidden" name="_token" value="{{ csrf_token }}">
+						<button type="submit" class="btn btn-outline-primary" title="{{ 'Scans the code for new or removed keys'|trans }}">
+							<i class="material-icons">sync</i>
+							{{ 'Refresh keys'|trans }}
+						</button>
+					</form>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block toolbar %}
+	<div class="bg-white toolbar dgtx-trans-toolbar px-3">
+		<ul class="nav nav-tabs dgtx-trans-tabs">
+			{% for language in languages %}
+				{% set count = counts[language.locale]|default({total: 0, translated: 0, obsolete: 0}) %}
+				{% set percent = count.total > 0 ? (100 * count.translated / count.total)|round : 0 %}
+				<li class="nav-item">
+					<a class="nav-link {% if language.locale == locale %}active{% endif %}"
+					   href="{{ path('dgtx_admin_entity_read', {entityName: entityName, locale: language.locale}) }}"
+					   data-locale="{{ language.locale }}">
+						<span class="dgtx-trans-tab-title">
+							{{ language.name }}
+							<span class="badge rounded-pill text-bg-light">
+								<span data-count="translated">{{ count.translated }}</span>/<span data-count="total">{{ count.total }}</span>
+							</span>
+						</span>
+						<span class="progress" title="{{ '%translated% of %total% translated'|trans({'%translated%': count.translated, '%total%': count.total}) }}">
+							<span class="progress-bar {% if percent == 100 %}bg-success{% endif %}" data-progress style="width: {{ percent }}%"></span>
+						</span>
+					</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+{% endblock %}
+
+{% block content %}
+	<form method="get" action="{{ path('dgtx_admin_entity_read', {entityName: entityName}) }}" class="row g-2 align-items-center dgtx-trans-filters mb-3">
+		<input type="hidden" name="locale" value="{{ locale }}">
+		<div class="col-md-3">
+			<select name="domain" class="form-select" aria-label="{{ 'Domain'|trans }}">
+				<option value="">{{ 'All domains'|trans }}</option>
+				{% for domain in domains %}
+					<option value="{{ domain }}" {% if domain == filters.domain %}selected{% endif %}>{{ domain }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div class="col-md-2">
+			<select name="status" class="form-select" aria-label="{{ 'Status'|trans }}">
+				<option value="">{{ 'All statuses'|trans }}</option>
+				{% for status in statuses %}
+					<option value="{{ status }}" {% if status == filters.status %}selected{% endif %}>{{ ('label.translation.' ~ status)|trans({}, 'Admin.Fields.Label') }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div class="col-md-5">
+			<input type="search" name="q" value="{{ filters.q }}" class="form-control" placeholder="{{ 'Search a key or a translation'|trans }}" aria-label="{{ 'Search a key or a translation'|trans }}">
+		</div>
+		<div class="col-md-2 d-flex justify-content-end gap-1">
+			<button type="submit" class="btn btn-outline-primary">{{ 'list.default.filter'|trans({}, 'Admin.List.Default') }}</button>
+			{% if filters.domain or filters.status or filters.q %}
+				<a href="{{ path('dgtx_admin_entity_read', {entityName: entityName, locale: locale}) }}" class="btn btn-light" title="{{ 'Clear filters'|trans }}"><i class="material-icons">close</i></a>
+			{% endif %}
+		</div>
+	</form>
+
+	<div class="text-muted small mb-2">{{ 'list.default.total'|trans({}, 'Admin.List.Default') }} <small>({{ total_items }})</small></div>
+
+	<div class="table-responsive">
+		<table class="table table-hover dgtx-trans-table"
+		       data-token="{{ csrf_token }}"
+		       data-placeholder="{{ 'Click to translate'|trans }}"
+		       data-save-label="{{ 'Save (Ctrl+Enter)'|trans }}"
+		       data-cancel-label="{{ 'Cancel (Esc)'|trans }}"
+		       data-html-label="{{ 'Rich text (HTML)'|trans }}"
+		       data-error="{{ 'The translation could not be saved.'|trans }}">
+			<thead>
+				<tr>
+					<th scope="col" width="14%">{{ 'Domain'|trans }}</th>
+					<th scope="col" width="34%">{{ 'Source text'|trans }}</th>
+					<th scope="col">{{ 'Translation'|trans }}</th>
+					<th scope="col" width="9%">{{ 'Status'|trans }}</th>
+					<th scope="col" width="4%"></th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for entry in entities %}
+				<tr id="translation-{{ entry.id }}" class="dgtx-trans-row dgtx-trans-row-{{ entry.statusValue }}">
+					<td><span class="badge text-bg-light dgtx-trans-domain">{{ entry.domain }}</span></td>
+					{# the two text cells keep their line breaks (pre-wrap): no whitespace around the value #}
+					<td class="dgtx-trans-key">{{ entry.key }}</td>
+					<td class="dgtx-trans-value{% if can_edit %} editable{% endif %}{% if entry.html %} dgtx-trans-html{% endif %}"
+					    {% if can_edit %}tabindex="0" role="button" title="{{ 'Click to translate'|trans }}"{% endif %}
+					    data-url="{{ path('dgtx_admin_entity_action', {entityName: entityName, action: 'update', entityId: entry.id}) }}"
+					    data-value="{{ entry.value }}"
+					    data-html="{{ entry.html ? 1 : 0 }}"
+					>{%- if entry.value is null -%}
+						<span class="text-muted fst-italic dgtx-trans-empty">{{ 'Click to translate'|trans }}</span>
+					{%- elseif entry.html -%}
+						{{ entry.value|raw }}
+					{%- else -%}
+						{{ entry.value }}
+					{%- endif -%}</td>
+					<td><span class="badge dgtx-status dgtx-status-{{ entry.statusValue }}">{{ ('label.translation.' ~ entry.statusValue)|trans({}, 'Admin.Fields.Label') }}</span></td>
+					<td class="text-end">
+						{% if can_edit %}
+							<a class="item-edit" href="{{ path('dgtx_admin_entity_edit', {entityName: entityName, entityId: entry.id}) }}" title="{{ 'Open in a form'|trans }}">
+								<i class="material-icons">edit</i>
+							</a>
+						{% endif %}
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="5" class="text-center text-muted py-4">{{ 'No entry matches your filters.'|trans }}</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+	{% include '@DigitixFramework/admin/helper/list/_partials/pagination.twig' %}
+{% endblock %}

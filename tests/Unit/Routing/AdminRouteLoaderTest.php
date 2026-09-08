@@ -28,7 +28,15 @@ final class AdminRouteLoaderTest extends TestCase
             'dgtx_admin_entity_edit',
             'dgtx_admin_entity_delete',
             'dgtx_admin_entity_ajax_sortable',
+            'dgtx_admin_entity_action',
+            'dgtx_admin_entity_action_collection',
         ], array_keys($routes->all()));
+
+        $action = $routes->get('dgtx_admin_entity_action');
+        self::assertNotNull($action);
+        self::assertSame('/admin/{entityName}/action/{action}/{entityId}', $action->getPath());
+        self::assertSame(AdminController::class.'::action', $action->getDefault('_controller'));
+        self::assertSame(AdminRouteLoader::ACTION_REQUIREMENT, $action->getRequirement('action'));
 
         $delete = $routes->get('dgtx_admin_entity_delete');
         self::assertNotNull($delete);

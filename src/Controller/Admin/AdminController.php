@@ -155,6 +155,23 @@ class AdminController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
+    /**
+     * Dispatches "/admin/{entityName}/action/{action}[/{entityId}]" to the
+     * "{action}Action(AdminContext $context)" method of the entity controller
+     * ("export_csv" => exportCsvAction). Lets a controller add actions
+     * without declaring routes.
+     */
+    public function action(AdminContext $context, string $action): Response
+    {
+        $method = lcfirst(str_replace('_', '', ucwords($action, '_'))).'Action';
+
+        if (!method_exists($this, $method) || !(new \ReflectionMethod($this, $method))->isPublic()) {
+            throw new NotFoundHttpException(sprintf('Unknown action "%s" for "%s".', $action, $context->getEntityName()));
+        }
+
+        return $this->$method($context);
+    }
+
     public static function deleteTokenId(?int $entityId): string
     {
         return 'dgtx_delete_'.$entityId;

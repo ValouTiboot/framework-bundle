@@ -141,26 +141,98 @@ final class TranslationWorkflowTest extends AdminTestCase
         self::assertStringContainsString('Admin.Fields.Label.fr_FR.php', $tester->getDisplay());
     }
 
-    public function testRefreshFromTheAdminAndEditAnEntry(): void
+    public function testRefreshFromTheAdminThenEditThroughTheForm(): void
     {
         $this->login();
 
-        $this->client->request('GET', '/admin/translation?refresh');
-        self::assertResponseRedirects('/admin/translation');
+        $crawler = $this->client->request('GET', '/admin/translation');
+        self::assertResponseIsSuccessful();
+        self::assertCount(0, $crawler->filter('tr.dgtx-trans-row'), 'nothing extracted yet');
+
+        // refresh is a POST with a token
+        $this->client->request('POST', '/admin/translation/action/refresh?locale=fr_FR', ['_token' => 'wrong']);
+        self::assertResponseRedirects('/admin/translation?locale=fr_FR');
+        self::assertSame(0, $this->repository()->count([]), 'a bad token does nothing');
+
+        $this->client->request('POST', '/admin/translation/action/refresh?locale=fr_FR', ['_token' => $crawler->filter('.dgtx-trans-table')->attr('data-token')]);
+        self::assertResponseRedirects('/admin/translation?locale=fr_FR');
         $crawler = $this->client->followRedirect();
-        self::assertStringContainsString('Translation keys refreshed', implode(' ', $this->flashes($crawler, 'success')));
-        self::assertGreaterThan(0, $crawler->filter('table tbody tr')->count());
+        // the flash is translated by the bundle's own fr_FR file
+        self::assertStringContainsString('Clés de traduction actualisées', implode(' ', $this->flashes($crawler, 'success')));
+        self::assertGreaterThan(0, $crawler->filter('tr.dgtx-trans-row')->count());
+        self::assertSame('fr_FR', $crawler->filter('.dgtx-trans-tabs .nav-link.active')->attr('data-locale'));
 
         $entry = $this->entry('Admin.List.Default', 'list.default.add');
         $crawler = $this->client->request('GET', '/admin/translation/edit/'.$entry->getId());
         self::assertResponseIsSuccessful();
 
-        $this->submitAdminForm($crawler, 'translation', ['value' => 'Ajouter']);
-        self::assertResponseRedirects('/admin/translation');
+        $this->submitAdminForm($crawler, 'translation', ['value' => 'Ajouter (formulaire)']);
+        self::assertResponseRedirects('/admin/translation?locale=fr_FR');
 
         $this->em()->clear();
-        self::assertSame('Ajouter', $this->entry('Admin.List.Default', 'list.default.add')->getValue());
-        self::assertStringContainsString("'list.default.add' => 'Ajouter'", (string) file_get_contents($this->compiler()->getOutputDir().'/fr_FR/Admin.List.Default.fr_FR.php'));
+        self::assertSame('Ajouter (formulaire)', $this->entry('Admin.List.Default', 'list.default.add')->getValue());
+        self::assertStringContainsString("'list.default.add' => 'Ajouter (formulaire)'", (string) file_get_contents($this->compiler()->getOutputDir().'/fr_FR/Admin.List.Default.fr_FR.php'));
+    }
+
+    public function testEditorFiltersAndSearch(): void
+    {
+        $this->synchronizer()->synchronize();
+        $this->login();
+
+        $crawler = $this->client->request('GET', '/admin/translation?status=missing');
+        self::assertResponseIsSuccessful();
+        self::assertGreaterThan(0, $crawler->filter('tr.dgtx-trans-row')->count());
+        self::assertCount(0, $crawler->filter('tr.dgtx-trans-row-translated'), 'only missing entries');
+
+        $crawler = $this->client->request('GET', '/admin/translation?domain=Admin.List.Default&q=list.default.add');
+        self::assertCount(1, $crawler->filter('tr.dgtx-trans-row'));
+        self::assertStringContainsString('list.default.add', $crawler->filter('.dgtx-trans-key')->text());
+
+        $crawler = $this->client->request('GET', '/admin/translation?q=nothing-like-this-anywhere');
+        self::assertCount(0, $crawler->filter('tr.dgtx-trans-row'));
+        self::assertStringContainsString('Aucune entrée ne correspond', $crawler->filter('table tbody')->text());
+    }
+
+    public function testInlineUpdateThroughJson(): void
+    {
+        $this->synchronizer()->synchronize();
+        $this->login();
+
+        $crawler = $this->client->request('GET', '/admin/translation');
+        $token = $crawler->filter('.dgtx-trans-table')->attr('data-token');
+        $entry = $this->entry('Admin.Message.Error', 'Invalid security token, please try again.');
+        $url = '/admin/translation/action/update/'.$entry->getId();
+        $headers = ['CONTENT_TYPE' => 'application/json', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'];
+
+        $this->client->request('POST', $url, [], [], $headers, (string) json_encode(['value' => 'Jeton invalide', '_token' => 'wrong']));
+        self::assertResponseStatusCodeSame(403);
+        self::assertJson((string) $this->client->getResponse()->getContent());
+
+        $this->client->request('POST', $url, [], [], $headers, (string) json_encode(['value' => 'Jeton invalide', '_token' => $token]));
+        self::assertResponseIsSuccessful();
+        $data = json_decode((string) $this->client->getResponse()->getContent(), true);
+        self::assertIsArray($data);
+        self::assertSame('Jeton invalide', $data['value']);
+        self::assertSame('translated', $data['status']);
+        self::assertSame('fr_FR', $data['locale']);
+        self::assertArrayHasKey('translated', $data['counts']);
+
+        /** @var TranslatorInterface $translator */
+        $translator = static::getContainer()->get('translator');
+        self::assertSame('Jeton invalide', $translator->trans('Invalid security token, please try again.', [], 'Admin.Message.Error', 'fr_FR'), 'compiled right away');
+
+        // blanking the value puts the entry back to "missing"
+        $this->client->request('POST', $url, [], [], $headers, (string) json_encode(['value' => '  ', '_token' => $token]));
+        $data = json_decode((string) $this->client->getResponse()->getContent(), true);
+        self::assertIsArray($data);
+        self::assertNull($data['value']);
+        self::assertSame('missing', $data['status']);
+
+        $this->client->request('POST', '/admin/translation/action/update/999999', [], [], $headers, (string) json_encode(['value' => 'x', '_token' => $token]));
+        self::assertResponseStatusCodeSame(404);
+
+        $this->client->request('POST', '/admin/translation/action/no_such_action', [], [], $headers, '{}');
+        self::assertResponseStatusCodeSame(404);
     }
 
     private function entry(string $domain, string $key): Translation

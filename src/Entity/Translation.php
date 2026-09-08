@@ -133,6 +133,12 @@ class Translation
         return null !== $this->value;
     }
 
+    /** The source text or the translation contains HTML tags: edited with the rich editor. */
+    public function isHtml(): bool
+    {
+        return 1 === preg_match('/<[a-z][^>]*>/i', $this->key.' '.$this->value);
+    }
+
     public function getStatus(): TranslationStatus
     {
         return $this->status;

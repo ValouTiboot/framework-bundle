@@ -7,6 +7,7 @@ namespace Digitix\FrameworkBundle\Repository;
 use Digitix\FrameworkBundle\Entity\Translation;
 use Digitix\FrameworkBundle\Translation\TranslationStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -68,6 +69,34 @@ class TranslationRepository extends ServiceEntityRepository
         }
 
         return $grouped;
+    }
+
+    /**
+     * Query of the editor list: one locale, optional domain, status and
+     * full-text filters, sorted by domain then key.
+     */
+    public function createListQueryBuilder(string $locale, ?string $domain = null, ?TranslationStatus $status = null, ?string $search = null): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->where('t.locale = :locale')
+            ->setParameter('locale', $locale)
+            ->orderBy('t.domain', 'ASC')
+            ->addOrderBy('t.key', 'ASC');
+
+        if (null !== $domain && '' !== $domain) {
+            $qb->andWhere('t.domain = :domain')->setParameter('domain', $domain);
+        }
+
+        if (null !== $status) {
+            $qb->andWhere('t.status = :status')->setParameter('status', $status->value);
+        }
+
+        if (null !== $search && '' !== trim($search)) {
+            $qb->andWhere('LOWER(t.key) LIKE :search OR LOWER(t.value) LIKE :search')
+                ->setParameter('search', '%'.mb_strtolower(trim($search)).'%');
+        }
+
+        return $qb;
     }
 
     /** @return string[] */

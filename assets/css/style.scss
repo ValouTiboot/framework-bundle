@@ -185,19 +185,7 @@ body {
 	}
 }
 
-#translation {
-	.translationForm-title {
-		cursor: pointer;
-		font-size: 14px;
-		padding: 10px 20px;
-	}
-	.collaspe-form {
-		border-top: 1px solid #eee;
-		.container-form {
-			padding: 40px 20px 20px;
-		}
-	}
-}
+@import "_partials/translation";
 
 #menu {
   #menu-container {

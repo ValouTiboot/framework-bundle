@@ -47,6 +47,12 @@ let config = {
     $: '$',
     // jquery: 'jQuery',
   },
+  resolve: {
+    // one jQuery for everybody: jquery-ui ships its own copy, its widgets must attach to ours
+    alias: {
+      jquery: path.resolve(__dirname, 'node_modules/jquery'),
+    },
+  },
   plugins: [
     new MiniCssExtractPlugin({filename: path.join('..', 'css', '[name].css')}),
   ]

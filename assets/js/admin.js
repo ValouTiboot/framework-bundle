@@ -16,6 +16,7 @@ require('bootstrap');
 import 'jquery-ui/ui/widgets/sortable';
 import 'jquery-ui/ui/widgets/draggable';
 import Tagify from '@yaireo/tagify';
+import { initTranslationEditor } from './translation';
 
 // Import TinyMCE
 import tinymce from 'tinymce';
@@ -66,6 +67,9 @@ import 'tinymce/plugins/emoticons/js/emojis.min';
 console.log('Hello Webpack Encore! Edit me in asset/admin/_dev/admin.js');
 
 $(document).ready(function(){
+
+	// translation editor (inline edition), first: it must not depend on the rest of this callback
+	initTranslationEditor();
 
 	// Menu
 	$('.menu-items a[href^="#"]').click(function(e){
@@ -131,14 +135,16 @@ $(document).ready(function(){
 	});
 
 	// sortable
-	$('table.sortable tbody').sortable({
-		handle:'.sortable-item',
-		items:'tr',
-		axis: 'y',
-		update: function(event,ui) {
-			$.post($('table.sortable').data('sortable-action'), $(this).sortable("serialize"));
-		}
-	});
+	if ($.fn.sortable) {
+		$('table.sortable tbody').sortable({
+			handle:'.sortable-item',
+			items:'tr',
+			axis: 'y',
+			update: function(event,ui) {
+				$.post($('table.sortable').data('sortable-action'), $(this).sortable("serialize"));
+			}
+		});
+	}
 
 	// copyright
 	$(window).on('scroll', showfooter);

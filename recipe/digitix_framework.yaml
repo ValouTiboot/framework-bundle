@@ -257,51 +257,13 @@ digitix_framework:
             type: bool
             required: true
     Translation:
+      # translation editor: one tab per language, inline edition (AdminTranslationController)
       list:
-        template: null
+        template: '@DigitixFramework/admin/helper/list/translation'
         has_create: false
         items_per_page: 50
         toolbar: []
         actions: ['edit']
-        fields:
-          domain:
-            label: label.translation.domain
-            name: domain
-            type: text
-            sort: true
-            default_sort: 'asc'
-          key:
-            label: label.translation.key
-            name: key
-            type: text
-            sort: true
-          locale:
-            label: label.translation.locale
-            name: locale
-            type: text
-            sort: true
-          value:
-            label: label.translation.value
-            name: value
-            type: text
-          status:
-            label: label.translation.status
-            name: statusValue
-            type: text
-        filters:
-          domain:
-            label: label.translation.domain
-            type: text
-          key:
-            label: label.translation.key
-            type: text
-          locale:
-            label: label.translation.locale
-            type: text
-          status:
-            label: label.translation.status
-            type: choice
-            choice: {'label.translation.missing': missing, 'label.translation.translated': translated, 'label.translation.obsolete': obsolete}
       form:
         fields:
           domain:

@@ -118,9 +118,15 @@ code ──(dgtx:translation:extract)──> translation table ──(compile)�
   never commit it) and the translator cache is invalidated. `RuntimeTranslator`
   loads those files even when they did not exist at container compile time,
   so no `cache:clear` is needed.
+- **Editor** (`/admin/translation`): one tab per active language with its
+  progress, filters by domain, status and full text, inline edition of a
+  cell (Ctrl+Enter saves, Esc cancels) posted as JSON to
+  `/admin/translation/action/update/{id}` with the page token; the pencil
+  opens the plain form for browsers without JavaScript. "Refresh keys" runs
+  the extraction. Styles and script live in `assets/` (see below).
 - Console: `dgtx:translation:extract [--locale=fr_FR] [--no-compile]`,
   `dgtx:translation:compile [locale]`. Run `extract` after each deployment
-  (or click "refresh" in the admin) so that new keys show up.
+  (or click "Refresh keys" in the admin) so that new keys show up.
 
 Themes: give their templates a domain of their own (`'Theme.MyTheme'`) and
 filter on it in the editor.
@@ -162,5 +168,26 @@ final class ProductController extends AdminController
 ```
 
 Helpers available in a controller: `forms()`, `listView()`, `formView()`, `templates()`, `persister()`, `uploads()`, `configuration()`, `doctrine()`, `handleForm()`, `renderAdmin()`, `redirectToList()`, `trans()`.
+
+Custom actions need no route: `/admin/{entityName}/action/{action}` and
+`/admin/{entityName}/action/{action}/{entityId}` call the public
+`{action}Action(AdminContext $context)` method of the entity controller
+(`export_csv` calls `exportCsvAction`), 404 when it does not exist. Check the
+permission and the HTTP method yourself in the action.
+
+## Assets
+
+The admin theme (Bootstrap 5, jQuery, TinyMCE, Material icons) is built with
+webpack from `assets/` into `public/`, which is committed:
+
+```bash
+cd assets
+yarn install --ignore-engines   # node 14 through nvm on the Digitix servers
+yarn build                      # or: yarn watch
+php bin/console assets:install  # in the project, copies public/ to public/bundles/digitixframework/
+```
+
+Styles: `assets/css/style.scss` and `assets/css/_partials/*.scss`. Scripts:
+`assets/js/admin.js` (entry point) and its modules.
 
 `trans()` has the translator's signature, `trans($id, $parameters, $domain)`: always pass the domain as a literal string so that the translation extractor finds the key.
