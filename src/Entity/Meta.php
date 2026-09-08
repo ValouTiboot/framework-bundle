@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Digitix\FrameworkBundle\Entity\Translatable\Translatable;
@@ -8,26 +10,22 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * SEO meta of a static front page, keyed by route name.
  */
+#[ORM\Entity]
 class Meta extends Translatable
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $page;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $page = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity="MetaTranslation", mappedBy="translatable", cascade={"ALL"}, orphanRemoval=true)
-     */
-    protected $translations;
+    /** @var Collection<int, MetaTranslation> */
+    #[ORM\OneToMany(targetEntity: MetaTranslation::class, mappedBy: 'translatable', cascade: ['all'], orphanRemoval: true)]
+    private Collection $translations;
 
     public function __construct()
     {
@@ -51,9 +49,7 @@ class Meta extends Translatable
         return $this;
     }
 
-    /**
-     * @return Collection|MetaTranslation[]
-     */
+    /** @return Collection<int, MetaTranslation> */
     public function getTranslations(): Collection
     {
         return $this->translations;
@@ -62,7 +58,7 @@ class Meta extends Translatable
     public function addTranslation(MetaTranslation $translation): self
     {
         if (!$this->translations->contains($translation)) {
-            $this->translations[] = $translation;
+            $this->translations->add($translation);
             $translation->setTranslatable($this);
         }
 
@@ -71,12 +67,8 @@ class Meta extends Translatable
 
     public function removeTranslation(MetaTranslation $translation): self
     {
-        if ($this->translations->contains($translation)) {
-            $this->translations->removeElement($translation);
-            // set the owning side to null (unless already changed)
-            if ($translation->getTranslatable() === $this) {
-                $translation->setTranslatable(null);
-            }
+        if ($this->translations->removeElement($translation) && $translation->getTranslatable() === $this) {
+            $translation->setTranslatable(null);
         }
 
         return $this;

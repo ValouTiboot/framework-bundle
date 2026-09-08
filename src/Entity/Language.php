@@ -1,70 +1,48 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Language
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=80)
-     */
-    private $name;
+    #[ORM\Column(type: 'string', length: 80)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="string", length=2)
-     */
-    private $iso;
+    #[ORM\Column(type: 'string', length: 2)]
+    private ?string $iso = null;
 
-    /**
-     * @ORM\Column(type="string", length=5)
-     */
-    private $locale;
+    #[ORM\Column(type: 'string', length: 5)]
+    private ?string $locale = null;
 
-    /**
-     * @ORM\Column(type="string", length=30)
-     */
-    private $formatDate;
+    #[ORM\Column(type: 'string', length: 30)]
+    private ?string $formatDate = null;
 
-    /**
-     * @ORM\Column(type="string", length=30)
-     */
-    private $formatDatetime;
+    #[ORM\Column(type: 'string', length: 30)]
+    private ?string $formatDatetime = null;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $active;
+    #[ORM\Column(type: 'boolean')]
+    private bool $active = false;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $defaultLanguage;
+    #[ORM\Column(type: 'boolean')]
+    private bool $defaultLanguage = false;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $rtl;
+    #[ORM\Column(type: 'boolean')]
+    private bool $rtl = false;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateAdd;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateAdd = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateUpd;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateUpd = null;
 
     public function getId(): ?int
     {
@@ -107,7 +85,31 @@ class Language
         return $this;
     }
 
-    public function getActive(): ?bool
+    public function getFormatDate(): ?string
+    {
+        return $this->formatDate;
+    }
+
+    public function setFormatDate(string $formatDate): self
+    {
+        $this->formatDate = $formatDate;
+
+        return $this;
+    }
+
+    public function getFormatDatetime(): ?string
+    {
+        return $this->formatDatetime;
+    }
+
+    public function setFormatDatetime(string $formatDatetime): self
+    {
+        $this->formatDatetime = $formatDatetime;
+
+        return $this;
+    }
+
+    public function getActive(): bool
     {
         return $this->active;
     }
@@ -119,7 +121,7 @@ class Language
         return $this;
     }
 
-    public function getDefaultLanguage(): ?bool
+    public function getDefaultLanguage(): bool
     {
         return $this->defaultLanguage;
     }
@@ -131,7 +133,7 @@ class Language
         return $this;
     }
 
-    public function getRtl(): ?bool
+    public function getRtl(): bool
     {
         return $this->rtl;
     }
@@ -163,30 +165,6 @@ class Language
     public function setDateUpd(\DateTimeInterface $dateUpd): self
     {
         $this->dateUpd = $dateUpd;
-
-        return $this;
-    }
-
-    public function getFormatDate(): ?string
-    {
-        return $this->formatDate;
-    }
-
-    public function setFormatDate(string $formatDate): self
-    {
-        $this->formatDate = $formatDate;
-
-        return $this;
-    }
-
-    public function getFormatDatetime(): ?string
-    {
-        return $this->formatDatetime;
-    }
-
-    public function setFormatDatetime(string $formatDatetime): self
-    {
-        $this->formatDatetime = $formatDatetime;
 
         return $this;
     }

@@ -1,12 +1,10 @@
 {
     "name": "digitix/framework-bundle",
-    "description": "DIGITX extra framework for Admin generator",
-    "keywords": ["backend", "admin", "generator"],
+    "description": "Digitix admin generator: a YAML-described back office for Symfony",
+    "keywords": ["backend", "admin", "generator", "symfony", "bundle"],
     "type": "symfony-bundle",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "homepage": "https://www.digitix.agency",
-    "license": "DIGITIX",
+    "license": "proprietary",
     "authors": [
         {
             "name": "THIBAULT Valentin",
@@ -17,29 +15,45 @@
     "require": {
         "php": ">=8.2",
         "ext-json": "*",
-        "doctrine/annotations": "^1.0",
-        "doctrine/doctrine-bundle": "^2.5",
+        "doctrine/collections": "^1.8|^2.0",
+        "doctrine/dbal": "^3.8|^4.0",
+        "doctrine/doctrine-bundle": "^2.11",
+        "doctrine/doctrine-fixtures-bundle": "^3.5|^4.0",
         "doctrine/doctrine-migrations-bundle": "^3.2",
-        "doctrine/doctrine-fixtures-bundle": "^3.4",
-        "doctrine/orm": "^2.11",
-        "sensio/framework-extra-bundle": "^6.1",
-        "symfony/form": "6.4.*",
-        "symfony/framework-bundle": "6.4.*",
-        "symfony/monolog-bundle": "^3.0",
-        "symfony/intl": "6.4.*",
-        "symfony/mailer": "6.4.*",
-        "symfony/security-bundle": "6.4.*",
-        "symfony/twig-bundle": "6.4.*",
-        "symfony/validator": "6.4.*",
-        "symfony/webpack-encore-bundle": "^1.12",
-        "symfony/yaml": "6.4.*",
-        "symfony/string": "6.*",
-        "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0"
+        "doctrine/orm": "^2.18|^3.0",
+        "doctrine/persistence": "^3.1|^4.0",
+        "symfony/config": "^6.4|^7.0",
+        "symfony/console": "^6.4|^7.0",
+        "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/doctrine-bridge": "^6.4|^7.0",
+        "symfony/event-dispatcher": "^6.4|^7.0",
+        "symfony/form": "^6.4|^7.0",
+        "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/http-foundation": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/mailer": "^6.4|^7.0",
+        "symfony/mime": "^6.4|^7.0",
+        "symfony/options-resolver": "^6.4|^7.0",
+        "symfony/password-hasher": "^6.4|^7.0",
+        "symfony/property-access": "^6.4|^7.0",
+        "symfony/routing": "^6.4|^7.0",
+        "symfony/security-bundle": "^6.4|^7.0",
+        "symfony/security-core": "^6.4|^7.0",
+        "symfony/security-http": "^6.4|^7.0",
+        "symfony/string": "^6.4|^7.0",
+        "symfony/translation": "^6.4|^7.0",
+        "symfony/twig-bridge": "^6.4|^7.0",
+        "symfony/twig-bundle": "^6.4|^7.0",
+        "symfony/validator": "^6.4|^7.0",
+        "symfony/yaml": "^6.4|^7.0",
+        "twig/twig": "^3.0"
     },
     "autoload": {
         "psr-4": {
             "Digitix\\FrameworkBundle\\": "src/"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }

@@ -15,9 +15,9 @@ pages, filters, sorting, pagination, translations, permissions.
 
 ```bash
 composer require digitix/framework-bundle
-cp packages/digitix/framework-bundle/src/Resources/recipe/digitix_framework.yaml config/packages/
-cp packages/digitix/framework-bundle/src/Resources/recipe/routes/digitix_framework.yaml config/routes/
-# merge src/Resources/recipe/security.yaml into config/packages/security.yaml
+cp packages/digitix/framework-bundle/recipe/digitix_framework.yaml config/packages/
+cp packages/digitix/framework-bundle/recipe/routes/digitix_framework.yaml config/routes/
+# merge recipe/security.yaml into config/packages/security.yaml
 php bin/console doctrine:migrations:diff && php bin/console doctrine:migrations:migrate
 php bin/console doctrine:fixtures:load   # SuperAdmin user, default language, configuration rows
 ```

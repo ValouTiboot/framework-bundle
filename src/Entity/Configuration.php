@@ -1,30 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * Global key/value settings edited through the "Parameter" and
+ * "Performance" admin pages.
  */
+#[ORM\Entity]
 class Configuration
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $value;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $value = null;
 
     public function getId(): ?int
     {

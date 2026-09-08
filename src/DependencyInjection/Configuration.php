@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Digitix\FrameworkBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -15,14 +16,24 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * one. Two optional keys were added per admin entity ("class", "controller"),
  * plus "items_per_page" on lists. Unknown keys under a field or a filter are
  * kept as-is so that custom field/filter types can declare their own options.
+ *
+ * The tree is exposed through buildTree() so that the bundle can load it from
+ * config/definition.php (AbstractBundle) while the class stays usable as a
+ * regular ConfigurationInterface.
  */
 final class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('digitix_framework');
+        self::buildTree($treeBuilder->getRootNode());
 
-        $treeBuilder->getRootNode()
+        return $treeBuilder;
+    }
+
+    public static function buildTree(ArrayNodeDefinition $root): void
+    {
+        $root
             ->children()
                 ->arrayNode('entity_namespaces')
                     ->info('Namespaces searched, in order, to find the Doctrine class of an admin entity by its name.')
@@ -34,16 +45,14 @@ final class Configuration implements ConfigurationInterface
                     ->scalarPrototype()->end()
                     ->defaultValue(['App\\Controller\\Admin\\', 'Digitix\\FrameworkBundle\\Controller\\Admin\\'])
                 ->end()
-                ->append($this->menuNode())
-                ->append($this->adminEntitiesNode())
-                ->append($this->frontEntitiesNode())
+                ->append(self::menuNode())
+                ->append(self::adminEntitiesNode())
+                ->append(self::frontEntitiesNode())
             ->end()
         ;
-
-        return $treeBuilder;
     }
 
-    private function menuNode(): NodeDefinition
+    private static function menuNode(): NodeDefinition
     {
         $node = (new TreeBuilder('admin_menu'))->getRootNode();
 
@@ -71,7 +80,7 @@ final class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    private function adminEntitiesNode(): NodeDefinition
+    private static function adminEntitiesNode(): NodeDefinition
     {
         $node = (new TreeBuilder('admin_entities'))->getRootNode();
 
@@ -110,11 +119,11 @@ final class Configuration implements ConfigurationInterface
                                 ->defaultValue(['edit', 'delete'])
                             ->end()
                             ->variableNode('header_link')->defaultValue([])->end()
-                            ->append($this->fieldsNode('fields'))
-                            ->append($this->filtersNode())
+                            ->append(self::fieldsNode('fields'))
+                            ->append(self::filtersNode())
                         ->end()
                     ->end()
-                    ->append($this->formNode('Admin.Fields.Label'))
+                    ->append(self::formNode('Admin.Fields.Label'))
                 ->end()
             ->end()
         ;
@@ -122,7 +131,7 @@ final class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    private function frontEntitiesNode(): NodeDefinition
+    private static function frontEntitiesNode(): NodeDefinition
     {
         $node = (new TreeBuilder('front_entities'))->getRootNode();
 
@@ -131,7 +140,7 @@ final class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('entity_name')
             ->arrayPrototype()
                 ->children()
-                    ->append($this->formNode('Messages'))
+                    ->append(self::formNode('Messages'))
                 ->end()
             ->end()
         ;
@@ -139,7 +148,7 @@ final class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    private function formNode(string $defaultTranslationDomain): NodeDefinition
+    private static function formNode(string $defaultTranslationDomain): NodeDefinition
     {
         $node = (new TreeBuilder('form'))->getRootNode();
 
@@ -150,14 +159,14 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('has_return_link')->defaultTrue()->end()
                 ->booleanNode('has_auto_submit_button')->defaultTrue()->end()
                 ->scalarNode('translation_domain')->defaultValue($defaultTranslationDomain)->end()
-                ->append($this->fieldsNode('fields'))
+                ->append(self::fieldsNode('fields'))
             ->end()
         ;
 
         return $node;
     }
 
-    private function fieldsNode(string $name): NodeDefinition
+    private static function fieldsNode(string $name): NodeDefinition
     {
         $node = (new TreeBuilder($name))->getRootNode();
 
@@ -196,7 +205,7 @@ final class Configuration implements ConfigurationInterface
         return $node;
     }
 
-    private function filtersNode(): NodeDefinition
+    private static function filtersNode(): NodeDefinition
     {
         $node = (new TreeBuilder('filters'))->getRootNode();
 

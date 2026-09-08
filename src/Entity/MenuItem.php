@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Digitix\FrameworkBundle\Entity\Translatable\Translatable;
@@ -7,73 +9,53 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class MenuItem extends Translatable
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuItems', cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Menu $menu = null;
+
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'parents', cascade: ['persist'])]
+    private ?self $parent = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Menu::class, inversedBy="menuItems", cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false)
+     * Children of this item (historical name kept for compatibility).
+     *
+     * @var Collection<int, self>
      */
-    private $menu;
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    private Collection $parents;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=MenuItem::class, inversedBy="parents", cascade={"persist"})
-     */
-    private $parent;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $idEntity = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=MenuItem::class, mappedBy="idParent")
-     */
-    private $parents;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $route = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $idEntity;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $cssClass = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $route;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateAdd = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $cssClass;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateUpd = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateAdd;
+    /** @var Collection<int, MenuItemTranslation> */
+    #[ORM\OneToMany(targetEntity: MenuItemTranslation::class, mappedBy: 'translatable', cascade: ['all'], orphanRemoval: true)]
+    private Collection $translations;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateUpd;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $link = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=MenuItemTranslation::class, mappedBy="translatable", cascade={"ALL"}, orphanRemoval=true)
-     */
-    private $translations;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $link;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $depth;
+    #[ORM\Column(type: 'integer')]
+    private int $depth = 0;
 
     public function __construct()
     {
@@ -110,31 +92,26 @@ class MenuItem extends Translatable
         return $this;
     }
 
-    /**
-     * @return Collection<int, self>
-     */
+    /** @return Collection<int, self> */
     public function getParents(): Collection
     {
         return $this->parents;
     }
 
-    public function addParent(self $parent): self
+    public function addParent(self $child): self
     {
-        if (!$this->parents->contains($parent)) {
-            $this->parents[] = $parent;
-            $parent->setParent($this);
+        if (!$this->parents->contains($child)) {
+            $this->parents->add($child);
+            $child->setParent($this);
         }
 
         return $this;
     }
 
-    public function removeParent(self $parent): self
+    public function removeParent(self $child): self
     {
-        if ($this->parents->removeElement($parent)) {
-            // set the owning side to null (unless already changed)
-            if ($parent->getParent() === $this) {
-                $parent->setParent(null);
-            }
+        if ($this->parents->removeElement($child) && $child->getParent() === $this) {
+            $child->setParent(null);
         }
 
         return $this;
@@ -200,9 +177,7 @@ class MenuItem extends Translatable
         return $this;
     }
 
-    /**
-     * @return Collection<int, MenuItemTranslation>
-     */
+    /** @return Collection<int, MenuItemTranslation> */
     public function getTranslations(): Collection
     {
         return $this->translations;
@@ -211,7 +186,7 @@ class MenuItem extends Translatable
     public function addTranslation(MenuItemTranslation $translation): self
     {
         if (!$this->translations->contains($translation)) {
-            $this->translations[] = $translation;
+            $this->translations->add($translation);
             $translation->setTranslatable($this);
         }
 
@@ -220,11 +195,8 @@ class MenuItem extends Translatable
 
     public function removeTranslation(MenuItemTranslation $translation): self
     {
-        if ($this->translations->removeElement($translation)) {
-            // set the owning side to null (unless already changed)
-            if ($translation->getTranslatable() === $this) {
-                $translation->setTranslatable(null);
-            }
+        if ($this->translations->removeElement($translation) && $translation->getTranslatable() === $this) {
+            $translation->setTranslatable(null);
         }
 
         return $this;
@@ -242,7 +214,7 @@ class MenuItem extends Translatable
         return $this;
     }
 
-    public function getDepth(): ?int
+    public function getDepth(): int
     {
         return $this->depth;
     }

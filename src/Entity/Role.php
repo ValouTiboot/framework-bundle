@@ -1,30 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * Admin role. The Symfony role is derived from the name
+ * ("SuperAdmin" => ROLE_SUPERADMIN, see User::getRoles()); "authorization"
+ * holds per-entity permissions read by AdminVoter.
  */
+#[ORM\Entity]
 class Role
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=80)
-     */
-    private $name;
+    #[ORM\Column(type: 'string', length: 80)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $authorization = [];
+    /** @var array<string, string[]> */
+    #[ORM\Column(type: 'json')]
+    private array $authorization = [];
 
     public function getId(): ?int
     {
@@ -43,11 +43,13 @@ class Role
         return $this;
     }
 
-    public function getAuthorization(): ?array
+    /** @return array<string, string[]> */
+    public function getAuthorization(): array
     {
         return $this->authorization;
     }
 
+    /** @param array<string, string[]> $authorization */
     public function setAuthorization(array $authorization): self
     {
         $this->authorization = $authorization;

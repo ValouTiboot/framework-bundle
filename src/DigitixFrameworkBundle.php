@@ -4,12 +4,42 @@ declare(strict_types=1);
 
 namespace Digitix\FrameworkBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Digitix\FrameworkBundle\Admin\Config\AdminConfig;
+use Digitix\FrameworkBundle\DependencyInjection\AdminConfigResolver;
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-final class DigitixFrameworkBundle extends Bundle
+/**
+ * Modern bundle layout: config/, templates/, translations/, public/ live at
+ * the bundle root, PHP code under src/.
+ */
+final class DigitixFrameworkBundle extends AbstractBundle
 {
-    public static function getPathDir()
+    public function configure(DefinitionConfigurator $definition): void
     {
-        return dirname(__FILE__);
+        $definition->import('../config/definition.php');
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+    {
+        $config = AdminConfigResolver::resolve($config);
+
+        $container->parameters()->set('digitix_framework.entity_namespaces', $config['entity_namespaces']);
+        $container->import('../config/services.php');
+
+        // The whole configuration is baked into the container: AdminConfig is
+        // built once by AdminConfigFactory::fromArray() and shared everywhere.
+        $builder->getDefinition(AdminConfig::class)->setArgument(0, $config);
+    }
+
+    /** Bundle root directory. */
+    public static function getPathDir(): string
+    {
+        return \dirname(__DIR__);
     }
 }

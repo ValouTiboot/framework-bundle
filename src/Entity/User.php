@@ -1,76 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Digitix\FrameworkBundle\Entity\Role;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     */
-    private $email;
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    private ?string $email = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Role::class)
-     * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
-     */
-    private $role;
+    #[ORM\ManyToOne(targetEntity: Role::class)]
+    #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'id')]
+    private ?Role $role = null;
 
-    /**
-     * @var array
-     */
-    private $roles = [];
+    /** @var string[] extra roles, not persisted */
+    private array $roles = [];
 
-    /**
-     * non-persisted field that's used to create the encoded password.
-     * @var string
-     */
-    private $plainPassword;
+    /** Not persisted: used to set a new password through the admin form. */
+    private ?string $plainPassword = null;
 
-    /**
-     * @var string The hashed password
-     * @ORM\Column(type="string")
-     */
-    private $password;
+    #[ORM\Column(type: 'string')]
+    private ?string $password = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $lastname;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $lastname = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $firstname;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $firstname = null;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $active;
+    #[ORM\Column(type: 'boolean')]
+    private bool $active = false;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateAdd;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateAdd = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateUpd;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateUpd = null;
 
     public function getId(): ?int
     {
@@ -89,34 +64,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
-    public function getUsername(): string
+    public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     */
+    /** Kept for templates still using "user.username". */
+    public function getUsername(): string
+    {
+        return $this->getUserIdentifier();
+    }
+
+    /** @return string[] */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        $role = $this->getRole();
 
-        if ($role !== null) {
-            $role = 'ROLE_'.strtoupper(str_replace(' ', '_', $role->getName()));
-            $roles[] = $role;
+        if (null !== $this->role && null !== $this->role->getName()) {
+            $roles[] = 'ROLE_'.strtoupper(str_replace(' ', '_', $this->role->getName()));
         }
-        // guarantee every user at least has ROLE_USER
+
         $roles[] = 'ROLE_USER';
 
-        return array_unique($roles);
+        return array_values(array_unique($roles));
     }
 
+    /** @param string[] $roles */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
@@ -124,9 +97,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function getPassword(): string
     {
         return (string) $this->password;
@@ -139,34 +109,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPlainPassword()
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
-    public function setPlainPassword($plainPassword)
+    public function setPlainPassword(?string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
-        // $this->password = null;
+
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
-    public function getSalt()
+    public function eraseCredentials(): void
     {
-        // not needed when using the "bcrypt" algorithm in security.yaml
-        return null;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials()
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
     public function getLastname(): ?string
@@ -193,7 +150,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getActive(): ?bool
+    public function getActive(): bool
     {
         return $this->active;
     }
@@ -239,15 +196,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->dateUpd = $dateUpd;
 
         return $this;
-    }
-
-    /**
-     * The public representation of the user (e.g. a username, an email address, etc.)
-     *
-     * @see UserInterface
-     */
-    public function getUserIdentifier(): string
-    {
-        return (string) $this->email;
     }
 }

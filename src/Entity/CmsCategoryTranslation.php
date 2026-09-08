@@ -1,47 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class CmsCategoryTranslation
 {
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity=CmsCategory::class, inversedBy="translations")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $translatable;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: CmsCategory::class, inversedBy: 'translations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?CmsCategory $translatable = null;
 
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity=Language::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $language;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Language::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Language $language = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $metaTitle;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $metaTitle = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $metaDescription;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $metaDescription = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $rewrite;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $rewrite = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $name = null;
 
     public function getTranslatable(): ?CmsCategory
     {
@@ -72,7 +60,7 @@ class CmsCategoryTranslation
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(string $metaTitle): self
+    public function setMetaTitle(?string $metaTitle): self
     {
         $this->metaTitle = $metaTitle;
 
@@ -108,7 +96,7 @@ class CmsCategoryTranslation
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 

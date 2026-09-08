@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Digitix\FrameworkBundle\Entity\Translatable\Translatable;
@@ -7,42 +9,29 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Cms extends Translatable
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=CmsCategory::class)
-     */
-    private $category;
+    #[ORM\ManyToOne(targetEntity: CmsCategory::class)]
+    private ?CmsCategory $category = null;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $active;
+    #[ORM\Column(type: 'boolean')]
+    private bool $active = false;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateAdd;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateAdd = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateUpd;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateUpd = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=CmsTranslation::class, mappedBy="translatable", cascade={"ALL"}, orphanRemoval=true)
-     */
-    private $translations;
+    /** @var Collection<int, CmsTranslation> */
+    #[ORM\OneToMany(targetEntity: CmsTranslation::class, mappedBy: 'translatable', cascade: ['all'], orphanRemoval: true)]
+    private Collection $translations;
 
     public function __construct()
     {
@@ -66,7 +55,7 @@ class Cms extends Translatable
         return $this;
     }
 
-    public function getActive(): ?bool
+    public function getActive(): bool
     {
         return $this->active;
     }
@@ -102,9 +91,7 @@ class Cms extends Translatable
         return $this;
     }
 
-    /**
-     * @return Collection|CmsTranslation[]
-     */
+    /** @return Collection<int, CmsTranslation> */
     public function getTranslations(): Collection
     {
         return $this->translations;
@@ -113,7 +100,7 @@ class Cms extends Translatable
     public function addTranslation(CmsTranslation $translation): self
     {
         if (!$this->translations->contains($translation)) {
-            $this->translations[] = $translation;
+            $this->translations->add($translation);
             $translation->setTranslatable($this);
         }
 
@@ -122,12 +109,8 @@ class Cms extends Translatable
 
     public function removeTranslation(CmsTranslation $translation): self
     {
-        if ($this->translations->contains($translation)) {
-            $this->translations->removeElement($translation);
-            // set the owning side to null (unless already changed)
-            if ($translation->getTranslatable() === $this) {
-                $translation->setTranslatable(null);
-            }
+        if ($this->translations->removeElement($translation) && $translation->getTranslatable() === $this) {
+            $translation->setTranslatable(null);
         }
 
         return $this;

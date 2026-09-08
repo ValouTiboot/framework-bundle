@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Digitix\FrameworkBundle\Entity\Translatable\Translatable;
@@ -7,42 +9,30 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Menu extends Translatable
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $active;
+    #[ORM\Column(type: 'boolean')]
+    private bool $active = false;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateAdd;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateAdd = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateUpd;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $dateUpd = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=MenuTranslation::class, mappedBy="translatable", cascade={"ALL"}, orphanRemoval=true)
-     */
-    private $translations;
+    /** @var Collection<int, MenuTranslation> */
+    #[ORM\OneToMany(targetEntity: MenuTranslation::class, mappedBy: 'translatable', cascade: ['all'], orphanRemoval: true)]
+    private Collection $translations;
 
-    /**
-     * @ORM\OneToMany(targetEntity=MenuItem::class, mappedBy="menu", orphanRemoval=true)
-     */
-    private $menuItems;
+    /** @var Collection<int, MenuItem> */
+    #[ORM\OneToMany(targetEntity: MenuItem::class, mappedBy: 'menu', orphanRemoval: true)]
+    private Collection $menuItems;
 
     public function __construct()
     {
@@ -55,7 +45,12 @@ class Menu extends Translatable
         return $this->id;
     }
 
-    public function isActive(): ?bool
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function getActive(): bool
     {
         return $this->active;
     }
@@ -91,9 +86,7 @@ class Menu extends Translatable
         return $this;
     }
 
-    /**
-     * @return Collection<int, MenuTranslation>
-     */
+    /** @return Collection<int, MenuTranslation> */
     public function getTranslations(): Collection
     {
         return $this->translations;
@@ -102,7 +95,7 @@ class Menu extends Translatable
     public function addTranslation(MenuTranslation $translation): self
     {
         if (!$this->translations->contains($translation)) {
-            $this->translations[] = $translation;
+            $this->translations->add($translation);
             $translation->setTranslatable($this);
         }
 
@@ -111,19 +104,14 @@ class Menu extends Translatable
 
     public function removeTranslation(MenuTranslation $translation): self
     {
-        if ($this->translations->removeElement($translation)) {
-            // set the owning side to null (unless already changed)
-            if ($translation->getTranslatable() === $this) {
-                $translation->setTranslatable(null);
-            }
+        if ($this->translations->removeElement($translation) && $translation->getTranslatable() === $this) {
+            $translation->setTranslatable(null);
         }
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, MenuItem>
-     */
+    /** @return Collection<int, MenuItem> */
     public function getMenuItems(): Collection
     {
         return $this->menuItems;
@@ -132,7 +120,7 @@ class Menu extends Translatable
     public function addMenuItem(MenuItem $menuItem): self
     {
         if (!$this->menuItems->contains($menuItem)) {
-            $this->menuItems[] = $menuItem;
+            $this->menuItems->add($menuItem);
             $menuItem->setMenu($this);
         }
 
@@ -141,11 +129,8 @@ class Menu extends Translatable
 
     public function removeMenuItem(MenuItem $menuItem): self
     {
-        if ($this->menuItems->removeElement($menuItem)) {
-            // set the owning side to null (unless already changed)
-            if ($menuItem->getMenu() === $this) {
-                $menuItem->setMenu(null);
-            }
+        if ($this->menuItems->removeElement($menuItem) && $menuItem->getMenu() === $this) {
+            $menuItem->setMenu(null);
         }
 
         return $this;

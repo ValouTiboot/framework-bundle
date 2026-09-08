@@ -8,7 +8,7 @@ let config = {
     theme: ['./js/admin.js', './css/style.scss'],
   },
   output: {
-    path: path.resolve(__dirname, '../src/Resources/public/assets'),
+    path: path.resolve(__dirname, '../public/assets'),
     filename: '[name].js',
   },
   module: {

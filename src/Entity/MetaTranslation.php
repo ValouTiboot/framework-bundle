@@ -1,42 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class MetaTranslation
 {
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity=Meta::class, inversedBy="translations")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $translatable;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Meta::class, inversedBy: 'translations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Meta $translatable = null;
 
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity=Language::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $language;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Language::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Language $language = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $metaTitle;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $metaTitle = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $metaDescription;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $metaDescription = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $rewrite;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $rewrite = null;
 
     public function getTranslatable(): ?Meta
     {
@@ -67,7 +57,7 @@ class MetaTranslation
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(string $metaTitle): self
+    public function setMetaTitle(?string $metaTitle): self
     {
         $this->metaTitle = $metaTitle;
 

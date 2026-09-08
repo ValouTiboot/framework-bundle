@@ -60,7 +60,7 @@ final class TranslationFormFactory
                 $this->translationFinder->searchInConfig('/config/packages/', 'digitix'),
                 $this->translationProvider->getTradInFile(
                     $this->translationFinder->findFiles('/translations/', $locale.'/Admin')
-                    + $this->translationFinder->findFiles($this->bundlePath.'/Resources/translations/', $locale.'/Admin'),
+                    + $this->translationFinder->findFiles($this->bundlePath.'/translations/', $locale.'/Admin'),
                     $locale,
                 ),
             ),
