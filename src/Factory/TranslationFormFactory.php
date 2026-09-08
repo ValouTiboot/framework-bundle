@@ -1,183 +1,149 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Factory;
 
+use Digitix\FrameworkBundle\Admin\Form\AdminFormBuilder;
 use Digitix\FrameworkBundle\DigitixFrameworkBundle;
-use Digitix\FrameworkBundle\Field\TextField;
-use Digitix\FrameworkBundle\Field\TextareaField;
-use Digitix\FrameworkBundle\Field\SubmitField;
-use Digitix\FrameworkBundle\Field\FieldData;
 use Digitix\FrameworkBundle\Finder\TranslationFinder;
-use Digitix\FrameworkBundle\Form\Type\FormType;
 use Digitix\FrameworkBundle\Provider\TranslationProvider;
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Collects the translation keys of a scope (back office, front, emails,
+ * theme) and builds one form per translation domain to edit them.
+ */
 final class TranslationFormFactory
 {
-	private $translationFinder;
-	private $translationProvider;
-	private $bundlePath;
-	private $fields;
+    private readonly string $bundlePath;
 
-	public function __construct(TranslationFinder $translationFinder, TranslationProvider $translationProvider)
-	{
-		$this->translationFinder = $translationFinder;
-		$this->translationProvider = $translationProvider;
-		$this->bundlePath = DigitixFrameworkBundle::getPathDir();
-	}
+    public function __construct(
+        private readonly TranslationFinder $translationFinder,
+        private readonly TranslationProvider $translationProvider,
+        private readonly AdminFormBuilder $formBuilder,
+    ) {
+        $this->bundlePath = DigitixFrameworkBundle::getPathDir();
+    }
 
-	public function getProvider()
-	{
-		return $this->translationProvider;
-	}
+    public function getProvider(): TranslationProvider
+    {
+        return $this->translationProvider;
+    }
 
-	public function build($data = '')
-	{
-		if ($data['type'] == 'bo') {
-			$adminControllerTrads = $this->translationFinder->searchInController('/src/Controller/Admin/', 'Admin');
-			$adminTemplateTrads = $this->translationFinder->searchInTemplate('/templates/admin/', '');
-			$adminFieldsTrads = $this->translationFinder->searchInConfig('/config/packages/', 'digitix');
+    /**
+     * @param array<string, mixed> $selection type, locale, theme
+     */
+    public function build(array $selection): self
+    {
+        $type = (string) ($selection['type'] ?? 'bo');
+        $locale = (string) ($selection['locale'] ?? 'fr_FR');
 
-			$translationFiles = $this->translationFinder->findFiles('/translations/', $data['locale'].'/Admin');
-			$bundleTranslationFiles = $this->translationFinder->findFiles($this->bundlePath.'/Resources/translations/', $data['locale'].'/Admin');
-			$translationTrads = $this->translationProvider->getTradInFile($translationFiles + $bundleTranslationFiles, $data['locale']);
+        $translations = match ($type) {
+            'fo' => array_replace_recursive(
+                $this->translationFinder->searchInController('/src/Controller/Front/', '', 'Front.*'),
+                $this->translationFinder->searchInConfig('/config/packages/', 'digitix', 'Front.Fields.Label'),
+                $this->translationProvider->getTradInFile($this->translationFinder->findFiles('/translations/', $locale.'/Front'), $locale),
+            ),
+            'email' => array_replace_recursive(
+                $this->translationFinder->searchInController('/src/Controller/', '', 'Email.*'),
+                $this->translationProvider->getTradInFile($this->translationFinder->findFiles('/translations/', $locale.'/Email'), $locale),
+            ),
+            'theme' => $this->themeTranslations((string) ($selection['theme'] ?? ''), $locale),
+            default => array_replace_recursive(
+                $this->translationFinder->searchInController('/src/Controller/Admin/', 'Admin'),
+                $this->translationFinder->searchInTemplate('/templates/admin/', ''),
+                $this->translationFinder->searchInConfig('/config/packages/', 'digitix'),
+                $this->translationProvider->getTradInFile(
+                    $this->translationFinder->findFiles('/translations/', $locale.'/Admin')
+                    + $this->translationFinder->findFiles($this->bundlePath.'/Resources/translations/', $locale.'/Admin'),
+                    $locale,
+                ),
+            ),
+        };
 
-			$this->translationProvider->setTranslations(
-				array_replace_recursive(
-					$adminControllerTrads,
-					$adminTemplateTrads,
-					$adminFieldsTrads,
-					$translationTrads
-				)
-			);
-		} else if ($data['type'] == 'fo') {
-			$frontControllerTrads = $this->translationFinder->searchInController('/src/Controller/Front/', '', 'Front.*');
-			$frontFieldsTrads = $this->translationFinder->searchInConfig('/config/packages/', 'digitix', 'Front.Fields.Label');
-			$translationFiles = $this->translationFinder->findFiles('/translations/', $data['locale'].'/Front');
-			$translationTrads = $this->translationProvider->getTradInFile($translationFiles, $data['locale']);
+        $this->translationProvider->setTranslations($translations);
 
-			$this->translationProvider->setTranslations(
-				array_replace_recursive(
-					$frontControllerTrads,
-					$frontFieldsTrads,
-					$translationTrads
-				)
-			);
-		} else if ($data['type'] == 'email') {
-			$frontControllerTrads = $this->translationFinder->searchInController('/src/Controller/', '', 'Email.*');
-			$translationFiles = $this->translationFinder->findFiles('/translations/', $data['locale'].'/Email');
-			$translationTrads = $this->translationProvider->getTradInFile($translationFiles, $data['locale']);
+        return $this;
+    }
 
-			$this->translationProvider->setTranslations(
-				array_replace_recursive(
-					$frontControllerTrads,
-					$translationTrads
-				)
-			);
-		} else if ($data['type'] == 'theme') {
-			$themeName = ucfirst(substr(strrchr($data['theme'], '/'), 1));
-			$frontTemplateTrads = $this->translationFinder->searchInTemplate($data['theme'].'/', '');
-			$translationFiles = $this->translationFinder->findFiles('/translations/', $data['locale'].'/Theme.'.$themeName);
-			$translationTrads = $this->translationProvider->getTradInFile($translationFiles, $data['locale']);
-
-			$this->translationProvider->setTranslations(
-				array_replace_recursive(
-					$frontTemplateTrads,
-					$translationTrads
-				)
-			);
-		}
-
-		return $this;
-	}
-
-	public function buildFields()
-	{
-		$formFields = [];
-		foreach ($this->getProvider()->getTranslations() as $domain => $translations) {
-			$buildFields = [];
-
-			foreach ($translations as $name => $value) {
-				$field = [
-					'label' => $name,
-					'required' => false,
-					'data' => $value,
-				];
-
-				if (strlen(strip_tags($name)) != strlen($name)) {
-					$fieldType = TextareaField::class;
-					$field['class'] = 'tinymce';
-				} else if (strlen($name) > 140) {
-					$fieldType = TextareaField::class;
-				} else {
-					$fieldType = TextField::class;
-				}
-
-				$name = md5($name);
-				$buildFields[$name] = $fieldType::getInstance($name, $field);
-			}
-			$buildFields['save'] = SubmitField::getInstance();
-			$formFields[$domain] = new ArrayCollection($buildFields);
-		}
-
-		$this->fields = new ArrayCollection($formFields);
-
-		return $this;
-	}
-
-	public function buildForms($overrideOptions = []): array
-	{
+    /**
+     * One form per domain, keyed by domain, bound to the request.
+     *
+     * @return array<string, FormInterface>
+     */
+    public function buildForms(Request $request): array
+    {
         $forms = [];
-        foreach ($this->fields as $domain => $fields) {
-			$options = [
-	            'method' => 'POST',
-	            'fields' => $fields,
-	        ];
 
-			$form = Forms::createFormFactoryBuilder()->getFormFactory()->createNamed(
-				str_replace('.', '_', $domain),
-				FormType::class,
-				// (new FieldData($fields))->toArray(),
-				null,
-				array_merge($options, $overrideOptions)
-			);
+        foreach ($this->translationProvider->getTranslations() as $domain => $translations) {
+            $definitions = [];
 
-        	$forms[$domain] = $form->handleRequest();
+            foreach ($translations as $key => $value) {
+                $isHtml = \strlen(strip_tags($key)) !== \strlen($key);
+
+                $definitions[] = [
+                    'name' => md5($key),
+                    'type' => $isHtml || \strlen($key) > 140 ? TextareaType::class : TextType::class,
+                    'options' => [
+                        'label' => $key,
+                        'translation_domain' => false,
+                        'required' => false,
+                        'data' => $value,
+                        'attr' => $isHtml ? ['class' => 'tinymce'] : [],
+                    ],
+                ];
+            }
+
+            $definitions[] = [
+                'name' => 'save',
+                'type' => SubmitType::class,
+                'options' => ['label' => 'form.default.submit', 'translation_domain' => 'Admin.Form.Default'],
+            ];
+
+            $forms[$domain] = $this->formBuilder->createFromDefinitions(str_replace('.', '_', $domain), $definitions, null, [], $request);
         }
 
         ksort($forms);
+
         return $forms;
-	}
+    }
 
-	// private function buildTree($flat, $key = 0)
-	// {
-	// 	$tree = '';
-	// 	for ($i = count($flat)-1; $i >= 0; $i--)
-	// 	{
-	// 		if (end($flat) === $flat[$i])
-	// 			$tree = [$flat[$i] => ''];
-	// 		else
-	// 		{
-	// 			$tree[$flat[$i]] = $tree;
-	// 			unset($tree[$flat[$i+1]]);
-	// 		}
-	// 	}
-
-	// 	return $tree;
-	// }
-
-	public static function findThemes(): array
+    /**
+     * Theme directories under templates/themes, as "name => path" choices
+     * (used by the "theme" choice callback of the Translation form).
+     *
+     * @return array<string, string>
+     */
+    public static function findThemes(): array
     {
         $themes = [];
-        $tmpDir = glob('../templates/themes/*', GLOB_ONLYDIR);
 
-        if (count($tmpDir)) {
-            foreach ($tmpDir as $dir) {
-				$themes[substr(strrchr($dir, '/'), 1)] = strchr($dir, '/');
-			}
+        foreach (glob('../templates/themes/*', \GLOB_ONLYDIR) ?: [] as $dir) {
+            $themes[basename($dir)] = strchr($dir, '/') ?: $dir;
         }
 
         return $themes;
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    private function themeTranslations(string $theme, string $locale): array
+    {
+        if ('' === $theme) {
+            return [];
+        }
+
+        $themeName = ucfirst(basename($theme));
+
+        return array_replace_recursive(
+            $this->translationFinder->searchInTemplate($theme.'/', ''),
+            $this->translationProvider->getTradInFile($this->translationFinder->findFiles('/translations/', $locale.'/Theme.'.$themeName), $locale),
+        );
     }
 }

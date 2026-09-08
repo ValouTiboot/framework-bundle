@@ -1,84 +1,143 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity\Translatable;
 
-class Translatable
+use Doctrine\Common\Collections\Collection;
+
+/**
+ * Base class for entities whose text fields live in a sibling
+ * "<Entity>Translation" entity (one row per language).
+ *
+ * Magic accessors, kept for compatibility with the YAML forms and templates:
+ *
+ *   $cms->name / $cms->getName()   value in the current language
+ *   $cms->translatableName         [languageId => value] for every translation
+ *   $cms->translatableName = [...] sets each translation from a [languageId => value] map
+ *
+ * The current language is injected by TranslatableLanguageListener on load and
+ * by EntityInstantiator on creation; it is never persisted.
+ */
+abstract class Translatable
 {
-	public function __set($name, $value)
-	{
-		$translationFqcn = get_class($this).'Translation';
+    private const PREFIX = 'translatable';
 
-		if (preg_match('@(translatable)@', $name)) {
-			$method = 'set'.str_replace('translatable', '', $name);
+    private int $currentLanguageId = 1;
 
-			if (method_exists($translationFqcn, $method)) {
-				foreach ($this->getTranslations() as &$translation) {
-		            if (isset($value[$translation->getLanguage()->getId()])
-						|| $value[$translation->getLanguage()->getId()] === null
-					) {
-		                $translation->{$method}($value[$translation->getLanguage()->getId()]);
-					}
-		        }
-			}
-		}
+    /** @return Collection<int, object> */
+    abstract public function getTranslations(): Collection;
 
-		return $this;
-	}
+    public function setCurrentLanguageId(int $languageId): void
+    {
+        $this->currentLanguageId = $languageId;
+    }
 
-	public function __get($name)
-	{
-		$translationFqcn = get_class($this).'Translation';
+    public function getCurrentLanguageId(): int
+    {
+        return $this->currentLanguageId;
+    }
 
-		if (preg_match('@(translatable)@', $name)) {
-			$method = 'get'.str_replace('translatable', '', $name);
+    /**
+     * Translation for the given language (current one by default), falling
+     * back to the first available translation.
+     */
+    public function getTranslation(?int $languageId = null): ?object
+    {
+        $languageId ??= $this->currentLanguageId;
 
-			if (method_exists($translationFqcn, $method)) {
-				$getter = [];
-		        $translations = $this->getTranslations();
+        foreach ($this->getTranslations() as $translation) {
+            if ($translation->getLanguage()?->getId() === $languageId) {
+                return $translation;
+            }
+        }
 
-		        foreach ($translations as $translation) {
-		            $getter[$translation->getLanguage()->getId()] = $translation->{$method}();
-				}
+        $first = $this->getTranslations()->first();
 
-	        	return $getter;
-        	}
-		} else {
-			$method = 'get'.ucfirst($name);
+        return false === $first ? null : $first;
+    }
 
-			if (method_exists($translationFqcn, $method)) {
-		        $translations = $this->getTranslations();
+    public function __get(string $name): mixed
+    {
+        if (null !== ($getter = $this->translatableGetter($name))) {
+            $values = [];
+            foreach ($this->getTranslations() as $translation) {
+                $values[$translation->getLanguage()?->getId()] = $translation->$getter();
+            }
 
-		        foreach ($translations as $translation) {
-					// get the context lanaguage id
-					if ($translation->getLanguage()->getId() == '1') {
-						return $translation->{$method}();
-					}
-				}
-        	}
-		}
+            return $values;
+        }
 
-		return null;
-	}
+        $getter = 'get'.ucfirst($name);
+        $translation = $this->getTranslation();
 
-	public function __call($method, $args)
-	{
-		$translationFqcn = get_class($this).'Translation';
+        return null !== $translation && method_exists($translation, $getter) ? $translation->$getter() : null;
+    }
 
-		if (class_exists($translationFqcn)) {
-			if (substr($method, 0, 3) != 'get') {
-				$method = 'get'.ucfirst($method);
-			}
+    public function __set(string $name, mixed $value): void
+    {
+        if (null === ($setter = $this->translatableSetter($name))) {
+            throw new \LogicException(sprintf('Cannot set undefined property "%s" on %s.', $name, static::class));
+        }
 
-			if (method_exists($translationFqcn, $method)) {
-		        $translations = $this->getTranslations();
+        if (!\is_array($value)) {
+            return;
+        }
 
-		        foreach ($translations as $translation) {
-					// get the context lanaguage id
-					if ($translation->getLanguage()->getId() == '1') {
-						return $translation->{$method}();
-					}
-				}
-			}
-		}
-	}
+        foreach ($this->getTranslations() as $translation) {
+            $languageId = $translation->getLanguage()?->getId();
+
+            if (null !== $languageId && \array_key_exists($languageId, $value)) {
+                $translation->$setter($value[$languageId]);
+            }
+        }
+    }
+
+    public function __isset(string $name): bool
+    {
+        if (null !== $this->translatableGetter($name)) {
+            return true;
+        }
+
+        $translation = $this->getTranslation();
+
+        return null !== $translation && method_exists($translation, 'get'.ucfirst($name));
+    }
+
+    /**
+     * @param array<int, mixed> $arguments
+     */
+    public function __call(string $method, array $arguments): mixed
+    {
+        $getter = str_starts_with($method, 'get') ? $method : 'get'.ucfirst($method);
+        $translation = $this->getTranslation();
+
+        if (null !== $translation && method_exists($translation, $getter)) {
+            return $translation->$getter(...$arguments);
+        }
+
+        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s().', static::class, $method));
+    }
+
+    private function translatableGetter(string $name): ?string
+    {
+        if (!str_starts_with($name, self::PREFIX)) {
+            return null;
+        }
+
+        $getter = 'get'.substr($name, \strlen(self::PREFIX));
+
+        return method_exists(static::class.'Translation', $getter) ? $getter : null;
+    }
+
+    private function translatableSetter(string $name): ?string
+    {
+        if (!str_starts_with($name, self::PREFIX)) {
+            return null;
+        }
+
+        $setter = 'set'.substr($name, \strlen(self::PREFIX));
+
+        return method_exists(static::class.'Translation', $setter) ? $setter : null;
+    }
 }

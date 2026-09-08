@@ -1,87 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Controller\Admin;
 
-use Digitix\FrameworkBundle\Controller\Admin\AdminController;
-use Digitix\FrameworkBundle\Entity\Configuration;
+use Digitix\FrameworkBundle\Admin\Context\AdminContext;
+use Digitix\FrameworkBundle\Admin\Security\AdminPermission;
 use Digitix\FrameworkBundle\Utils\Cache;
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpFoundation\Response;
 
-class AdminPerformanceController extends AdminController
+/**
+ * "Performance" virtual entity: same Configuration-backed form as
+ * Parameter, plus a "clear cache" action (?cacheClear).
+ */
+final class AdminPerformanceController extends AdminParameterController
 {
     public static function getSubscribedServices(): array
     {
-        return [
-            'dgtx.configuration.provider' => '?'.ConfigurationProvider::class,
-            'dgtx.cache' => '?'.Cache::class,
-        ] + parent::getSubscribedServices();
+        return array_merge(parent::getSubscribedServices(), [Cache::class]);
     }
 
-	/**
-     * {@inheritdoc}
-     */
-    public function create(string $entityName)
+    public function create(AdminContext $context): Response
     {
-        if ($this->getContext()->getRequest()->query->get('cacheClear') !== null) {
-            if (($error = $this->get('dgtx.cache')->cacheClear()) != 0) {
-                $this->addFlash('danger', $this->getContext()->trans('Something goes wrong when clearing cache: '.$error, [], 'Admin.Message.Error'));
+        if ($context->getRequest()->query->has('cacheClear')) {
+            $this->assertGranted(AdminPermission::EDIT, $context);
+
+            $exitCode = $this->container->get(Cache::class)->cacheClear();
+
+            if (0 !== $exitCode) {
+                $this->addFlash('danger', $this->trans('Something goes wrong when clearing cache: %code%', 'Admin.Message.Error', ['%code%' => $exitCode]));
             } else {
-                $this->addFlash('success', $this->getContext()->trans('Clearing cache Ok', [], 'Admin.Message.Success'));
+                $this->addFlash('success', $this->trans('Clearing cache Ok'));
             }
 
-            return $this->redirectToRoute($this->getContext()->getRequest()->attributes->get('_route'), $this->getContext()->getRequest()->attributes->get('_route_params'));
+            return $this->redirectToRoute('dgtx_admin_entity_create', ['entityName' => $context->getEntitySlug()]);
         }
 
-        $datas = [];
-        $tplVars = [];
-        $fields = $this->get('dgtx.field.factory')->build();
-
-        foreach ($fields as $name => $field) {
-            $value = $this->getContext()->getConfiguration($name);
-            $datas[$name] = $value;
-        }
-
-        $form = $this->get('dgtx.form.factory')->buildForm([], $datas);
-        $helperForm = $this->get('dgtx.helper.form.factory')
-            ->build(
-                $this->get('dgtx.parameter.factory')->build()->getParameters(),
-                $form,
-                $tplVars
-            )
-        ;
-
-        $errors = $form->getErrors(true, false);
-
-        if (count($errors) > 0) {
-            $this->addFlash('danger', $errors);
-        }
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->preparePersistenEntities($form->getData());
-            $this->addFlash(
-                'success',
-                $this->getContext()->trans('Succesfully updated.', [], 'Admin.Message.Success')
-            );
-        }
-
-        return $this->display($helperForm->generateForm());
-    }
-
-    protected function preparePersistenEntities($data)
-    {
-        $objects = [];
-        $configurationProvider = $this->get('dgtx.configuration.provider');
-
-        foreach ($data as $propertie => $value) {
-            if (($configuration = $configurationProvider->get($propertie)) === null) {
-                $configuration = new Configuration();
-                $configuration->setName($propertie);
-            }
-
-            $configuration->setValue($value === false ? 0 : $value);
-            $objects[] = $configuration;
-        }
-
-        return $this->persistEntities(new ArrayCollection($objects, false));
+        return parent::create($context);
     }
 }

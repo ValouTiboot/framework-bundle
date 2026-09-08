@@ -8,22 +8,17 @@
     </div>
 
     {% for key, field in fields %}
-      {% if key not in ['saveAndStay'] %}
+      {% if key not in ['saveAndStay', 'save'] and form.children[key] is defined %}
 
-        {{ form_row(attribute(form.children, key)) }}
+        {{ form_row(form.children[key]) }}
 
-        {% if key in uploadfields %}
-          {% set row = attribute(form.children, key) %}
-
-          {% if row.vars.data is defined and row.vars.data is not empty %}
+        {% if key in uploadfields and upload_values[key]|default(null) %}
           <div class="form-group row">
             <label class="col-sm-2"></label>
             <div class="col-sm-9">
-              <img src="{{ asset('uploads/' ~ entityName ~ '/' ~ key ~ '/' ~ row.vars.data) }}" width="200" />
+              <img src="{{ asset('uploads/' ~ entityName ~ '/' ~ key ~ '/' ~ upload_values[key]) }}" width="200" alt="" />
             </div>
           </div>
-          {% endif %}
-
         {% endif %}
       {% endif %}
     {% endfor %}
@@ -38,13 +33,13 @@
         </div>
       {% endif %}
 
-      {% for key, field in fields %}
-        {% if key in ['saveAndStay'] %}
-          {{ form_widget(attribute(form.children, key)) }}
-        {% endif %}
-      {% endfor %}
+      {% if form.children.saveAndStay is defined %}
+        {{ form_widget(form.children.saveAndStay) }}
+      {% endif %}
 
-      {{ form_widget(attribute(form.children, 'save')) }}
+      {% if form.children.save is defined %}
+        {{ form_widget(form.children.save) }}
+      {% endif %}
 
     </div>
 

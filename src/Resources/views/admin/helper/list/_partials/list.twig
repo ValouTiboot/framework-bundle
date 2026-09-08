@@ -8,10 +8,10 @@
 				<th scope="col" width="2%"></th>
 				{% endif %}
 				{% for field in list_fields %}
-				<th scope="col" width="{% if field.name == 'id' %}4%{% elseif field.name == 'dateAdd' %}10%{% elseif field.type == 'sortable' %}2%{% elseif field.name == 'active' %}4%{% else %}auto{% endif %}">
+				<th scope="col" width="{% if field.property == 'id' %}4%{% elseif field.property == 'dateAdd' %}10%{% elseif field.type == 'sortable' %}2%{% elseif field.property == 'active' %}4%{% else %}auto{% endif %}">
 					<div class="head d-flex align-items-center">
 						<span>{{ field.label|trans({}, 'Admin.Fields.Label') }}</span>
-						{% if field.sort is defined %}
+						{% if field.sortable %}
 							<div class="sorter ms-1 d-flex">
 								<a href="{{ sorter.generateLink(field.name, 'asc') }}" class="{% if sorter.orderBy == field.name and sorter.orderWay == 'asc' %}active{% endif %}">
 									<i class="material-icons">expand_less</i>
@@ -30,15 +30,15 @@
 			{% endblock %}
 			{% block filters %}
 				{% form_theme filters_form '@DigitixFramework/admin/_partials/form_theme.twig' %}
-				{% if filters_form is defined and filters_form.children|length %}
+				{% if filters_form.children|length %}
 				<tr>
 					{% if sortable %}
 					<th></th>
 					{% endif %}
 					{% for field in list_fields %}
-						{% if attribute(filters_form.children, field.name) is defined %}
+						{% if attribute(filters_form.children, field.property) is defined %}
 							<th>
-								{{ form_widget(attribute(filters_form.children, field.name)) }}
+								{{ form_widget(attribute(filters_form.children, field.property)) }}
 							</th>
 						{% else %}
 							<th></th>
@@ -59,14 +59,14 @@
 				{% endif %}
 
 				{% for field in list_fields %}
-					{% set item = attribute(entity, field.name) %}
+					{% set item = attribute(entity, field.property) %}
 
-					{% if field.type ==  'iterable' and item is iterable %}
+					{% if field.type == 'iterable' and item is iterable %}
 						<td>{{ item|join(', ') }}</td>
 					{% elseif field.type == 'entity' %}
 						<td>
-							{% if item.id is defined %}
-								{% if field.column is defined %}
+							{% if item is not null %}
+								{% if field.column is not null %}
 									{{ attribute(item, field.column) }}
 								{% else %}
 									{{ item.name }}
@@ -76,34 +76,41 @@
 							{% endif %}
 						</td>
 					{% elseif field.type == 'datetime' %}
-						<td>{{ item|date('d/m/Y H:i:s') }}</td>
+						<td>{{ item ? item|date('d/m/Y H:i:s') : '--' }}</td>
 					{% elseif field.type == 'bool' %}
 						<td class="text-center">
 							<i class="material-icons {% if item %}t-success{% else %}t-danger{% endif %}">{% if item %}check{% else %}close{% endif %}</i>
 						</td>
 					{% elseif field.type == 'choice' %}
-						{% set choice = 'label.' ~ entity_name ~ '.' ~ item %}
-						<td>{{ choice|trans({}, 'Admin.Fields.Label') }}</td>
+						<td>{{ ('label.' ~ entityName ~ '.' ~ item)|trans({}, 'Admin.Fields.Label') }}</td>
 					{% elseif field.type == 'sortable' %}
 						<td class="text-center">{{ item }}</td>
 					{% else %}
 						<td>{{ item }}</td>
 					{% endif %}
-
 				{% endfor %}
+
 				<td class="text-end">
 					{% for action in actions %}
-					<a class="item-{{ action }}" href="{{ path('dgtx_admin_entity_'~action, {entityName: entityName, entityId: entity.id}) }}">
-						{% if action == 'view' or action == 'view_entity' %}
-							<i class="material-icons">visibility</i>
+						{% if action == 'delete' %}
+							<form method="post" action="{{ path('dgtx_admin_entity_delete', {entityName: entityName, entityId: entity.id}) }}" class="d-inline item-delete-form" onsubmit="return confirm('{{ 'list.default.confirm_delete'|trans({}, 'Admin.List.Default')|e('js') }}');">
+								<input type="hidden" name="_token" value="{{ csrf_token('dgtx_delete_' ~ entity.id) }}" />
+								<button type="submit" class="item-delete btn btn-link p-0 align-baseline" title="{{ 'list.default.delete'|trans({}, 'Admin.List.Default') }}">
+									<i class="material-icons">delete</i>
+								</button>
+							</form>
 						{% else %}
-							<i class="material-icons">{{ action }}</i>
+							<a class="item-{{ action }}" href="{{ path('dgtx_admin_entity_' ~ action, {entityName: entityName, entityId: entity.id}) }}">
+								{% if action == 'view' or action == 'view_entity' %}
+									<i class="material-icons">visibility</i>
+								{% else %}
+									<i class="material-icons">{{ action }}</i>
+								{% endif %}
+							</a>
 						{% endif %}
-					</a>
 					{% endfor %}
 				</td>
 			</tr>
-
 		{% endfor %}
 		</tbody>
 	</table>

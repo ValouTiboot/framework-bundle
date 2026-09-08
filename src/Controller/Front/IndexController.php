@@ -15,6 +15,6 @@ class IndexController extends FrontController
      */
 	public function index()
 	{
-		return $this->render('@ApporteurImmo/index.twig', []);
+		return $this->render('index.twig', []);
 	}
 }

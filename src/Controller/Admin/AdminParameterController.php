@@ -1,76 +1,81 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Controller\Admin;
 
-use Digitix\FrameworkBundle\Controller\Admin\AdminController;
+use Digitix\FrameworkBundle\Admin\Context\AdminContext;
+use Digitix\FrameworkBundle\Admin\Security\AdminPermission;
 use Digitix\FrameworkBundle\Entity\Configuration;
-use Digitix\FrameworkBundle\Provider\ConfigurationProvider;
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * "Parameter" virtual entity: one form whose fields are stored as
+ * Configuration rows (name => value).
+ */
 class AdminParameterController extends AdminController
 {
-    public static function getSubscribedServices(): array
+    public function create(AdminContext $context): Response
     {
-        return [
-            'dgtx.configuration.provider' => '?'.ConfigurationProvider::class,
-        ] + parent::getSubscribedServices();
-    }
+        $this->assertGranted(AdminPermission::EDIT, $context);
 
-	/**
-     * {@inheritdoc}
-     */
-    public function create(string $entityName)
-    {
-        $datas = [];
-        $tplVars = [];
-        $fields = $this->get('dgtx.field.factory')->build();
-
-        foreach ($fields as $name => $field) {
-            $value = $this->getContext()->getConfiguration($name);
-            $datas[$name] = $value;
-        }
-
-        $form = $this->get('dgtx.form.factory')->buildForm([], $datas);
-        $helperForm = $this->get('dgtx.helper.form.factory')
-            ->build(
-                $this->get('dgtx.parameter.factory')->build()->getParameters(),
-                $form,
-                $tplVars
-            )
-        ;
-
-        $errors = $form->getErrors(true, false);
-
-        if (count($errors) > 0) {
-            $this->addFlash('danger', $errors);
-        }
+        $form = $this->forms()->createForm($context, [], $this->currentValues($context));
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->preparePersistenEntities($form->getData());
-            $this->addFlash(
-                'success',
-                $this->getContext()->trans('Entity successfuly added.', [], 'Admin.Message.Success')
-            );
+            $this->saveConfiguration($form->getData());
+            $this->addFlash('success', $this->trans('Succesfully updated.'));
+
+            return $this->redirectToRoute('dgtx_admin_entity_create', ['entityName' => $context->getEntitySlug()]);
         }
 
-        return $this->display($helperForm->generateForm());
+        return $this->renderAdmin(
+            $this->templates()->form($context->getEntityConfig()),
+            $this->formView()->build($context, $form)
+        );
     }
 
-    protected function preparePersistenEntities($data)
+    /**
+     * @return array<string, mixed> field name => current Configuration value
+     */
+    protected function currentValues(AdminContext $context): array
     {
-        $entities = [];
-        $configProvider = $this->get('dgtx.configuration.provider');
+        $values = [];
 
-        foreach ($data as $propertie => $value) {
-            if (($configuration = $configProvider->get($propertie)) === null) {
-                $configuration = new Configuration();
-                $configuration->setName($propertie);
+        foreach ($context->getEntityConfig()->form->fields as $field) {
+            if (\in_array($field->type, ['submit', 'button'], true)) {
+                continue;
             }
 
-            $configuration->setValue($value === false ? 0 : $value);
-            $entities[] = $configuration;
+            $value = $this->configuration()->getValue($field->name);
+
+            $values[$field->name] = 'bool' === $field->type
+                ? filter_var($value, \FILTER_VALIDATE_BOOLEAN)
+                : $value;
         }
 
-        return $this->persistEntities(new ArrayCollection($entities, false));
+        return $values;
+    }
+
+    /**
+     * @param array<string, mixed> $data submitted form data
+     */
+    protected function saveConfiguration(array $data): void
+    {
+        $rows = [];
+
+        foreach ($data as $name => $value) {
+            $row = $this->configuration()->get($name) ?? (new Configuration())->setName($name);
+
+            $row->setValue(match (true) {
+                \is_bool($value) => $value ? '1' : '0',
+                null === $value => null,
+                default => (string) $value,
+            });
+
+            $rows[] = $row;
+        }
+
+        $this->persister()->saveAll($rows, false);
+        $this->configuration()->reset();
     }
 }

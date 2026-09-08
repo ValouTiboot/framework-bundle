@@ -1,177 +1,136 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Controller\Admin;
 
-use Digitix\FrameworkBundle\Controller\Admin\AdminController;
+use Digitix\FrameworkBundle\Admin\Context\AdminContext;
+use Digitix\FrameworkBundle\Admin\Security\AdminPermission;
 use Digitix\FrameworkBundle\Entity\Cms;
-use Digitix\FrameworkBundle\Entity\Language;
 use Digitix\FrameworkBundle\Entity\Menu;
 use Digitix\FrameworkBundle\Entity\MenuItem;
 use Digitix\FrameworkBundle\Entity\MenuItemTranslation;
+use Digitix\FrameworkBundle\Provider\LanguageProvider;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Drag & drop menu builder (viewEntity). The tree is posted as a flat
+ * "menu_item[n][...]" list and replaces the existing items.
+ */
 class AdminMenuController extends AdminController
 {
-    public function viewEntity(string $entityName, int $entityId)
+    public static function getSubscribedServices(): array
     {
-        $post = $this->getContext()->getRequest()->request->all();
-        $menu = $this->getContext()->getEntity()->getInstance();
-
-        if (isset($post['menu_item'])) {
-            $this->deleteItems($menu->getId());
-            $this->addItems($menu, $post['menu_item']);
-
-            $this->addFlash('success', $this->getContext()->trans('Entity successfuly updated.', [], 'Admin.Message.Success'));
-            return $this->redirectToRoute(
-                'dgtx_admin_entity_view_entity',
-                [
-                    'entityName' => $entityName,
-                    'entityId' => $entityId
-                ]
-            );
-        }
-
-
-        $tplVars = [
-            'menuEntity' => $this->getContext()->getEntity()->getInstance(),
-            'pages' => $this->getAllPages(),
-            'items' => $this->getItemByMenu($menu->getId()),
-        ];
-
-        $helperView = $this->get('dgtx.helper.view.factory')
-            ->build(
-                $this->get('dgtx.parameter.factory')->build()->getParameters(),
-                $tplVars
-            )
-        ;
-
-        return $this->display($helperView->generateView());
+        return array_merge(parent::getSubscribedServices(), [LanguageProvider::class]);
     }
 
-    private function getAllPages()
+    public function viewEntity(AdminContext $context): Response
+    {
+        $this->assertGranted(AdminPermission::EDIT, $context);
+
+        $menu = $context->getEntity();
+        if (!$menu instanceof Menu) {
+            throw new NotFoundHttpException('Menu not found.');
+        }
+
+        $request = $context->getRequest();
+
+        if ($request->isMethod('POST') && $request->request->has('menu_item')) {
+            $this->replaceItems($menu, (array) $request->request->all('menu_item'));
+            $this->addFlash('success', $this->trans('Entity successfuly updated.'));
+
+            return $this->redirectToRoute('dgtx_admin_entity_view_entity', [
+                'entityName' => $context->getEntitySlug(),
+                'entityId' => $menu->getId(),
+            ]);
+        }
+
+        return $this->renderAdmin(
+            $this->templates()->view($context->getEntityConfig()),
+            $this->baseVars($context) + [
+                'menuEntity' => $menu,
+                'pages' => $this->getAvailablePages(),
+                'items' => $this->doctrine()->getRepository(MenuItem::class)->findBy(['menu' => $menu]),
+            ]
+        );
+    }
+
+    /**
+     * Pages offered on the left panel, grouped: static routes, CMS pages, free links.
+     * Override getStaticPages() in a project controller to add its own routes.
+     *
+     * @return array<string, array<string|int, array{route: string, label: string, idEntity?: int|null}>>
+     */
+    protected function getAvailablePages(): array
     {
         $pages = [];
 
-        $pages['pages'] = [
-            'blog' => [
-                'route' => 'front_blog_index',
-                'label' => $this->getContext()->trans('Blog', [], 'Menu.Label')
-            ],
-            'contact' => [
-                'route' => 'front_contact_index',
-                'label' => $this->getContext()->trans('Contact', [], 'Menu.Label')
-            ],
-            'faq' => [
-                'route' => 'front_faq_show',
-                'label' => $this->getContext()->trans('Faq\'s', [], 'Menu.Label')
-            ],
-            'lexicon' => [
-                'route' => 'front_lexicon_index',
-                'label' => $this->getContext()->trans('Lexique', [], 'Menu.Label')
-            ],
-            'realEstateIndex' => [
-                'route' => 'front_real_estate_index',
-                'label' => $this->getContext()->trans('Vendre en viager', [], 'Menu.Label')
-            ],
-            'realEstate' => [
-                'route' => 'front_real_estate_create',
-                'label' => $this->getContext()->trans('Estimation', [], 'Menu.Label')
-            ],
-            // 'sales' => [
-            //     'route' => 'front_sales_view',
-            //     'label' => $this->getContext()->trans('Nos ventes', [], 'Menu.Label')
-            // ],
-            'viager' => [
-                'route' => 'front_viager_view',
-                'label' => $this->getContext()->trans('Différents viager', [], 'Menu.Label')
-            ],
-        ];
+        if ($static = $this->getStaticPages()) {
+            $pages['pages'] = $static;
+        }
 
-        $cmsRepository = $this->get('dgtx.entity.repository.provider')->getRepository(Cms::class);
-        $cmsPages = $cmsRepository->findAll();
-
-        foreach ($cmsPages as $cms) {
+        foreach ($this->doctrine()->getRepository(Cms::class)->findAll() as $cms) {
             $pages['cms'][] = [
                 'route' => 'front_cms_show',
-                'label' => $cms->getName(),
-                'idEntity' => $cms->getId()
+                'label' => (string) $cms->getName(),
+                'idEntity' => $cms->getId(),
             ];
         }
 
         $pages['link'] = [
-            'liens' => [
-                'route' => '',
-                'label' => $this->getContext()->trans('Link', [], 'Menu.Label')
-            ]
+            'link' => ['route' => '', 'label' => $this->trans('Link', 'Menu.Label')],
         ];
 
         return $pages;
     }
 
-    private function getItemByMenu($idMenu)
+    /**
+     * @return array<string, array{route: string, label: string}>
+     */
+    protected function getStaticPages(): array
     {
-        $menuItemRepository = $this->get('dgtx.entity.repository.provider')->getRepository(MenuItem::class);
-        $menuItems = $menuItemRepository->findBy(['menu' => $idMenu]);
-
-        return $menuItems;
+        return [];
     }
 
-    private function deleteItems(int $idMenu): bool
+    /**
+     * @param array<int|string, array<string, mixed>> $items
+     */
+    private function replaceItems(Menu $menu, array $items): void
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $manager = $this->doctrine()->getManagerForClass(MenuItem::class);
+        $existing = $manager->getRepository(MenuItem::class)->findBy(['menu' => $menu]);
 
-        $menuItemRepository = $this->get('dgtx.entity.repository.provider')->getRepository(MenuItem::class);
-        $menuItems = $menuItemRepository->findBy(['menu' => $idMenu]);
-
-        if (null !== $menuItems) {
-            foreach (array_reverse($menuItems) as $menuItem) {
-                $entityManager->remove($menuItem);
-                $entityManager->flush();
-            }
+        // children before parents
+        foreach (array_reverse($existing) as $item) {
+            $manager->remove($item);
         }
+        $manager->flush();
 
-        return true;
-    }
-
-    private function addItems(Menu $menu, array $items): bool
-    {
-        $itemsArray = [];
-        $entityPersister = $this->get('dgtx.entity.persister');
-        $languageRepository = $this->get('dgtx.entity.repository.provider')->getRepository(Language::class);
-        $languages = $languageRepository->findAll();
+        $languages = $this->container->get(LanguageProvider::class)->getActiveLanguages();
+        $created = [];
 
         foreach ($items as $item) {
-            $parent = null;
+            $parentKey = $item['idParent'] ?? 0;
 
-            if ($item['idParent'] != 0) {
-                $parent = $itemsArray[$item['idParent']];
-            }
-
-            $menuItem = new MenuItem();
-            $menuItem
+            $menuItem = (new MenuItem())
                 ->setMenu($menu)
-                ->setParent($parent)
-                ->setIdEntity($item['idEntity'])
-                ->setRoute($item['route'])
-                ->setCssClass($item['class'])
-                ->setLink($item['link'])
-                ->setDepth($item['depth'])
-            ;
+                ->setParent(0 != $parentKey ? ($created[$parentKey] ?? null) : null)
+                ->setIdEntity(isset($item['idEntity']) && '' !== $item['idEntity'] ? (int) $item['idEntity'] : null)
+                ->setRoute($item['route'] ?? null)
+                ->setCssClass($item['class'] ?? null)
+                ->setLink($item['link'] ?? null)
+                ->setDepth((int) ($item['depth'] ?? 0));
 
             foreach ($languages as $language) {
-                $menuItemTranslation = new MenuItemTranslation();
-                $menuItemTranslation
+                $menuItem->addTranslation((new MenuItemTranslation())
                     ->setLanguage($language)
-                    ->setName($item['name'])
-                    ->setLabel($item['label'])
-                ;
-
-                $menuItem->addTranslation($menuItemTranslation);
+                    ->setName((string) ($item['name'] ?? ''))
+                    ->setLabel((string) ($item['label'] ?? '')));
             }
 
-            $entityPersister->persistObject($menuItem);
-            $itemsArray[$item['itemId']] = $menuItem;
+            $this->persister()->save($menuItem);
+            $created[$item['itemId'] ?? count($created)] = $menuItem;
         }
-
-        return true;
     }
 }

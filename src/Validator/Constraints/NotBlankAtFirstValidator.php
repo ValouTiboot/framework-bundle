@@ -1,23 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Validator\Constraints;
 
-use Digitix\FrameworkBundle\Provider\ContextProvider;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-class NotBlankAtFirstValidator extends ConstraintValidator
+/**
+ * "Not blank" enforced only while the validated object is not persisted yet
+ * (its id is null): typically a password that is mandatory on creation and
+ * optional on edition.
+ */
+final class NotBlankAtFirstValidator extends ConstraintValidator
 {
-	public $contextProvider;
-
-	public function __construct(ContextProvider $contextProvider)
-	{
-		$this->contextProvider = $contextProvider->getContext();
-	}
-
-	public function validate($value, Constraint $constraint)
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof NotBlankAtFirst) {
             throw new UnexpectedTypeException($constraint, NotBlankAtFirst::class);
@@ -31,8 +29,9 @@ class NotBlankAtFirstValidator extends ConstraintValidator
             $value = ($constraint->normalizer)($value);
         }
 
-        if ($this->contextProvider->getEntity()->getInstance()->getId() !== null) {
-        	return;
+        $object = $this->context->getObject();
+        if (\is_object($object) && method_exists($object, 'getId') && null !== $object->getId()) {
+            return;
         }
 
         if (false === $value || (empty($value) && '0' != $value)) {

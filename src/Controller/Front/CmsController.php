@@ -1,42 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Controller\Front;
 
 use Digitix\FrameworkBundle\Entity\Cms;
-use Digitix\FrameworkBundle\Entity\CmsTranslation;
-use Digitix\FrameworkBundle\Controller\Front\FrontController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * @Route("/")
+ * Public CMS page. The "entityName" default lets FrontController load the
+ * Cms record from "entityId".
  */
 class CmsController extends FrontController
 {
-	/**
-     * @Route("{entityId}-{rewrite}.html",
-     *	name="front_cms_show",
-     *	defaults={"entityName": "cms"},
-     *	requirements={"entityId"="\d+"},
-     *	methods={"GET"})
-     *
-     * @return Response
-     */
-	public function show(string $entityName, int $entityId, string $rewrite)
-	{
-		$cms = $this->getContext()->getEntity()->getInstance();
+    #[Route('/{entityId}-{rewrite}.html', name: 'front_cms_show', defaults: ['entityName' => 'cms'], requirements: ['entityId' => '\d+'], methods: ['GET'])]
+    public function show(int $entityId, string $rewrite): Response
+    {
+        $cms = $this->getCurrentEntity();
 
-		if ($entityId != 1 && $entityId != 3)
-			$this->breadcrumb[] = [
-	            'name' => $cms->getName(),
-	            'url' => $this->generateUrl('front_cms_show', ['entityId' => $entityId, 'rewrite' => $cms->getRewrite()], 0),
-	        ];
+        if (!$cms instanceof Cms) {
+            throw $this->createNotFoundException(sprintf('No CMS page with id %d.', $entityId));
+        }
 
-		if ($cms->getRewrite() != $rewrite)
-			return $this->redirectToRoute('front_cms_show', ['entityId' => $entityId, 'rewrite' => $cms->getRewrite()], 301);
+        if ($cms->getRewrite() !== $rewrite) {
+            return $this->redirectToRoute('front_cms_show', ['entityId' => $entityId, 'rewrite' => $cms->getRewrite()], 301);
+        }
 
-		return $this->render('@ApporteurImmo/cms/show.twig', ['cms' => $cms]);
-	}
+        $this->breadcrumb[] = [
+            'name' => (string) $cms->getName(),
+            'url' => $this->generateUrl('front_cms_show', ['entityId' => $entityId, 'rewrite' => $cms->getRewrite()]),
+        ];
+
+        return $this->render('cms/show.html.twig', ['cms' => $cms]);
+    }
 }

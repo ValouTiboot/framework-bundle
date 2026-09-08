@@ -1,91 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Controller\Admin;
 
-use Digitix\FrameworkBundle\Controller\Admin\AdminController;
+use Digitix\FrameworkBundle\Admin\Context\AdminContext;
+use Digitix\FrameworkBundle\Admin\Security\AdminPermission;
+use Digitix\FrameworkBundle\Admin\View\TemplateResolver;
 use Digitix\FrameworkBundle\Factory\TranslationFormFactory;
 use Digitix\FrameworkBundle\Updater\TranslationUpdater;
+use Symfony\Component\HttpFoundation\Response;
 
-class AdminTranslationController extends AdminController
+/**
+ * Translation editor.
+ *
+ *  read:   selection form (type, theme, locale), submitted in GET to create()
+ *  create: one form per translation domain, written back to translations/
+ */
+final class AdminTranslationController extends AdminController
 {
     public static function getSubscribedServices(): array
     {
-        return [
-            'dgtx.translation.form.factory' => '?'.TranslationFormFactory::class,
-            'dgtx.translation.updater' => '?'.TranslationUpdater::class
-        ] + parent::getSubscribedServices();
+        return array_merge(parent::getSubscribedServices(), [
+            TranslationFormFactory::class,
+            TranslationUpdater::class,
+        ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function read(string $entityName)
+    public function read(AdminContext $context): Response
     {
-        $tplVars = [];
+        $this->assertGranted(AdminPermission::READ, $context);
 
-        $action = $this->generateUrl(
-            'dgtx_admin_entity_create',
-            [
-                'entityName' => $this->getContext()->getEntity()->getName()
-            ]
-        );
+        $form = $this->forms()->createForm($context, [
+            'method' => 'GET',
+            'action' => $this->generateUrl('dgtx_admin_entity_create', ['entityName' => $context->getEntitySlug()]),
+            'csrf_protection' => false,
+        ]);
 
-        $form = $this->get('dgtx.form.factory')->buildForm(['method' => 'GET', 'action' => $action]);
-
-        $helperForm = $this->get('dgtx.helper.form.factory')
-            ->build(
-                $this->get('dgtx.parameter.factory')->build()->getParameters(),
-                $form,
-                $tplVars
-            )
-        ;
-
-        return $this->display($helperForm
-            ->setTemplateOverride('@DigitixFramework/admin/helper/form/create')
-            ->generateForm()
-        );
+        // the entity "form.template" is the multi-form page used by create()
+        return $this->renderAdmin(TemplateResolver::FORM, $this->formView()->build($context, $form));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function create(string $entityName)
+    public function create(AdminContext $context): Response
     {
-        $tplVars = [];
-    	$data = $this->getContext()->getRequest()->query->all('translation');
+        $this->assertGranted(AdminPermission::EDIT, $context);
 
-    	$translationFactory = $this->get('dgtx.translation.form.factory')->build($data);
-    	$translationForms = $translationFactory->buildFields()->buildForms();
+        $request = $context->getRequest();
+        $selection = $request->query->all('translation');
 
-        $helperForm = $this->get('dgtx.helper.form.factory')
-        	->buildMulti(
-                $this->get('dgtx.parameter.factory')->build()->getParameters(),
-                $translationForms,
-                $tplVars
-            )
-        ;
+        if (empty($selection['type']) || empty($selection['locale'])) {
+            return $this->redirectToList($context);
+        }
 
-		foreach ($translationForms as $form) {
-	        $errors = $form->getErrors(true, false);
+        $factory = $this->container->get(TranslationFormFactory::class)->build($selection);
+        $forms = $factory->buildForms($request);
 
-	        if (count($errors) > 0) {
-                $this->addFlash('danger', $errors);
+        foreach ($forms as $form) {
+            if ($form->isSubmitted() && $form->isValid()) {
+                $updater = $this->container->get(TranslationUpdater::class);
+                $updater->prepare($factory->getProvider()->getTranslations(), $form);
+                $updater->write((string) $selection['locale']);
+
+                $this->addFlash('success', $this->trans('Translations successfuly updated.'));
+
+                return $this->redirect($request->getUri());
             }
+        }
 
-	        if ($form->isSubmitted() && $form->isValid()) {
-	        	$orignalTranslations = $translationFactory->getProvider()->getTranslations();
-
-                $updater = $this->get('dgtx.translation.updater');
-	        	$updater->prepare($orignalTranslations, $form);
-	        	$updater->write($data['locale']);
-
-                $this->addFlash(
-                    'success',
-                    $this->getContext()->trans('Translations successfuly updated.', [], 'Admin.Message.Success')
-                );
-	        }
-		}
-
-    	return $this->display($helperForm->generateForm());
+        return $this->renderAdmin(
+            $this->templates()->form($context->getEntityConfig()),
+            $this->formView()->buildMulti($context, $forms)
+        );
     }
 }

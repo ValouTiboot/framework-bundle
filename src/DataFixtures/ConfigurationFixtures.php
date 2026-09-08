@@ -8,7 +8,7 @@ use Digitix\FrameworkBundle\Entity\Configuration;
 
 class ConfigurationFixtures extends Fixture
 {
-    const DATA = [
+    const DATAS = [
         [
             'name' => 'cache',
             'value' => 0,
@@ -53,7 +53,7 @@ class ConfigurationFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        foreach (self::DATA as $config) {
+        foreach (self::DATAS as $config) {
             $configuration = new Configuration();
             $configuration->setName($config['name']);
             $configuration->setValue($config['value']);

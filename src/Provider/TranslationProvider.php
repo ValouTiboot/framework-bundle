@@ -1,36 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Provider;
 
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
+/**
+ * Holds the translations being edited: domain => key => value.
+ */
 final class TranslationProvider
 {
-	private $translations;
+    /** @var array<string, array<string, string>> */
+    private array $translations = [];
 
-	public function getTradInFile(?array $files = [], string $locale)
-	{
-		$translations = [];
-		foreach ($files as $file) {
-			$loader = new ArrayLoader();
-			$resource = require_once($file);
-			$domain = str_replace('.'.$locale, '', pathinfo($file, PATHINFO_FILENAME));
+    /**
+     * Loads PHP translation files named "<Domain>.<locale>.php".
+     *
+     * @param string[] $files
+     *
+     * @return array<string, array<string, string>>
+     */
+    public function getTradInFile(array $files, string $locale): array
+    {
+        $translations = [];
+        $loader = new ArrayLoader();
 
-			$catalog = $loader->load($resource, $locale, $domain);
-			$translations[$domain] = $catalog->all($domain);
-		}
+        foreach ($files as $file) {
+            $resource = require $file;
 
-		return $translations;
-	}
+            if (!\is_array($resource)) {
+                continue;
+            }
 
-	public function setTranslations(array $translations = []): self
-	{
-		$this->translations = $translations;
-		return $this;
-	}
+            $domain = str_replace('.'.$locale, '', pathinfo($file, \PATHINFO_FILENAME));
+            $translations[$domain] = $loader->load($resource, $locale, $domain)->all($domain);
+        }
 
-	public function getTranslations()
-	{
-		return $this->translations;
-	}
+        return $translations;
+    }
+
+    /**
+     * @param array<string, array<string, string>> $translations
+     */
+    public function setTranslations(array $translations): self
+    {
+        $this->translations = $translations;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    public function getTranslations(): array
+    {
+        return $this->translations;
+    }
 }
