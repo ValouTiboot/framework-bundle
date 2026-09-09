@@ -6,7 +6,15 @@
 {% endblock %}
 
 {% block page_actions %}
+  <a class="btn btn-light" href="{{ path('dgtx_admin_entity_action_collection', {entityName: entityName, action: 'export', locale: locale}) }}" title="{{ 'Downloads the translations of this language as a JSON file'|trans }}">
+    <i class="material-icons">download</i>
+    {{ 'Export'|trans }}
+  </a>
   {% if can_edit %}
+    <button type="button" class="btn btn-light" data-bs-toggle="collapse" data-bs-target="#dgtx-trans-import" aria-expanded="false" aria-controls="dgtx-trans-import">
+      <i class="material-icons">upload</i>
+      {{ 'Import'|trans }}
+    </button>
     <form method="post" action="{{ path('dgtx_admin_entity_action_collection', {entityName: entityName, action: 'refresh', locale: locale}) }}" class="d-inline">
       <input type="hidden" name="_token" value="{{ csrf_token }}">
       <button type="submit" class="btn btn-light" title="{{ 'Scans the code for new or removed keys'|trans }}">
@@ -18,6 +26,33 @@
 {% endblock %}
 
 {% block content_container %}
+  {% if can_edit %}
+    <div class="collapse{% if import_open|default(false) %} show{% endif %}" id="dgtx-trans-import">
+      <div class="dgtx-card mb-3">
+        <div class="dgtx-card-header">{{ 'Import translations into %language%'|trans({'%language%': locale}) }}</div>
+        <div class="dgtx-card-body">
+          <form method="post" action="{{ path('dgtx_admin_entity_action_collection', {entityName: entityName, action: 'import', locale: locale}) }}" enctype="multipart/form-data" class="row g-3 align-items-end">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <div class="col-md-5">
+              <label class="form-label" for="dgtx-trans-import-file">{{ 'JSON file produced by the export'|trans }}</label>
+              <input type="file" class="form-control" id="dgtx-trans-import-file" name="file" accept="application/json,.json" required>
+            </div>
+            <div class="col-md-4">
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" id="dgtx-trans-import-overwrite" name="overwrite" value="1">
+                <label class="form-check-label" for="dgtx-trans-import-overwrite">{{ 'Replace the translations that already exist'|trans }}</label>
+              </div>
+              <div class="form-text">{{ 'Otherwise only the missing ones are filled in.'|trans }}</div>
+            </div>
+            <div class="col-md-3 text-md-end">
+              <button type="submit" class="btn btn-primary"><i class="material-icons">upload</i> {{ 'Import'|trans }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
   <div class="dgtx-card">
     <div class="dgtx-toolbar dgtx-trans-toolbar">
       <ul class="nav nav-tabs dgtx-trans-tabs">

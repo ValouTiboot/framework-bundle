@@ -2,6 +2,13 @@
 
 return [
     'Refresh keys' => 'Actualiser les clés',
+    'Export' => 'Exporter',
+    'Import' => 'Importer',
+    'Downloads the translations of this language as a JSON file' => 'Télécharge les traductions de cette langue en fichier JSON',
+    'Import translations into %language%' => 'Importer des traductions dans %language%',
+    'JSON file produced by the export' => 'Fichier JSON produit par l\'export',
+    'Replace the translations that already exist' => 'Remplacer les traductions déjà existantes',
+    'Otherwise only the missing ones are filled in.' => 'Sinon seules les traductions manquantes sont complétées.',
     'Everything written in the code is English: translate it here, changes are live immediately.' => 'Tout ce qui est écrit dans le code est en anglais : traduisez-le ici, les modifications sont visibles immédiatement.',
     'Scans the code for new or removed keys' => 'Analyse le code pour trouver les clés ajoutées ou retirées',
     '%translated% of %total% translated' => '%translated% sur %total% traduites',

@@ -12,8 +12,10 @@ use Digitix\FrameworkBundle\Entity\Translation;
 use Digitix\FrameworkBundle\Provider\LanguageProvider;
 use Digitix\FrameworkBundle\Repository\TranslationRepository;
 use Digitix\FrameworkBundle\Translation\TranslationCompiler;
+use Digitix\FrameworkBundle\Translation\TranslationExchange;
 use Digitix\FrameworkBundle\Translation\TranslationStatus;
 use Digitix\FrameworkBundle\Translation\TranslationSynchronizer;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +28,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *  read:           one locale (tab), filters (domain, status, search), paginated table
  *  update action:  POST {value, _token} for one entry, JSON when requested by script
  *  refresh action: POST, re-extracts the keys from the code
+ *  export action:  GET, JSON file of the locale
+ *  import action:  POST file + token, merges a JSON export into the locale
  *  edit:           generic form, fallback without JavaScript
  *
  * Every save regenerates the catalogue files of the locale.
@@ -41,7 +45,72 @@ class AdminTranslationController extends AdminController
             TranslationRepository::class,
             TranslationCompiler::class,
             TranslationSynchronizer::class,
+            TranslationExchange::class,
         ]);
+    }
+
+    /**
+     * Downloads the translations of the current locale as JSON.
+     */
+    public function exportAction(AdminContext $context): Response
+    {
+        $this->assertGranted(AdminPermission::READ, $context);
+
+        $request = $context->getRequest();
+        $locale = $this->localeFromRequest($request, $this->languages()->getActiveLanguages(), $context);
+        $json = $this->container->get(TranslationExchange::class)->exportToJson($locale);
+
+        $response = new Response($json."\n", Response::HTTP_OK, ['Content-Type' => 'application/json; charset=UTF-8']);
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            'attachment',
+            sprintf('translations-%s-%s.json', $locale, date('Ymd-Hi'))
+        ));
+
+        return $response;
+    }
+
+    /**
+     * POST multipart: "file" (JSON export), "overwrite" (optional), "_token".
+     */
+    public function importAction(AdminContext $context): Response
+    {
+        $this->assertGranted(AdminPermission::EDIT, $context);
+
+        $request = $context->getRequest();
+        $locale = $this->localeFromRequest($request, $this->languages()->getActiveLanguages(), $context);
+
+        if (!$request->isMethod('POST') || !$this->isCsrfTokenValid(self::CSRF_TOKEN_ID, (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', $this->trans('Invalid security token, please try again.', [], 'Admin.Message.Error'));
+
+            return $this->redirectToEditor($context, $locale);
+        }
+
+        $file = $request->files->get('file');
+        if (!$file instanceof UploadedFile || !$file->isValid()) {
+            $this->addFlash('danger', $this->trans('Please choose a translation file to import.', [], 'Admin.Message.Error'));
+
+            return $this->redirectToEditor($context, $locale);
+        }
+
+        try {
+            $report = $this->container->get(TranslationExchange::class)->importJson(
+                (string) file_get_contents((string) $file->getPathname()),
+                $locale,
+                $request->request->getBoolean('overwrite'),
+            );
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('danger', $this->trans('The file could not be imported: %reason%', ['%reason%' => $e->getMessage()], 'Admin.Message.Error'));
+
+            return $this->redirectToEditor($context, $locale);
+        }
+
+        $this->addFlash('success', $this->trans(
+            'Translations imported: %added% added, %updated% updated, %unchanged% unchanged, %skipped% skipped.',
+            ['%added%' => $report->added, '%updated%' => $report->updated, '%unchanged%' => $report->unchanged, '%skipped%' => $report->skipped + $report->invalid],
+            'Admin.Message.Success'
+        ));
+
+        return $this->redirectToEditor($context, $locale);
     }
 
     public function read(AdminContext $context): Response

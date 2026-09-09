@@ -51,8 +51,8 @@ final class TranslationWorkflowTest extends AdminTestCase
         // a PHP key with its explicit domain, seeded by the bundle's Admin.Message.Success file
         self::assertSame('Ajouté avec succès.', $this->entry('Admin.Message.Success', 'Entity successfuly added.')->getValue());
 
-        // a PHP key without any translation yet
-        self::assertSame(TranslationStatus::Missing, $this->entry('Admin.Message.Error', 'Invalid security token, please try again.')->getStatus());
+        // a PHP key without any translation yet (the bundle ships no Front.Contact.Form file)
+        self::assertSame(TranslationStatus::Missing, $this->entry('Front.Contact.Form', 'Message could not be sent.')->getStatus());
     }
 
     public function testASecondExtractionChangesNothing(): void
@@ -96,7 +96,7 @@ final class TranslationWorkflowTest extends AdminTestCase
         $translator = static::getContainer()->get('translator');
         self::assertInstanceOf(RuntimeTranslator::class, $translator);
         self::assertNotSame('Ajouter une entrée', $translator->trans('list.default.add', [], 'Admin.List.Default', 'fr_FR'));
-        self::assertSame('Invalid security token, please try again.', $translator->trans('Invalid security token, please try again.', [], 'Admin.Message.Error', 'fr_FR'), 'untranslated keys fall back to the key');
+        self::assertSame('Message could not be sent.', $translator->trans('Message could not be sent.', [], 'Front.Contact.Form', 'fr_FR'), 'untranslated keys fall back to the key');
 
         $this->entry('Admin.List.Default', 'list.default.add')->setValue('Ajouter une entrée');
         $this->em()->flush();

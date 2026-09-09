@@ -127,6 +127,13 @@ code ──(dgtx:translation:extract)──> translation table ──(compile)�
 - Console: `dgtx:translation:extract [--locale=fr_FR] [--no-compile]`,
   `dgtx:translation:compile [locale]`. Run `extract` after each deployment
   (or click "Refresh keys" in the admin) so that new keys show up.
+- **Export / import**: one JSON file per locale ("Export" and "Import" in
+  the editor, or `dgtx:translation:export fr_FR file.json` and
+  `dgtx:translation:import file.json [--locale=fr_FR] [--overwrite]`).
+  Typical use: the client translates on staging, the file is imported in
+  production. Without `--overwrite` only missing translations are filled;
+  empty values never erase anything; unknown keys are created and flagged
+  obsolete by the next extraction if the code does not use them.
 
 Themes: give their templates a domain of their own (`'Theme.MyTheme'`) and
 filter on it in the editor.

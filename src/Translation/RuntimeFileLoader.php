@@ -24,4 +24,18 @@ final class RuntimeFileLoader extends PhpFileLoader
 
         return parent::load($resource, $locale, $domain);
     }
+
+    /**
+     * PhpFileLoader memoises each file for the whole process (when opcache is
+     * off); generated catalogues are rewritten at runtime, so read them again
+     * every time. TranslationCompiler invalidates opcache on write.
+     *
+     * @return array<string, mixed>
+     */
+    protected function loadResource(string $resource): array
+    {
+        $messages = require $resource;
+
+        return \is_array($messages) ? $messages : [];
+    }
 }
