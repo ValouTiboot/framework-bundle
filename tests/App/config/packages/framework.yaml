@@ -21,4 +21,5 @@ framework:
         dsn: 'null://null'
     property_info:
         with_constructor_extractor: true
-    assets: ~
+    assets:
+        version_strategy: Digitix\FrameworkBundle\Asset\MtimeVersionStrategy

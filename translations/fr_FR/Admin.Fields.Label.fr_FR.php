@@ -48,6 +48,11 @@ return array (
       'translated' => 'Traduite',
       'obsolete' => 'Obsolète',
     ),
+    'menu' =>
+    array (
+      'name' => 'Nom',
+      'code' => 'Code',
+    ),
     'parameter' =>
     array (
       'mailFrom' => 'Adresse e-mail d\'expediteur',
@@ -67,7 +72,8 @@ return array (
     'meta' =>
     array (
       'page' => 'Page',
-      'dgtx_index' => 'Index',
+      'app_index' => 'Accueil',
+      'front_contact' => 'Contact',
       'metaTitle' => 'Meta title',
       'metaDescription' => 'Meta description',
       'metaKeywords' => 'Meta keywords',
@@ -98,6 +104,10 @@ return array (
   ),
   'help' =>
   array (
+    'menu' =>
+    array (
+      'code' => 'Identifiant technique utilisé par les templates, ex : dgtx_menu(\'main\'). Minuscules, chiffres, tirets.',
+    ),
     'language' =>
     array (
       'iso' => 'norme iso, ex: "fr", "en"',

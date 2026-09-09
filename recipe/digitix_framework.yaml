@@ -8,6 +8,10 @@ digitix_framework:
       title: Pages
       route: dgtx_admin_entity_read
       icon: web
+    menu:
+      title: Menus
+      route: dgtx_admin_entity_read
+      icon: menu
     international:
       title: International
       route: ~
@@ -375,7 +379,7 @@ digitix_framework:
             name: page
             type: choice
             choice: {
-              label.meta.dgtx_index: dgtx_index,
+              label.meta.app_index: app_index,
               label.meta.front_contact: front_contact,
             }
             required: true
@@ -558,6 +562,68 @@ digitix_framework:
             required: true
           active:
             label: label.cms.active
+            name: active
+            type: bool
+            required: true
+    Menu:
+      # front menus: the eye opens the builder (AdminMenuController), rendered with dgtx_menu('<code>')
+      view:
+        template: '@DigitixFramework/admin/helper/view/menu/view.html'
+      list:
+        template: null
+        has_create: true
+        toolbar: ['add']
+        actions: ['view_entity', 'edit', 'delete']
+        fields:
+          id:
+            label: label.default.id
+            name: id
+            type: text
+            sort: true
+            default_sort: 'asc'
+          name:
+            label: label.menu.name
+            name: name
+            type: text
+          code:
+            label: label.menu.code
+            name: code
+            type: text
+            sort: true
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            sort: true
+          dateAdd:
+            label: label.default.dateAdd
+            name: dateAdd
+            type: datetime
+        filters:
+          name:
+            label: label.menu.name
+            type: text
+            alias: 't'
+          code:
+            label: label.menu.code
+            type: text
+          active:
+            label: label.default.active
+            type: 'bool'
+      form:
+        fields:
+          translatableName:
+            label: label.menu.name
+            name: name
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+          code:
+            label: label.menu.code
+            name: code
+            type: text
+            help: help.menu.code
+          active:
+            label: label.default.active
             name: active
             type: bool
             required: true

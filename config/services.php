@@ -10,6 +10,11 @@ use Digitix\FrameworkBundle\Admin\Field\FieldTypeRegistry;
 use Digitix\FrameworkBundle\Admin\Filter\FilterTypeRegistry;
 use Digitix\FrameworkBundle\Admin\Persistence\EntityClassResolver;
 use Digitix\FrameworkBundle\Admin\Routing\AdminRouteLoader;
+use Digitix\FrameworkBundle\Asset\MtimeVersionStrategy;
+use Digitix\FrameworkBundle\Menu\MenuProvider;
+use Digitix\FrameworkBundle\Menu\MenuSourceProvider;
+use Digitix\FrameworkBundle\Menu\MenuTreePersister;
+use Digitix\FrameworkBundle\Translation\ConfigKeyExtractor;
 use Digitix\FrameworkBundle\Translation\TranslationCompiler;
 use Digitix\FrameworkBundle\Translation\TranslationExtractor;
 use Digitix\FrameworkBundle\Translation\TranslationSynchronizer;
@@ -68,6 +73,9 @@ return static function (ContainerConfigurator $container): void {
         ->arg('$extractor', service('translation.extractor'))
         ->arg('$paths', param('digitix_framework.translation.paths'));
 
+    $services->set(ConfigKeyExtractor::class)
+        ->arg('$menuPages', param('digitix_framework.menu.pages'));
+
     $services->set(TranslationSynchronizer::class)
         ->arg('$translator', service('translator'));
 
@@ -75,6 +83,29 @@ return static function (ContainerConfigurator $container): void {
         ->arg('$outputDir', param('digitix_framework.translation.output_dir'))
         ->arg('$translatorCacheDir', '%kernel.cache_dir%/translations')
         ->arg('$translator', service('translator.default'));
+
+    // --- Front menus: builder sources, tree persistence, rendering --------------------
+    $services->load('Digitix\\FrameworkBundle\\Menu\\', '../src/Menu/')
+        ->exclude([
+            '../src/Menu/MenuItemType.php',
+            '../src/Menu/MenuNode.php',
+            '../src/Menu/MenuTree.php',
+            '../src/Menu/MenuTreeException.php',
+        ]);
+    $services->load('Digitix\\FrameworkBundle\\Twig\\', '../src/Twig/');
+
+    $services->set(MenuSourceProvider::class)
+        ->arg('$pages', param('digitix_framework.menu.pages'));
+
+    $services->set(MenuTreePersister::class)
+        ->arg('$maxDepth', param('digitix_framework.menu.max_depth'));
+
+    $services->set(MenuProvider::class)
+        ->arg('$cache', service('cache.app'));
+
+    // --- Assets: cache busting by file mtime (opt-in through framework.assets.version_strategy)
+    $services->set(MtimeVersionStrategy::class)
+        ->arg('$publicDir', '%kernel.project_dir%/public');
 
     // --- Content kit: mailer, cache, fixtures, validators ------------------------------
     $services->load('Digitix\\FrameworkBundle\\Utils\\', '../src/Utils/')

@@ -131,6 +131,41 @@ code ──(dgtx:translation:extract)──> translation table ──(compile)�
 Themes: give their templates a domain of their own (`'Theme.MyTheme'`) and
 filter on it in the editor.
 
+## Menus
+
+Menus are built in the admin (`/admin/menu`, then the eye icon) and rendered
+on the front by their code:
+
+```twig
+{{ dgtx_menu('main') }}
+{{ dgtx_menu('footer', {class: 'footer-menu', depth: 1}) }}
+{% set tree = dgtx_menu_tree('main') %}   {# MenuTree: items[], each MenuNode has title, url, target, cssClass, children, current, active #}
+```
+
+Options: `class` (root `<ul>` class, default `menu`), `depth` (levels
+rendered), `locale`, `template`. The default markup lives in
+`templates/front/menu/menu.html.twig`, override it in
+`templates/bundles/DigitixFrameworkBundle/front/menu/menu.html.twig`.
+Rendered trees are cached (`cache.app`) and dropped whenever a menu is saved.
+
+Items point to a project route, a CMS page or a free URL, have one title per
+language, a CSS class, an optional "new tab" target and an active flag.
+The builder offers the pages declared in the configuration plus the active
+CMS pages:
+
+```yaml
+digitix_framework:
+  menu:
+    max_depth: 3                                    # levels allowed in a menu
+    pages:                                          # labels translated in the "Menu.Label" domain
+      - { route: app_index, label: 'Home' }
+      - { route: front_contact, label: 'Contact', params: {} }
+```
+
+A project controller extending `AdminMenuController` can add dynamic pages by
+overriding `getStaticPages()`. The tree is saved in one POST (JSON) as a diff:
+ids and translations survive, removed items are deleted.
+
 ## Tests
 
 The bundle ships its own test application (`tests/App`, SQLite in memory,
@@ -188,6 +223,16 @@ php bin/console assets:install  # in the project, copies public/ to public/bundl
 ```
 
 Styles: `assets/css/style.scss` and `assets/css/_partials/*.scss`. Scripts:
-`assets/js/admin.js` (entry point) and its modules.
+`assets/js/admin.js` (entry point) and its modules. `window.dgtxNotify(message, type)`
+shows a toast (success, error, warning, info) for the AJAX screens.
+
+File names are fixed, so let browsers notice a rebuild with the bundle's
+mtime-based version strategy (`?v=<mtime>` appended to every existing asset):
+
+```yaml
+framework:
+    assets:
+        version_strategy: Digitix\FrameworkBundle\Asset\MtimeVersionStrategy
+```
 
 `trans()` has the translator's signature, `trans($id, $parameters, $domain)`: always pass the domain as a literal string so that the translation extractor finds the key.

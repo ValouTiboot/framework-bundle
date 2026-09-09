@@ -6,131 +6,146 @@ namespace Digitix\FrameworkBundle\Controller\Admin;
 
 use Digitix\FrameworkBundle\Admin\Context\AdminContext;
 use Digitix\FrameworkBundle\Admin\Security\AdminPermission;
-use Digitix\FrameworkBundle\Entity\Cms;
 use Digitix\FrameworkBundle\Entity\Menu;
-use Digitix\FrameworkBundle\Entity\MenuItem;
-use Digitix\FrameworkBundle\Entity\MenuItemTranslation;
+use Digitix\FrameworkBundle\Menu\MenuProvider;
+use Digitix\FrameworkBundle\Menu\MenuSourceProvider;
+use Digitix\FrameworkBundle\Menu\MenuTreeException;
+use Digitix\FrameworkBundle\Menu\MenuTreeExporter;
+use Digitix\FrameworkBundle\Menu\MenuTreePersister;
 use Digitix\FrameworkBundle\Provider\LanguageProvider;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Drag & drop menu builder (viewEntity). The tree is posted as a flat
- * "menu_item[n][...]" list and replaces the existing items.
+ * Menu builder (viewEntity): sources on the left, nested tree on the right,
+ * saved as one JSON tree through the "save" action. Every change to a menu
+ * drops its cached front rendering.
+ *
+ * Projects extend this controller to offer more pages: see getStaticPages().
  */
 class AdminMenuController extends AdminController
 {
+    public const CSRF_TOKEN_ID = 'dgtx_menu';
+
     public static function getSubscribedServices(): array
     {
-        return array_merge(parent::getSubscribedServices(), [LanguageProvider::class]);
+        return array_merge(parent::getSubscribedServices(), [
+            LanguageProvider::class,
+            MenuSourceProvider::class,
+            MenuTreeExporter::class,
+            MenuTreePersister::class,
+            MenuProvider::class,
+        ]);
     }
 
     public function viewEntity(AdminContext $context): Response
     {
         $this->assertGranted(AdminPermission::EDIT, $context);
 
-        $menu = $context->getEntity();
-        if (!$menu instanceof Menu) {
-            throw new NotFoundHttpException('Menu not found.');
-        }
+        $menu = $this->menuOf($context);
+        $languages = $this->container->get(LanguageProvider::class)->getActiveLanguages();
+        $defaultLanguage = $context->getLanguage();
+
+        return $this->renderAdmin($this->templates()->view($context->getEntityConfig()), $this->baseVars($context) + [
+            'menuEntity' => $menu,
+            'languages' => $languages,
+            'currentLocale' => (string) $defaultLanguage->getLocale(),
+            'sources' => $this->container->get(MenuSourceProvider::class)->getSources($this->getStaticPages()),
+            'items' => $this->container->get(MenuTreeExporter::class)->export($menu, $languages, $defaultLanguage),
+            'maxDepth' => $this->container->get(MenuTreePersister::class)->getMaxDepth(),
+            'csrf_token' => $this->container->get('security.csrf.token_manager')->getToken(self::CSRF_TOKEN_ID)->getValue(),
+            'save_url' => $this->generateUrl('dgtx_admin_entity_action', [
+                'entityName' => $context->getEntitySlug(),
+                'action' => 'save',
+                'entityId' => $menu->getId(),
+            ]),
+        ]);
+    }
+
+    /**
+     * POST JSON {items: [...], _token} from the builder (see MenuTreePersister).
+     */
+    public function saveAction(AdminContext $context): Response
+    {
+        $this->assertGranted(AdminPermission::EDIT, $context);
 
         $request = $context->getRequest();
-
-        if ($request->isMethod('POST') && $request->request->has('menu_item')) {
-            $this->replaceItems($menu, (array) $request->request->all('menu_item'));
-            $this->addFlash('success', $this->trans('Entity successfuly updated.', [], 'Admin.Message.Success'));
-
-            return $this->redirectToRoute('dgtx_admin_entity_view_entity', [
-                'entityName' => $context->getEntitySlug(),
-                'entityId' => $menu->getId(),
-            ]);
+        if (!$request->isMethod('POST')) {
+            return new JsonResponse(['error' => 'POST expected.'], Response::HTTP_METHOD_NOT_ALLOWED);
         }
 
-        return $this->renderAdmin(
-            $this->templates()->view($context->getEntityConfig()),
-            $this->baseVars($context) + [
-                'menuEntity' => $menu,
-                'pages' => $this->getAvailablePages(),
-                'items' => $this->doctrine()->getRepository(MenuItem::class)->findBy(['menu' => $menu]),
-            ]
-        );
+        $payload = json_decode((string) $request->getContent(), true);
+        if (!\is_array($payload)) {
+            return new JsonResponse(['error' => 'Invalid JSON payload.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$this->isCsrfTokenValid(self::CSRF_TOKEN_ID, (string) ($payload['_token'] ?? ''))) {
+            return new JsonResponse(['error' => $this->trans('Invalid security token, please try again.', [], 'Admin.Message.Error')], Response::HTTP_FORBIDDEN);
+        }
+
+        $menu = $this->menuOf($context);
+
+        try {
+            $ids = $this->container->get(MenuTreePersister::class)->save($menu, $payload);
+        } catch (MenuTreeException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return new JsonResponse([
+            'ids' => $ids,
+            'saved_at' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+        ]);
     }
 
-    /**
-     * Pages offered on the left panel, grouped: static routes, CMS pages, free links.
-     * Override getStaticPages() in a project controller to add its own routes.
-     *
-     * @return array<string, array<string|int, array{route: string, label: string, idEntity?: int|null}>>
-     */
-    protected function getAvailablePages(): array
+    public function edit(AdminContext $context): Response
     {
-        $pages = [];
+        $response = parent::edit($context);
 
-        if ($static = $this->getStaticPages()) {
-            $pages['pages'] = $static;
+        if ($response instanceof RedirectResponse && ($menu = $context->getEntity()) instanceof Menu) {
+            $this->container->get(MenuProvider::class)->invalidate($menu);
         }
 
-        foreach ($this->doctrine()->getRepository(Cms::class)->findAll() as $cms) {
-            $pages['cms'][] = [
-                'route' => 'front_cms_show',
-                'label' => (string) $cms->getName(),
-                'idEntity' => $cms->getId(),
-            ];
+        return $response;
+    }
+
+    public function delete(AdminContext $context): RedirectResponse
+    {
+        try {
+            $menu = $context->getEntity();
+        } catch (NotFoundHttpException) {
+            $menu = null;
         }
 
-        $pages['link'] = [
-            'link' => ['route' => '', 'label' => $this->trans('Link', [], 'Menu.Label')],
-        ];
+        $response = parent::delete($context);
 
-        return $pages;
+        if ($menu instanceof Menu) {
+            $this->container->get(MenuProvider::class)->invalidate($menu);
+        }
+
+        return $response;
     }
 
     /**
-     * @return array<string, array{route: string, label: string}>
+     * Pages a project offers in the builder on top of "digitix_framework.menu.pages".
+     * Override it to add dynamic entries (categories, products...).
+     *
+     * @return array<int, array{route: string, label: string, params?: array<string, mixed>}>
      */
     protected function getStaticPages(): array
     {
         return [];
     }
 
-    /**
-     * @param array<int|string, array<string, mixed>> $items
-     */
-    private function replaceItems(Menu $menu, array $items): void
+    private function menuOf(AdminContext $context): Menu
     {
-        $manager = $this->doctrine()->getManagerForClass(MenuItem::class);
-        $existing = $manager->getRepository(MenuItem::class)->findBy(['menu' => $menu]);
+        $menu = $context->getEntity();
 
-        // children before parents
-        foreach (array_reverse($existing) as $item) {
-            $manager->remove($item);
+        if (!$menu instanceof Menu || null === $menu->getId()) {
+            throw new NotFoundHttpException('Menu not found.');
         }
-        $manager->flush();
 
-        $languages = $this->container->get(LanguageProvider::class)->getActiveLanguages();
-        $created = [];
-
-        foreach ($items as $item) {
-            $parentKey = $item['idParent'] ?? 0;
-
-            $menuItem = (new MenuItem())
-                ->setMenu($menu)
-                ->setParent(0 != $parentKey ? ($created[$parentKey] ?? null) : null)
-                ->setIdEntity(isset($item['idEntity']) && '' !== $item['idEntity'] ? (int) $item['idEntity'] : null)
-                ->setRoute($item['route'] ?? null)
-                ->setCssClass($item['class'] ?? null)
-                ->setLink($item['link'] ?? null)
-                ->setDepth((int) ($item['depth'] ?? 0));
-
-            foreach ($languages as $language) {
-                $menuItem->addTranslation((new MenuItemTranslation())
-                    ->setLanguage($language)
-                    ->setName((string) ($item['name'] ?? ''))
-                    ->setLabel((string) ($item['label'] ?? '')));
-            }
-
-            $this->persister()->save($menuItem);
-            $created[$item['itemId'] ?? count($created)] = $menuItem;
-        }
+        return $menu;
     }
 }

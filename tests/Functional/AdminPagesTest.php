@@ -26,6 +26,8 @@ final class AdminPagesTest extends AdminTestCase
         yield 'cms create' => ['/admin/cms/create'];
         yield 'cms category list' => ['/admin/cmsCategory'];
         yield 'meta list' => ['/admin/meta'];
+        yield 'menu list' => ['/admin/menu'];
+        yield 'menu create' => ['/admin/menu/create'];
         yield 'translation editor' => ['/admin/translation'];
         yield 'translation editor filtered' => ['/admin/translation?locale=fr_FR&domain=Admin.List.Default&status=missing&q=add&page=1'];
         yield 'translation editor unknown locale' => ['/admin/translation?locale=xx_XX'];

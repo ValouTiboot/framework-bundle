@@ -45,6 +45,9 @@ final class DigitixFrameworkBundle extends AbstractBundle
             $config['translation']['paths']
         ))));
         $parameters->set(RuntimeTranslatorPass::OUTPUT_DIR_PARAMETER, $config['translation']['output_dir']);
+        $parameters->set('digitix_framework.front.home_route', $config['front']['home_route']);
+        $parameters->set('digitix_framework.menu.max_depth', $config['menu']['max_depth']);
+        $parameters->set('digitix_framework.menu.pages', $config['menu']['pages']);
 
         $container->import('../config/services.php');
 

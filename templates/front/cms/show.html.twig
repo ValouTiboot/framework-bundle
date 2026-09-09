@@ -1,0 +1,39 @@
+{#
+    Default CMS page, used when the project has no "cms/show.html.twig".
+    Copy it to templates/cms/show.html.twig and extend your own layout.
+#}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{{ meta.title|default(cms.name) }}</title>
+	{% if meta.description|default('') %}<meta name="description" content="{{ meta.description }}">{% endif %}
+	{% if meta.canonical|default('') %}<link rel="canonical" href="{{ meta.canonical }}">{% endif %}
+</head>
+<body>
+	<header>
+		{{ dgtx_menu('main') }}
+	</header>
+	<main>
+		{% if dgtxBreadcrumb %}
+			<nav aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					{% for crumb in dgtxBreadcrumb %}
+						<li class="breadcrumb-item{% if loop.last %} active{% endif %}">
+							{% if loop.last %}{{ crumb.name }}{% else %}<a href="{{ crumb.url }}">{{ crumb.name }}</a>{% endif %}
+						</li>
+					{% endfor %}
+				</ol>
+			</nav>
+		{% endif %}
+		<article class="cms">
+			<h1>{{ cms.name }}</h1>
+			<div class="cms-content">{{ cms.content|raw }}</div>
+		</article>
+	</main>
+	<footer>
+		{{ dgtx_menu('footer', {depth: 1}) }}
+	</footer>
+</body>
+</html>

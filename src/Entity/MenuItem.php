@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Entity;
 
 use Digitix\FrameworkBundle\Entity\Translatable\Translatable;
+use Digitix\FrameworkBundle\Menu\MenuItemType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * One entry of a Menu: a project route, a CMS page or a free link, placed in
+ * a tree (parent + position) whose depth is bounded by the configuration.
+ *
  * Translated fields, resolved in the current language (see Translatable):
  *
- * @method string|null getName()
- * @method string|null getLabel()
+ * @method string|null getName()  title displayed in the menu
+ * @method string|null getLabel() label of the source the item was created from
  */
 #[ORM\Entity]
+#[ORM\Index(name: 'idx_menu_item_order', columns: ['menu_id', 'parent_id', 'position'])]
 class MenuItem extends Translatable
 {
     #[ORM\Id]
@@ -24,25 +29,46 @@ class MenuItem extends Translatable
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuItems', cascade: ['persist'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Menu $menu = null;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'parents', cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children', cascade: ['persist'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?self $parent = null;
 
-    /**
-     * Children of this item (historical name kept for compatibility).
-     *
-     * @var Collection<int, self>
-     */
+    /** @var Collection<int, self> */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
-    private Collection $parents;
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    private Collection $children;
 
+    /** Order among the siblings, from 0. */
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    private int $position = 0;
+
+    /** 0 for a root item. Denormalised from the parent chain. */
+    #[ORM\Column(type: 'integer')]
+    private int $depth = 0;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private bool $active = true;
+
+    /** Id of the CMS page for MenuItemType::Cms. */
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $idEntity = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $route = null;
+
+    /** @var array<string, mixed>|null */
+    #[ORM\Column(name: 'route_params', type: 'json', nullable: true)]
+    private ?array $routeParams = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $link = null;
+
+    /** "_blank" to open in a new tab. */
+    #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    private ?string $target = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $cssClass = null;
@@ -57,15 +83,9 @@ class MenuItem extends Translatable
     #[ORM\OneToMany(targetEntity: MenuItemTranslation::class, mappedBy: 'translatable', cascade: ['all'], orphanRemoval: true)]
     private Collection $translations;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $link = null;
-
-    #[ORM\Column(type: 'integer')]
-    private int $depth = 0;
-
     public function __construct()
     {
-        $this->parents = new ArrayCollection();
+        $this->children = new ArrayCollection();
         $this->translations = new ArrayCollection();
     }
 
@@ -99,26 +119,67 @@ class MenuItem extends Translatable
     }
 
     /** @return Collection<int, self> */
-    public function getParents(): Collection
+    public function getChildren(): Collection
     {
-        return $this->parents;
+        return $this->children;
     }
 
-    public function addParent(self $child): self
+    public function addChild(self $child): self
     {
-        if (!$this->parents->contains($child)) {
-            $this->parents->add($child);
+        if (!$this->children->contains($child)) {
+            $this->children->add($child);
             $child->setParent($this);
         }
 
         return $this;
     }
 
-    public function removeParent(self $child): self
+    public function removeChild(self $child): self
     {
-        if ($this->parents->removeElement($child) && $child->getParent() === $this) {
+        if ($this->children->removeElement($child) && $child->getParent() === $this) {
             $child->setParent(null);
         }
+
+        return $this;
+    }
+
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function getDepth(): int
+    {
+        return $this->depth;
+    }
+
+    public function setDepth(int $depth): self
+    {
+        $this->depth = $depth;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function getActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
 
         return $this;
     }
@@ -142,7 +203,45 @@ class MenuItem extends Translatable
 
     public function setRoute(?string $route): self
     {
-        $this->route = $route;
+        $this->route = '' === $route ? null : $route;
+
+        return $this;
+    }
+
+    /** @return array<string, mixed> */
+    public function getRouteParams(): array
+    {
+        return $this->routeParams ?? [];
+    }
+
+    /** @param array<string, mixed>|null $routeParams */
+    public function setRouteParams(?array $routeParams): self
+    {
+        $this->routeParams = [] === $routeParams ? null : $routeParams;
+
+        return $this;
+    }
+
+    public function getLink(): ?string
+    {
+        return $this->link;
+    }
+
+    public function setLink(?string $link): self
+    {
+        $this->link = '' === $link ? null : $link;
+
+        return $this;
+    }
+
+    public function getTarget(): ?string
+    {
+        return $this->target;
+    }
+
+    public function setTarget(?string $target): self
+    {
+        $this->target = '' === $target ? null : $target;
 
         return $this;
     }
@@ -154,7 +253,7 @@ class MenuItem extends Translatable
 
     public function setCssClass(?string $cssClass): self
     {
-        $this->cssClass = $cssClass;
+        $this->cssClass = '' === $cssClass ? null : $cssClass;
 
         return $this;
     }
@@ -208,27 +307,29 @@ class MenuItem extends Translatable
         return $this;
     }
 
-    public function getLink(): ?string
+    /** Translation for a given language id, if any (no fallback). */
+    public function findTranslation(int $languageId): ?MenuItemTranslation
     {
-        return $this->link;
+        foreach ($this->translations as $translation) {
+            if ($translation->getLanguage()?->getId() === $languageId) {
+                return $translation;
+            }
+        }
+
+        return null;
     }
 
-    public function setLink(?string $link): self
+    /** Deduced from the stored fields: a link, a CMS page, or a route. */
+    public function getType(): MenuItemType
     {
-        $this->link = $link;
+        if (null !== $this->link) {
+            return MenuItemType::Link;
+        }
 
-        return $this;
-    }
+        if (MenuItemType::CMS_ROUTE === $this->route && null !== $this->idEntity) {
+            return MenuItemType::Cms;
+        }
 
-    public function getDepth(): int
-    {
-        return $this->depth;
-    }
-
-    public function setDepth(int $depth): self
-    {
-        $this->depth = $depth;
-
-        return $this;
+        return MenuItemType::Route;
     }
 }

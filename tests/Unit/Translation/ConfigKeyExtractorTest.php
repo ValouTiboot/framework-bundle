@@ -105,4 +105,18 @@ final class ConfigKeyExtractorTest extends TestCase
     {
         self::assertSame('', $this->catalogue->get('label.product.name', 'Admin.Fields.Label'));
     }
+
+    public function testMenuPagesLabelsUseTheMenuDomain(): void
+    {
+        $catalogue = new MessageCatalogue('en');
+        $extractor = new ConfigKeyExtractor(
+            AdminConfigFactory::fromArray(['admin_menu' => [], 'admin_entities' => []]),
+            [['route' => 'app_index', 'label' => 'Home'], ['route' => 'front_contact', 'label' => 'menu.contact', 'params' => []]],
+        );
+
+        $extractor->extract($catalogue);
+
+        self::assertTrue($catalogue->defines('Home', 'Menu.Label'));
+        self::assertTrue($catalogue->defines('menu.contact', 'Menu.Label'));
+    }
 }

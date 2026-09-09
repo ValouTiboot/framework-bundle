@@ -8,6 +8,7 @@
  * with TinyMCE.
  */
 import tinymce from 'tinymce';
+import { notify } from './notify';
 
 const RICH_EDITOR = {
 	menubar: false,
@@ -35,6 +36,7 @@ export function initTranslationEditor() {
 		cancel: table.dataset.cancelLabel,
 		html: table.dataset.htmlLabel,
 		error: table.dataset.error,
+		saved: table.dataset.savedMessage,
 	};
 	let sequence = 0;
 
@@ -165,10 +167,11 @@ export function initTranslationEditor() {
 				}
 				destroyEditor(state);
 				render(cell, data);
+				notify(labels.saved, 'success', 2000);
 			})
 			.catch((error) => {
 				cell.classList.remove('saving');
-				window.alert(error.message || labels.error);
+				notify(error.message || labels.error, 'error');
 			});
 	}
 

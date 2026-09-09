@@ -16,7 +16,9 @@ require('bootstrap');
 import 'jquery-ui/ui/widgets/sortable';
 import 'jquery-ui/ui/widgets/draggable';
 import Tagify from '@yaireo/tagify';
+import './notify';
 import { initTranslationEditor } from './translation';
+import { initMenuBuilder } from './menu-builder';
 
 // Import TinyMCE
 import tinymce from 'tinymce';
@@ -68,8 +70,9 @@ console.log('Hello Webpack Encore! Edit me in asset/admin/_dev/admin.js');
 
 $(document).ready(function(){
 
-	// translation editor (inline edition), first: it must not depend on the rest of this callback
+	// page modules first: they must not depend on the rest of this callback
 	initTranslationEditor();
+	initMenuBuilder();
 
 	// Menu
 	$('.menu-items a[href^="#"]').click(function(e){

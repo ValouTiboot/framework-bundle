@@ -1,3 +1,8 @@
 digitix_framework:
   resource: .
   type: digitix_framework
+
+# front pages of the bundle: CMS page (front_cms_show), contact...
+digitix_framework_front:
+  resource: '@DigitixFrameworkBundle/src/Controller/Front/'
+  type: attribute

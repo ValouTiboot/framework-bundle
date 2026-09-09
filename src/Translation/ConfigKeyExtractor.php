@@ -9,6 +9,7 @@ use Digitix\FrameworkBundle\Admin\Config\EntityConfig;
 use Digitix\FrameworkBundle\Admin\Config\FormConfig;
 use Digitix\FrameworkBundle\Admin\Field\Type\SubmitFieldType;
 use Digitix\FrameworkBundle\Admin\Filter\AbstractFilterType;
+use Digitix\FrameworkBundle\Menu\MenuSourceProvider;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
@@ -23,8 +24,13 @@ final class ConfigKeyExtractor
     /** Domain hard-coded by the list templates for column headers and header links. */
     public const LIST_DOMAIN = 'Admin.Fields.Label';
 
-    public function __construct(private readonly AdminConfig $config)
-    {
+    /**
+     * @param array<int, array{route: string, label: string, params?: array<string, mixed>}> $menuPages "digitix_framework.menu.pages"
+     */
+    public function __construct(
+        private readonly AdminConfig $config,
+        private readonly array $menuPages = [],
+    ) {
     }
 
     public function extract(MessageCatalogue $catalogue): void
@@ -36,6 +42,10 @@ final class ConfigKeyExtractor
 
         foreach ($this->config->getFrontForms() as $form) {
             $this->extractForm($form, $catalogue);
+        }
+
+        foreach ($this->menuPages as $page) {
+            $this->add($catalogue, MenuSourceProvider::LABEL_DOMAIN, $page['label']);
         }
     }
 

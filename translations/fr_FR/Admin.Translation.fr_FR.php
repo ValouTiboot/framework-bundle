@@ -18,5 +18,6 @@ return [
     'Cancel (Esc)' => 'Annuler (Échap)',
     'Rich text (HTML)' => 'Texte riche (HTML)',
     'The translation could not be saved.' => 'La traduction n\'a pas pu être enregistrée.',
+    'Translation saved.' => 'Traduction enregistrée.',
     'No entry matches your filters.' => 'Aucune entrée ne correspond à vos filtres.',
 ];

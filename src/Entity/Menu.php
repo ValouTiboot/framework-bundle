@@ -5,22 +5,33 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Entity;
 
 use Digitix\FrameworkBundle\Entity\Translatable\Translatable;
+use Digitix\FrameworkBundle\Repository\MenuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * A navigation menu, rendered on the front through dgtx_menu('<code>').
+ *
  * Translated fields, resolved in the current language (see Translatable):
  *
  * @method string|null getName()
  */
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: MenuRepository::class)]
 class Menu extends Translatable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    /** Stable identifier used by templates: dgtx_menu('main'). */
+    #[ORM\Column(type: 'string', length: 50, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 50)]
+    #[Assert\Regex(pattern: '/^[a-z0-9][a-z0-9_-]*$/', message: 'Use lower case letters, digits, "-" and "_" only.')]
+    private ?string $code = null;
 
     #[ORM\Column(type: 'boolean')]
     private bool $active = false;
@@ -48,6 +59,18 @@ class Menu extends Translatable
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = null === $code ? null : strtolower(trim($code));
+
+        return $this;
     }
 
     public function isActive(): bool

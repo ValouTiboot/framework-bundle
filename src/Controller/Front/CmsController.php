@@ -32,6 +32,11 @@ class CmsController extends FrontController
             'url' => $this->generateUrl('front_cms_show', ['entityId' => $entityId, 'rewrite' => $cms->getRewrite()]),
         ];
 
-        return $this->render('cms/show.html.twig', ['cms' => $cms]);
+        // the project template when it exists, otherwise the bundle default
+        $template = $this->container->get('twig')->getLoader()->exists('cms/show.html.twig')
+            ? 'cms/show.html.twig'
+            : '@DigitixFramework/front/cms/show.html.twig';
+
+        return $this->render($template, ['cms' => $cms]);
     }
 }

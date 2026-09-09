@@ -2,3 +2,7 @@
 # this keeps the recipe itself under test.
 imports:
     - { resource: '../../../../recipe/digitix_framework.yaml' }
+
+digitix_framework:
+    front:
+        home_route: test_home   # the "/" route of the test application (routes.yaml)

@@ -1,3 +1,15 @@
 digitix_framework:
     resource: .
     type: digitix_framework
+
+# front controllers of the bundle (CMS page, contact...)
+digitix_framework_front:
+    resource: '../../../src/Controller/Front/'
+    type: attribute
+
+# a home page rendering the menus, for the front tests
+test_home:
+    path: /
+    controller: Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+    defaults:
+        template: 'home.html.twig'
