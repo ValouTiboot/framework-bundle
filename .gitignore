@@ -2,6 +2,8 @@
 # the asset toolchain is frozen: a fresh resolution once duplicated jQuery (jquery-ui) and changed the theme
 !assets/yarn.lock
 assets/node_modules
+# source maps are a local development aid
+public/**/*.map
 assets/yarn-error.log
 vendor/
 var/

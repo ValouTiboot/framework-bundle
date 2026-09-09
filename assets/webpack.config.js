@@ -11,6 +11,10 @@ let config = {
     path: path.resolve(__dirname, '../public/assets'),
     filename: '[name].js',
   },
+  // theme.css.map points the browser dev tools back to the SCSS partial and line; the CSS is
+  // left expanded because node-sass maps a compressed output to a single line. Maps are
+  // ignored by git (see ../.gitignore). JS is minified without a map to keep the build fast.
+  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -21,9 +25,9 @@ let config = {
         test: /\.scss$/,
         use:[
             MiniCssExtractPlugin.loader,
-            'css-loader',
-            'postcss-loader',
-            'sass-loader',
+            {loader: 'css-loader', options: {sourceMap: true}},
+            {loader: 'postcss-loader', options: {sourceMap: true}},
+            {loader: 'sass-loader', options: {sourceMap: true, sassOptions: {outputStyle: 'expanded'}}},
           ],
       },
       {

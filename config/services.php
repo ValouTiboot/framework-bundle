@@ -108,9 +108,6 @@ return static function (ContainerConfigurator $container): void {
         ->arg('$publicDir', '%kernel.project_dir%/public');
 
     // --- Content kit: mailer, cache, fixtures, validators ------------------------------
-    $services->load('Digitix\\FrameworkBundle\\Utils\\', '../src/Utils/')
-        ->exclude(['../src/Utils/ToolString.php', '../src/Utils/Tools.php']);
-    $services->load('Digitix\\FrameworkBundle\\Validator\\', '../src/Validator/')
-        ->exclude(['../src/Validator/Constraints/NotBlankAtFirst.php']);
+    $services->load('Digitix\\FrameworkBundle\\Utils\\', '../src/Utils/');
     $services->load('Digitix\\FrameworkBundle\\DataFixtures\\', '../src/DataFixtures/');
 };

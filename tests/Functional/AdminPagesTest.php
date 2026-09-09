@@ -62,7 +62,8 @@ final class AdminPagesTest extends AdminTestCase
         $crawler = $this->client->request('GET', '/admin/user?filters[email]=nobody@nowhere.tld');
 
         self::assertResponseIsSuccessful();
-        self::assertCount(0, $crawler->filter('table tbody tr'));
+        self::assertCount(0, $crawler->filter('table tbody .dgtx-row-actions'), 'no row');
+        self::assertCount(1, $crawler->filter('table tbody .dgtx-empty'), 'the empty state is shown');
     }
 
     public function testTrailingSlashRedirects(): void

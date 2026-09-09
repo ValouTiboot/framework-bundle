@@ -2,6 +2,7 @@
 
 return [
     'Refresh keys' => 'Actualiser les clés',
+    'Everything written in the code is English: translate it here, changes are live immediately.' => 'Tout ce qui est écrit dans le code est en anglais : traduisez-le ici, les modifications sont visibles immédiatement.',
     'Scans the code for new or removed keys' => 'Analyse le code pour trouver les clés ajoutées ou retirées',
     '%translated% of %total% translated' => '%translated% sur %total% traduites',
     'Domain' => 'Domaine',

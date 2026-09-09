@@ -1,204 +1,206 @@
 /* Menu builder (templates/admin/helper/view/menu/view.html.twig) */
 #dgtx-menu-builder {
-	--dgtx-menu-indent: 36px; /* width of one level, read by menu-builder.js */
+  --dgtx-menu-indent: 36px; /* width of one level, read by menu-builder.js */
 }
 
 #menu {
-	.dgtx-menu-toolbar {
-		min-height: 48px;
-	}
-	.dgtx-menu-status {
-		font-size: 12px;
-		padding: .45rem .6rem;
-		white-space: nowrap;
-	}
-	[data-save].is-saving {
-		opacity: .6;
-	}
+  .dgtx-menu-toolbar {
+    min-height: 48px;
+  }
+  .dgtx-menu-status {
+    font-size: 12px;
+    padding: .45rem .6rem;
+    white-space: nowrap;
+  }
+  [data-save].is-saving {
+    opacity: .6;
+  }
 
-	/* --- sources (left) --- */
-	.dgtx-menu-sources {
-		background: $gray-100;
-		border-radius: .35rem;
-		padding: .75rem;
-		position: sticky;
-		top: 4rem;
-		.nav-pills .nav-link {
-			font-size: 12px;
-			padding: .3rem .5rem;
-		}
-	}
-	.dgtx-menu-source-list {
-		list-style: none;
-		margin: 0;
-		max-height: 60vh;
-		overflow: auto;
-		padding: 0;
-	}
-	.dgtx-menu-source {
-		align-items: center;
-		background: $white;
-		border: 1px solid $gray-200;
-		border-radius: .3rem;
-		display: flex;
-		gap: .4rem;
-		margin-bottom: .35rem;
-		padding: .35rem .5rem;
-		&:hover {
-			border-color: $gray-400;
-		}
-		.dgtx-menu-source-text {
-			display: flex;
-			flex: 1;
-			flex-direction: column;
-			min-width: 0;
-		}
-		.dgtx-menu-add {
-			line-height: 1;
-			padding: .1rem .3rem;
-			.material-icons {
-				font-size: 18px;
-			}
-		}
-	}
+  /* --- sources (left) --- */
+  .dgtx-menu-sources {
+    background: $gray-100;
+    border-radius: .35rem;
+    padding: .75rem;
+    position: sticky;
+    top: 4rem;
+    .nav-pills .nav-link {
+      font-size: 12px;
+      padding: .3rem .5rem;
+    }
+  }
+  .dgtx-menu-source-list {
+    list-style: none;
+    margin: 0;
+    max-height: 60vh;
+    overflow: auto;
+    padding: 0;
+  }
+  .dgtx-menu-source {
+    align-items: center;
+    background: $white;
+    border: 1px solid $gray-200;
+    border-radius: .3rem;
+    display: flex;
+    gap: .4rem;
+    margin-bottom: .35rem;
+    padding: .35rem .5rem;
+    &:hover {
+      border-color: $gray-400;
+    }
+    .dgtx-menu-source-text {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .dgtx-menu-add {
+      line-height: 1;
+      padding: .1rem .3rem;
+      .material-icons {
+        font-size: 18px;
+      }
+    }
+  }
 
-	/* --- tree (right): a flat list, the level is the left padding --- */
-	.dgtx-menu-root {
-		list-style: none;
-		margin: 0;
-		min-height: 200px;
-		padding: 0 0 3rem;
-		&.is-empty {
-			align-items: center;
-			border: 2px dashed $gray-300;
-			border-radius: .5rem;
-			color: $gray-600;
-			display: flex;
-			justify-content: center;
-			padding: 2rem;
-			&::before {
-				content: attr(data-empty-text);
-			}
-		}
-	}
-	.dgtx-menu-item {
-		margin-bottom: .35rem;
-		padding-left: calc(var(--depth, 0) * var(--dgtx-menu-indent));
-		transition: padding-left .12s ease;
-		&.is-inactive > .dgtx-menu-row {
-			opacity: .55;
-			.dgtx-menu-title {
-				text-decoration: line-through;
-			}
-		}
-	}
-	.dgtx-menu-row {
-		align-items: center;
-		background: $white;
-		border: 1px solid $gray-200;
-		border-radius: .35rem;
-		display: flex;
-		gap: .5rem;
-		padding: .4rem .6rem;
-		transition: box-shadow .15s;
-		&:hover {
-			box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
-		}
-	}
-	.dgtx-menu-handle {
-		color: $gray-500;
-		cursor: grab;
-		font-size: 20px;
-		&:active {
-			cursor: grabbing;
-		}
-	}
-	.dgtx-menu-branch {
-		color: $gray-500;
-		display: none;
-		font-size: 18px;
-		margin-right: -.25rem;
-	}
-	.dgtx-menu-item.is-nested .dgtx-menu-branch {
-		display: inline-block;
-	}
-	.dgtx-menu-type {
-		color: $primary;
-		font-size: 18px;
-	}
-	.dgtx-menu-title {
-		font-weight: 500;
-	}
-	.dgtx-menu-warning {
-		font-size: 18px;
-	}
-	.dgtx-menu-url {
-		flex: 1;
-		min-width: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-	.dgtx-menu-actions {
-		align-items: center;
-		display: flex;
-		gap: .25rem;
-		margin-left: auto;
-		.btn-link {
-			color: $gray-600;
-			padding: 0 .2rem;
-			&:hover {
-				color: $gray-900;
-			}
-			.material-icons {
-				font-size: 20px;
-				vertical-align: middle;
-			}
-		}
-		.form-switch .form-check-input {
-			cursor: pointer;
-			margin-left: 0;
-		}
-	}
-	.dgtx-menu-panel {
-		background: $gray-100;
-		border: 1px solid $gray-200;
-		border-radius: 0 0 .35rem .35rem;
-		border-top: 0;
-		margin: -.35rem 0 0 2.25rem;
-		padding: .9rem .75rem .5rem;
-	}
+  /* --- tree (right): a flat list, the level is the left padding --- */
+  .dgtx-menu-root {
+    list-style: none;
+    margin: 0;
+    min-height: 200px;
+    padding: 0 0 3rem;
+    &.is-empty {
+      align-items: center;
+      border: 2px dashed $gray-300;
+      border-radius: .5rem;
+      color: $gray-600;
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+      &::before {
+        content: attr(data-empty-text);
+      }
+    }
+  }
+  .dgtx-menu-item {
+    margin-bottom: .35rem;
+    padding-left: calc(var(--depth, 0) * var(--dgtx-menu-indent));
+    transition: padding-left .12s ease;
+    &.is-inactive > .dgtx-menu-row {
+      opacity: .55;
+      .dgtx-menu-title {
+        text-decoration: line-through;
+      }
+    }
+  }
+  .dgtx-menu-row {
+    align-items: center;
+    background: $white;
+    border: 1px solid $gray-200;
+    border-radius: .35rem;
+    display: flex;
+    gap: .5rem;
+    padding: .4rem .6rem;
+    position: relative;
+    transition: box-shadow .15s;
+    z-index: 1;
+    &:hover {
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+    }
+  }
+  .dgtx-menu-handle {
+    color: $gray-500;
+    cursor: grab;
+    font-size: 20px;
+    &:active {
+      cursor: grabbing;
+    }
+  }
+  .dgtx-menu-branch {
+    color: $gray-500;
+    display: none;
+    font-size: 18px;
+    margin-right: -.25rem;
+  }
+  .dgtx-menu-item.is-nested .dgtx-menu-branch {
+    display: inline-block;
+  }
+  .dgtx-menu-type {
+    color: $primary;
+    font-size: 18px;
+  }
+  .dgtx-menu-title {
+    font-weight: 500;
+  }
+  .dgtx-menu-warning {
+    font-size: 18px;
+  }
+  .dgtx-menu-url {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dgtx-menu-actions {
+    align-items: center;
+    display: flex;
+    gap: .25rem;
+    margin-left: auto;
+    .btn-link {
+      color: $gray-600;
+      padding: 0 .2rem;
+      &:hover {
+        color: $gray-900;
+      }
+      .material-icons {
+        font-size: 20px;
+        vertical-align: middle;
+      }
+    }
+    .form-switch .form-check-input {
+      cursor: pointer;
+      margin-left: 0;
+    }
+  }
+  .dgtx-menu-panel {
+    background: $gray-100;
+    border: 1px solid $gray-200;
+    border-radius: 0 0 .35rem .35rem;
+    border-top: 0;
+    margin: -.35rem 0 0 2.25rem;
+    padding: .9rem .75rem .5rem;
+  }
 
-	/* --- drag states --- */
-	#dgtx-menu-builder.is-dragging .dgtx-menu-root {
-		/* one faint guide per level, so the horizontal move reads as "indent" */
-		background: repeating-linear-gradient(90deg, rgba($primary, .12) 0 1px, transparent 1px var(--dgtx-menu-indent));
-		background-size: calc(var(--dgtx-menu-indent) * 6) 100%;
-		background-repeat: no-repeat;
-	}
-	.dgtx-menu-ghost {
-		transition: none;
-		> .dgtx-menu-row {
-			background: $bg-primary-color;
-			border: 1px dashed $primary;
-			> * {
-				opacity: .6;
-			}
-		}
-		&.dgtx-menu-source {
-			background: $bg-primary-color;
-			border-style: dashed;
-		}
-	}
-	.dgtx-menu-drag {
-		list-style: none;
-		opacity: .95;
-		> .dgtx-menu-row {
-			box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
-		}
-		&.dgtx-menu-source {
-			box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
-			list-style: none;
-		}
-	}
+  /* --- drag states --- */
+  #dgtx-menu-builder.is-dragging .dgtx-menu-root {
+    /* one faint guide per level, so the horizontal move reads as "indent" */
+    background: repeating-linear-gradient(90deg, rgba($primary, .12) 0 1px, transparent 1px var(--dgtx-menu-indent));
+    background-size: calc(var(--dgtx-menu-indent) * 6) 100%;
+    background-repeat: no-repeat;
+  }
+  .dgtx-menu-ghost {
+    transition: none;
+    > .dgtx-menu-row {
+      background: $bg-primary-color;
+      border: 1px dashed $primary;
+      > * {
+        opacity: .6;
+      }
+    }
+    &.dgtx-menu-source {
+      background: $bg-primary-color;
+      border-style: dashed;
+    }
+  }
+  .dgtx-menu-drag {
+    list-style: none;
+    opacity: .95;
+    > .dgtx-menu-row {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+    }
+    &.dgtx-menu-source {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+      list-style: none;
+    }
+  }
 }

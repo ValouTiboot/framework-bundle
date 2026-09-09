@@ -1,114 +1,115 @@
 /* Translation editor (templates/admin/helper/list/translation.twig) */
 #translation {
-	.dgtx-trans-toolbar {
-		padding-top: .5rem;
-	}
-	.dgtx-trans-tabs {
-		border-bottom: 0;
-		.nav-link {
-			color: inherit;
-			display: flex;
-			flex-direction: column;
-			gap: .35rem;
-			min-width: 150px;
-			&.active {
-				font-weight: 600;
-			}
-		}
-		.dgtx-trans-tab-title {
-			align-items: center;
-			display: flex;
-			gap: .5rem;
-			justify-content: space-between;
-		}
-		.progress {
-			background: $gray-200;
-			height: 4px;
-		}
-	}
+  .dgtx-trans-toolbar {
+    padding-top: .5rem;
+    padding-bottom: 0;
+  }
+  .dgtx-trans-tabs {
+    border-bottom: 0;
+    .nav-link {
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+      min-width: 150px;
+      &.active {
+        font-weight: 600;
+      }
+    }
+    .dgtx-trans-tab-title {
+      align-items: center;
+      display: flex;
+      gap: .5rem;
+      justify-content: space-between;
+    }
+    .progress {
+      background: $gray-200;
+      height: 4px;
+    }
+  }
 
-	.dgtx-trans-table {
-		td {
-			vertical-align: top;
-		}
-	}
-	.dgtx-trans-domain {
-		font-weight: 500;
-	}
-	.dgtx-trans-key {
-		color: $gray-700;
-		font-size: .9em;
-		white-space: pre-wrap;
-		word-break: break-word;
-	}
-	.dgtx-trans-value {
-		white-space: pre-wrap;
-		word-break: break-word;
-		&.dgtx-trans-html {
-			white-space: normal;
-			p:last-child, ul:last-child, ol:last-child {
-				margin-bottom: 0;
-			}
-		}
-		&.editable {
-			cursor: pointer;
-			transition: background-color .15s;
-			&:hover, &:focus {
-				background-color: $font-light-grey;
-				outline: none;
-			}
-		}
-		&.editing {
-			background-color: $font-light-grey;
-			cursor: default;
-			white-space: normal;
-			.tox-tinymce {
-				border-radius: .25rem;
-			}
-		}
-		.dgtx-trans-actions .active {
-			background-color: $primary;
-			color: $white;
-		}
-		&.saving {
-			opacity: .6;
-		}
-		&.saved {
-			animation: dgtx-trans-saved 1.2s ease-out;
-		}
-	}
-	.dgtx-trans-actions {
-		display: flex;
-		gap: .25rem;
-		margin-top: .35rem;
-		.material-icons {
-			font-size: 18px;
-			vertical-align: middle;
-		}
-	}
+  .dgtx-trans-table {
+    td {
+      vertical-align: top;
+    }
+  }
+  .dgtx-trans-domain {
+    font-weight: 500;
+  }
+  .dgtx-trans-key {
+    color: $gray-700;
+    font-size: .9em;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .dgtx-trans-value {
+    white-space: pre-wrap;
+    word-break: break-word;
+    &.dgtx-trans-html {
+      white-space: normal;
+      p:last-child, ul:last-child, ol:last-child {
+        margin-bottom: 0;
+      }
+    }
+    &.editable {
+      cursor: pointer;
+      transition: background-color .15s;
+      &:hover, &:focus {
+        background-color: $font-light-grey;
+        outline: none;
+      }
+    }
+    &.editing {
+      background-color: $font-light-grey;
+      cursor: default;
+      white-space: normal;
+      .tox-tinymce {
+        border-radius: .25rem;
+      }
+    }
+    .dgtx-trans-actions .active {
+      background-color: $primary;
+      color: $white;
+    }
+    &.saving {
+      opacity: .6;
+    }
+    &.saved {
+      animation: dgtx-trans-saved 1.2s ease-out;
+    }
+  }
+  .dgtx-trans-actions {
+    display: flex;
+    gap: .25rem;
+    margin-top: .35rem;
+    .material-icons {
+      font-size: 18px;
+      vertical-align: middle;
+    }
+  }
 
-	.dgtx-status {
-		font-weight: 500;
-		&.dgtx-status-missing {
-			background-color: $yellow;
-			color: $gray-900;
-		}
-		&.dgtx-status-translated {
-			background-color: $success;
-			color: $white;
-		}
-		&.dgtx-status-obsolete {
-			background-color: $gray-600;
-			color: $white;
-		}
-	}
-	.dgtx-trans-row-obsolete .dgtx-trans-key {
-		opacity: .7;
-		text-decoration: line-through;
-	}
+  .dgtx-status {
+    font-weight: 500;
+    &.dgtx-status-missing {
+      background-color: $bg-warning-color;
+      color: darken($warning, 12%);
+    }
+    &.dgtx-status-translated {
+      background-color: $success;
+      color: $white;
+    }
+    &.dgtx-status-obsolete {
+      background-color: $gray-600;
+      color: $white;
+    }
+  }
+  .dgtx-trans-row-obsolete .dgtx-trans-key {
+    opacity: .7;
+    text-decoration: line-through;
+  }
 }
 
 @keyframes dgtx-trans-saved {
-	0% { background-color: $bg-success-color; }
-	100% { background-color: transparent; }
+  0% { background-color: $bg-success-color; }
+  100% { background-color: transparent; }
 }

@@ -1,0 +1,39 @@
+{% extends '@DigitixFramework/admin/layout.html.twig' %}
+
+{% block page_subtitle %}
+  <div class="dgtx-page-subtitle">
+    {{ 'list.default.total'|trans({}, 'Admin.List.Default') }} <strong>{{ total_items }}</strong>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  {% for h_link in header_link|default([]) %}
+    <a href="{{ path('dgtx_admin_entity_read', {entityName: h_link.entity}) }}" class="btn btn-light">
+      <i class="material-icons">add</i>
+      {{ h_link.name|trans({}, 'Admin.Fields.Label') }}
+    </a>
+  {% endfor %}
+  {% if has_create %}
+    <a href="{{ path('dgtx_admin_entity_create', {entityName: entityName}) }}" class="btn btn-primary">
+      <i class="material-icons">add</i>
+      {{ 'list.default.add'|trans({}, 'Admin.List.Default') }}
+    </a>
+  {% endif %}
+{% endblock %}
+
+{% block content_container %}
+  <div class="dgtx-card">
+    {% block toolbar %}{% endblock %}
+    {% block list %}
+      {% include '@DigitixFramework/admin/helper/list/_partials/list.html.twig' %}
+    {% endblock %}
+    {% block pagination %}
+      {% if pagination is defined and pagination is not null and pagination.totalPages > 1 %}
+        <div class="dgtx-toolbar" style="border-bottom: 0; border-top: 1px solid var(--bs-border-color)">
+          <span class="dgtx-count">{{ 'list.default.total'|trans({}, 'Admin.List.Default') }} <strong>{{ total_items }}</strong></span>
+          {% include '@DigitixFramework/admin/helper/list/_partials/pagination.html.twig' %}
+        </div>
+      {% endif %}
+    {% endblock %}
+  </div>
+{% endblock %}

@@ -1,0 +1,360 @@
+/*
+ * Components on top of the themed Bootstrap: buttons, badges, tables, forms,
+ * the yes/no switch, pagination, empty states, helpers.
+ */
+
+/* --- helpers kept from the previous theme --- */
+.t-success, .t-success:hover { color: $success; }
+.t-warning { color: $warning; }
+.t-info { color: $info; }
+.t-danger { color: $danger; }
+.t-muted { color: $gray-500; }
+.cursor-p { cursor: pointer; }
+.hide { display: none; }
+
+a {
+  transition: color .15s;
+}
+
+/* --- buttons --- */
+.btn {
+  align-items: center;
+  display: inline-flex;
+  gap: .35rem;
+  justify-content: center;
+  line-height: 1.4;
+  .material-icons {
+    font-size: 18px;
+    margin: 0 -.1rem;
+  }
+  &.btn-sm .material-icons {
+    font-size: 16px;
+  }
+}
+.btn-light {
+  background: $white;
+  border-color: $gray-300;
+  color: $gray-700;
+  &:hover, &:focus-visible {
+    background: $gray-100;
+    border-color: $gray-300;
+    color: $gray-900;
+  }
+  &:active, &.active {
+    background: $gray-200;
+    border-color: $gray-300;
+    color: $gray-900;
+  }
+}
+.btn-outline-primary {
+  background: $white;
+  &:hover {
+    color: $white;
+  }
+}
+.btn-icon {
+  height: 2.125rem;
+  padding: 0;
+  width: 2.125rem;
+  .material-icons {
+    font-size: 20px;
+    margin: 0;
+  }
+}
+.btn-link {
+  color: $gray-500;
+  padding: 0 .2rem;
+  &:hover {
+    color: $gray-900;
+  }
+}
+
+/* --- badges --- */
+.badge {
+  letter-spacing: .01em;
+  line-height: 1.2;
+  &.text-bg-light {
+    border: 1px solid $gray-200;
+    color: $gray-600 !important;
+  }
+}
+
+/* --- tables --- */
+.table {
+  margin-bottom: 0;
+  thead th {
+    background: $white;
+    border-bottom: 1px solid $gray-200;
+    color: $gray-500;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    padding-bottom: .85rem;
+    padding-top: .85rem;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+    .head {
+      align-items: center;
+      display: flex;
+      gap: .25rem;
+    }
+    .sorter {
+      display: flex;
+      flex-direction: column;
+      a {
+        color: $gray-400;
+        display: flex;
+        line-height: 0;
+        opacity: 0;
+        transition: opacity .15s, color .15s;
+        .material-icons {
+          font-size: 14px;
+          line-height: .5;
+        }
+        &:hover, &.active {
+          color: $brand-600;
+          opacity: 1;
+        }
+      }
+    }
+    &:hover .sorter a {
+      opacity: 1;
+    }
+  }
+  thead tr.dgtx-filters th {
+    background: $white;
+    padding: .5rem .5rem;
+    text-transform: none;
+    .form-control, .form-select {
+      font-size: .8125rem;
+    }
+  }
+  tbody td {
+    vertical-align: middle;
+    .material-icons {
+      font-size: 20px;
+    }
+    &.dgtx-cell-date {
+      white-space: nowrap;
+    }
+  }
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  &.table-hover tbody tr:hover {
+    background: $gray-50;
+    .sortable-cell .sortable-item {
+      opacity: 1;
+    }
+    .dgtx-row-actions a, .dgtx-row-actions button {
+      opacity: 1;
+    }
+  }
+  .sortable-cell {
+    padding-left: .25rem;
+    padding-right: 0;
+    width: 1.75rem;
+    .sortable-item {
+      color: $gray-400;
+      cursor: grab;
+      opacity: .35;
+    }
+  }
+}
+.dgtx-row-actions {
+  white-space: nowrap;
+  a, button {
+    background: none;
+    border: 0;
+    border-radius: $radius;
+    color: $gray-500;
+    display: inline-flex;
+    opacity: .55;
+    padding: .2rem;
+    transition: opacity .15s, color .15s, background-color .15s;
+    &:hover {
+      background: $gray-100;
+      color: $gray-900;
+      opacity: 1;
+    }
+    &.item-delete:hover {
+      background: $brand-50;
+      color: $brand-600;
+    }
+  }
+  form {
+    display: inline;
+  }
+}
+.dgtx-empty {
+  color: $gray-500;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  .material-icons {
+    color: $gray-300;
+    display: block;
+    font-size: 40px;
+    margin: 0 auto .5rem;
+  }
+}
+
+/* --- pagination --- */
+.pagination {
+  margin: 0;
+  .page-link {
+    align-items: center;
+    display: flex;
+    font-weight: 500;
+    height: 100%;
+    &.page-link-i {
+      padding: .35rem .4rem;
+    }
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+}
+
+/* --- forms: label on the left, field on the right, full width of the card --- */
+.dgtx-form {
+  position: relative;
+  .form-label, .col-form-label {
+    color: $gray-800;
+    font-weight: 500;
+  }
+  legend.col-form-label {
+    font-size: .875rem;
+  }
+  .row.mb-3 {
+    margin-bottom: .85rem !important;
+  }
+  /* every field stops where a language code would sit, so all fields share the same width */
+  .dgtx-form-group {
+    > .form-control, > .form-select, > .tox-tinymce, > .tagify {
+      width: calc(100% - 3rem);
+    }
+    > .form-check {
+      margin-right: 3rem;
+    }
+  }
+  .form-text {
+    color: $gray-500;
+    font-size: .8125rem;
+  }
+  .invalid-feedback {
+    display: block;
+  }
+  textarea.form-control {
+    min-height: 6rem;
+  }
+  .date-select .form-control {
+    margin-right: .5rem;
+  }
+}
+.dgtx-form-footer {
+  align-items: center;
+  border-top: 1px solid $gray-200;
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  .dgtx-form-back {
+    margin-right: auto;
+  }
+}
+.dgtx-translate {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  .dgtx-translate-entry {
+    align-items: stretch;
+    display: flex;
+    gap: .5rem;
+    .dgtx-translate-field {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+  /* language code after the field, as tall as the field */
+  .dgtx-translate-lang {
+    align-items: center;
+    align-self: flex-start;
+    background: $gray-50;
+    border: 1px solid $gray-300;
+    border-radius: $radius;
+    color: $gray-600;
+    display: flex;
+    flex-shrink: 0;
+    font-size: .6875rem;
+    font-weight: 600;
+    height: calc(1.5em + .9rem + 2px);
+    justify-content: center;
+    letter-spacing: .04em;
+    min-width: 2.5rem;
+    padding: 0 .5rem;
+  }
+}
+.dgtx-upload-preview {
+  border: 1px solid $gray-200;
+  border-radius: $radius;
+  margin-top: .5rem;
+  max-width: 240px;
+  padding: .25rem;
+}
+
+/* yes / no switch: two radios rendered as a segmented control (admin.js toggles .checked) */
+.dgtx-switch {
+  background: $white;
+  border: 1px solid $gray-300;
+  border-radius: $radius;
+  display: inline-flex;
+  overflow: hidden;
+  .form-check {
+    margin: 0;
+    min-height: 0;
+    padding: 0;
+    input[type="radio"] {
+      display: none;
+    }
+    label {
+      color: $gray-500;
+      cursor: pointer;
+      display: block;
+      font-weight: 500;
+      min-width: 4.5rem;
+      padding: .4rem 1rem;
+      text-align: center;
+      transition: background-color .15s, color .15s;
+      &:hover {
+        color: $gray-900;
+      }
+      &.checked {
+        background: $navy-800;
+        color: $white;
+      }
+    }
+    & + .form-check label {
+      border-left: 1px solid $gray-300;
+    }
+  }
+  &.dgtx-switch-no .form-check label.checked {
+    background: $gray-600;
+  }
+}
+
+/* rich text editor and tags, same shape as the inputs */
+.tox-tinymce {
+  border-color: $gray-300 !important;
+  border-radius: $radius !important;
+}
+.tagify.tag {
+  --tag-bg: #{$navy-100};
+  --tag-hover: #{$navy-100};
+  --tag-text-color: #{$navy-800};
+  --tag-remove-btn-color: #{$navy-800};
+  --tags-border-color: #{$gray-300};
+  --tags-focus-border-color: #{$brand-500};
+  border-radius: $radius;
+}

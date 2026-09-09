@@ -1,37 +1,80 @@
-/*Colors*/
-$main:#000000;
-$gray-100: #f8f9fa;
-$gray-200: #e9ecef;
-$gray-300: #dee2e6;
-$gray-400: #ced4da;
-$gray-500: #adb5bd;
-$gray-600: #6c757d;
-$gray-700: #495057;
-$gray-800: #343a40;
-$gray-900: #212529;
-$white:#FFFFFF;
-$yellow:#ffd900;
+/*
+ * Design tokens of the Digitix admin.
+ *
+ * Brand red comes from the logo and is the only accent colour; navy carries
+ * the structure (sidebar); everything else is neutral. Bootstrap is themed
+ * from these values in _partials/bootstrap.scss.
+ */
 
-$dark-blue:#1e3253;
-$dark-blue-hover:#172b44;
-$blue-t:#a8f3fc;
-$blue-turquish-light:#d7f7fa;
-$bg-grey:#ecf0f7;
+/* --- Brand (logo gradient: burgundy to red) --- */
+$brand-900: #4d0a1f;
+$brand-700: #8a1130;
+$brand-600: #b4172f;
+$brand-500: #d81f3a;
+$brand-100: #fbe4e8;
+$brand-50: #fdf2f4;
 
-$font-light-grey:#f4f6f8;
-$font-ico-grey:#ced5df;
-$font-ico-grey-hover:#7d8796;
+/* --- Structure --- */
+$navy-900: #121d33;
+$navy-800: #1b2b47;
+$navy-700: #23385c;
+$navy-600: #2f4a75;
+$navy-100: #e6ebf3;
 
-$bg-primary-color:#cce5ff;
-$bg-success-color:#d4edda;
-$bg-warning-color:#fff3cd;
-$bg-danger-color:#f8d7da;
-$bg-info-color:#d1ecf1;
+$teal-600: #1f96a2;
+$teal-500: #2bb3c0;
+$teal-100: #dcf4f6;
 
-$primary:#004085;
-$secondary: $yellow;
-$info:#0c5460;
-$light: $gray-200;
+/* --- Neutrals --- */
+$white: #ffffff;
+$gray-50: #f7f8fa;
+$gray-100: #f1f3f6;
+$gray-200: #e4e7ec;
+$gray-300: #d0d5dd;
+$gray-400: #98a2b3;
+$gray-500: #667085;
+$gray-600: #475467;
+$gray-700: #344054;
+$gray-800: #1d2939;
+$gray-900: #101828;
 
-/*Fonts*/
-$font-ico:'Material Icons';
+/* --- Semantic --- */
+$primary: $brand-600;
+$secondary: $navy-800;
+$success: #1a8a55;
+$info: $teal-600;
+$warning: #d9880b;
+$danger: $brand-500;
+$light: $gray-100;
+$dark: $navy-900;
+
+$body-bg: $gray-50;
+$body-color: $gray-700;
+$border-color: $gray-200;
+
+/* --- Shape and layout --- */
+$radius: 4px;
+$sidebar-width: 15rem;
+$topbar-height: 3.5rem;
+$content-padding: 1.75rem;
+
+/* --- Fonts --- */
+$font-sans: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+$font-ico: 'Material Symbols Outlined';
+
+/* --- Tinted backgrounds (alerts, badges, drag states) --- */
+$bg-primary-color: $brand-50;
+$bg-success-color: #e3f5ec;
+$bg-warning-color: #fdf1dc;
+$bg-danger-color: $brand-100;
+$bg-info-color: $teal-100;
+
+/* --- Legacy names still used by a few partials --- */
+$main: $gray-900;
+$dark-blue: $navy-800;
+$dark-blue-hover: $navy-700;
+$blue-t: $teal-500;
+$bg-grey: $gray-100;
+$font-light-grey: $gray-50;
+$font-ico-grey: $gray-400;
+$font-ico-grey-hover: $gray-600;

@@ -7,17 +7,17 @@
 {% import _self as menu %}
 
 {% macro level(nodes, depth, options) %}
-	{% import _self as menu %}
-	<ul class="{% if depth == 0 %}{{ options.class|default('menu') }}{% else %}sub-menu sub-menu-{{ depth }}{% endif %}">
-		{% for node in nodes %}
-			<li class="menu-item{% if node.hasChildren %} has-children{% endif %}{% if node.current %} current{% endif %}{% if node.active %} active{% endif %}{% if node.cssClass %} {{ node.cssClass }}{% endif %}">
-				<a href="{{ node.url }}" class="menu-link"{% if node.target %} target="{{ node.target }}" rel="noopener"{% endif %}{% if node.current %} aria-current="page"{% endif %}>{{ node.title }}</a>
-				{% if node.hasChildren and (options.depth is not defined or depth + 1 < options.depth) %}
-					{{ menu.level(node.children, depth + 1, options) }}
-				{% endif %}
-			</li>
-		{% endfor %}
-	</ul>
+  {% import _self as menu %}
+  <ul class="{% if depth == 0 %}{{ options.class|default('menu') }}{% else %}sub-menu sub-menu-{{ depth }}{% endif %}">
+    {% for node in nodes %}
+      <li class="menu-item{% if node.hasChildren %} has-children{% endif %}{% if node.current %} current{% endif %}{% if node.active %} active{% endif %}{% if node.cssClass %} {{ node.cssClass }}{% endif %}">
+        <a href="{{ node.url }}" class="menu-link"{% if node.target %} target="{{ node.target }}" rel="noopener"{% endif %}{% if node.current %} aria-current="page"{% endif %}>{{ node.title }}</a>
+        {% if node.hasChildren and (options.depth is not defined or depth + 1 < options.depth) %}
+          {{ menu.level(node.children, depth + 1, options) }}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
 {% endmacro %}
 
 {{ menu.level(tree.items, 0, options) }}

@@ -51,7 +51,8 @@ final class CmsCrudTest extends AdminTestCase
         self::assertCount(1, $crawler->filter('table tbody tr'));
 
         $crawler = $this->client->request('GET', '/admin/cms?filters[name]=zzz');
-        self::assertCount(0, $crawler->filter('table tbody tr'));
+        self::assertCount(0, $crawler->filter('table tbody .dgtx-row-actions'));
+        self::assertCount(1, $crawler->filter('table tbody .dgtx-empty'));
 
         // edit form is pre-filled and updates the translation
         $crawler = $this->client->request('GET', '/admin/cms/edit/'.$cms->getId());

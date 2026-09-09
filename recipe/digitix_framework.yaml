@@ -48,7 +48,7 @@ digitix_framework:
   admin_entities:
     Dashboard:
       view:
-        template: null
+        template: '@DigitixFramework/admin/helper/view/dashboard/view.html'
     User:
       list:
         template: null

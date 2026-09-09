@@ -8,11 +8,12 @@ use Digitix\FrameworkBundle\Admin\Config\EntityConfig;
 
 /**
  * Picks the Twig template of a page: the one configured for the entity, or
- * the bundle default. Configured names may omit the ".twig" suffix.
+ * the bundle default. Configured names may omit the ".html.twig" suffix
+ * ("admin/product/view" and "admin/product/view.html" both work).
  */
 final class TemplateResolver
 {
-    public const LIST = '@DigitixFramework/admin/helper/list/list.twig';
+    public const LIST = '@DigitixFramework/admin/helper/list/list.html.twig';
     public const FORM = '@DigitixFramework/admin/helper/form/_partials/form.html.twig';
     public const VIEW = '@DigitixFramework/admin/helper/view/view.html.twig';
 
@@ -37,6 +38,10 @@ final class TemplateResolver
             return null;
         }
 
-        return str_ends_with($template, '.twig') ? $template : $template.'.twig';
+        if (str_ends_with($template, '.twig')) {
+            return $template;
+        }
+
+        return $template.(str_ends_with($template, '.html') ? '.twig' : '.html.twig');
     }
 }

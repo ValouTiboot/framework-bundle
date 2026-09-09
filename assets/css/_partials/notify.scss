@@ -1,63 +1,63 @@
 /* Toast notifications (assets/js/notify.js) */
 .dgtx-toasts {
-	display: flex;
-	flex-direction: column;
-	gap: .5rem;
-	max-width: min(420px, calc(100vw - 2rem));
-	pointer-events: none;
-	position: fixed;
-	right: 1rem;
-	top: 3.75rem;
-	z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  max-width: min(420px, calc(100vw - 2rem));
+  pointer-events: none;
+  position: fixed;
+  right: 1rem;
+  top: 3.75rem;
+  z-index: 1100;
 }
 .dgtx-toast {
-	align-items: center;
-	background: $success;
-	border-radius: .4rem;
-	box-shadow: 0 6px 20px rgba(0, 0, 0, .25);
-	color: $white;
-	display: flex;
-	font-size: 14px;
-	gap: .6rem;
-	opacity: 0;
-	padding: .7rem .8rem .7rem 1rem;
-	pointer-events: auto;
-	transform: translateX(1.5rem);
-	transition: opacity .25s ease, transform .25s ease;
-	&.is-visible {
-		opacity: 1;
-		transform: none;
-	}
-	&.dgtx-toast-error {
-		background: $danger;
-	}
-	&.dgtx-toast-warning {
-		background: $warning;
-		color: $gray-900;
-	}
-	&.dgtx-toast-info {
-		background: $primary;
-	}
-	.dgtx-toast-icon {
-		font-size: 22px;
-	}
-	.dgtx-toast-text {
-		flex: 1;
-		line-height: 1.3;
-	}
-	.dgtx-toast-close {
-		background: none;
-		border: 0;
-		color: inherit;
-		line-height: 1;
-		opacity: .75;
-		padding: 0;
-		&:hover {
-			opacity: 1;
-		}
-		.material-icons {
-			font-size: 18px;
-			vertical-align: middle;
-		}
-	}
+  align-items: center;
+  background: $success;
+  border-radius: .4rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .25);
+  color: $white;
+  display: flex;
+  font-size: 14px;
+  gap: .6rem;
+  opacity: 0;
+  padding: .7rem .8rem .7rem 1rem;
+  pointer-events: auto;
+  transform: translateX(1.5rem);
+  transition: opacity .25s ease, transform .25s ease;
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  &.dgtx-toast-error {
+    background: $danger;
+  }
+  &.dgtx-toast-warning {
+    background: $warning;
+    color: $gray-900;
+  }
+  &.dgtx-toast-info {
+    background: $primary;
+  }
+  .dgtx-toast-icon {
+    font-size: 22px;
+  }
+  .dgtx-toast-text {
+    flex: 1;
+    line-height: 1.3;
+  }
+  .dgtx-toast-close {
+    background: none;
+    border: 0;
+    color: inherit;
+    line-height: 1;
+    opacity: .75;
+    padding: 0;
+    &:hover {
+      opacity: 1;
+    }
+    .material-icons {
+      font-size: 18px;
+      vertical-align: middle;
+    }
+  }
 }

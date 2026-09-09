@@ -1,142 +1,134 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ app.request.locale|slice(0, 2) }}">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noodp, noimageindex, notranslate, nocache" />
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <meta name="generator" content="DgtxAdmin" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <meta name="generator" content="DgtxAdmin">
+  <link rel="shortcut icon" href="{{ asset('bundles/digitixframework/assets/images/favicon.ico') }}" type="image/x-icon">
+  {% set pageTitle = dgtx_entity_title(entityName|default(null)) ?: controllerName|default('') %}
+  <title>{% block seo_title %}{{ pageTitle }}{% endblock %} · DgtxAdmin</title>
 
-    <link rel="shortcut icon" href="{{ asset('bundles/digitixframework/assets/images/favicon.ico') }}" type="image/x-icon" />
-
-    <title>DgtxAdmin - {% block seo_title %}{% endblock %}</title>
-
-    {% block head_stylesheets %}
-	<link rel="stylesheet" href="{{ asset('bundles/digitixframework/css/theme.css') }}">
-    {% endblock %}
-
-    {% block configured_stylesheets %}
-    	{#
-        {% for css_asset in ea.assets.cssFiles ?? [] %}
-            <link rel="stylesheet" href="{{ asset(css_asset) }}">
-        {% endfor %}
-    	#}
-    {% endblock %}
-
-    {% block head_javascript %}
-	<script src="{{ asset('bundles/digitixframework/assets/theme.js') }}"></script>
-    {% endblock head_javascript %}
-
-    {#
-    {% block configured_head_contents %}
-        {% for htmlContent in ea.assets.headContents ?? [] %}
-            {{ htmlContent|raw }}
-        {% endfor %}
-    {% endblock %}
-    #}
+  {% block head_stylesheets %}
+    <link rel="stylesheet" href="{{ asset('bundles/digitixframework/css/theme.css') }}">
+  {% endblock %}
+  {% block head_javascript %}
+    <script src="{{ asset('bundles/digitixframework/assets/theme.js') }}" defer></script>
+  {% endblock %}
 </head>
 
 {% block body %}
-<body id="{{ entityName }}">
+{% trans_default_domain 'Admin.Layout' %}
+<body id="{{ entityName|default('admin') }}" class="dgtx-admin">
 
-	{% block header %}
-	<header id="header">
-		<nav class="nav-header">
-			<div class="w-100 row justify-content-between align-items-center">
-				<div class="col-auto">
-					<a href="{{ path('dgtx_admin_entity_view', {entityName: 'dashboard'}) }}">
-						<div class="logo"></div>
-					</a>
-				</div>
-				<div class="col-auto">
-					<div class="row align-items-center justify-content-center">
-						<div class="col-auto">
-							<a class="nav-header-links d-flex align-items-center" href="{{ path('dgtx_admin_entity_edit', {entityName: 'user', entityId: app.user.id}) }}">
-								<i class="material-icons me-1">account_circle</i> {{ app.user.firstname|capitalize }} {{ app.user.lastname|capitalize }}
-							</a>
-						</div>
-						<div class="col-auto">
-							<a href="{{ app.request.getSchemeAndHttpHost() }}" target="_blank"><i class="material-icons">exit_to_app</i></a>
-						</div>
-						<div class="col-auto">
-							<a href="{{ path('dgtx_admin_logout') }}">
-								<i class="material-icons">power_settings_new</i>
-							</a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</nav>
-	</header>
-	{% endblock %}
+  {% block menu %}
+  <aside class="dgtx-sidebar">
+    <a class="dgtx-brand" href="{{ path('dgtx_admin_entity_view', {entityName: 'dashboard'}) }}">
+      <img src="{{ asset('bundles/digitixframework/assets/images/logo-ico.png') }}" alt="">
+      <span class="dgtx-brand-name">Digitix</span>
+      <span class="dgtx-brand-tag">admin</span>
+    </a>
+    <nav class="dgtx-nav" aria-label="{{ 'Main menu'|trans }}">
+      {% include '@DigitixFramework/admin/_partials/menu.html.twig' %}
+    </nav>
+    <div class="dgtx-sidebar-foot">
+      <span>DgtxAdmin</span>
+      <span>v2.0</span>
+    </div>
+  </aside>
+  {% endblock %}
 
-	{% block menu %}
-		{% include '@DigitixFramework/admin/_partials/menu.twig' %}
-	{% endblock %}
+  <div class="dgtx-main">
+    {% block header %}
+    <header class="dgtx-topbar">
+      <button type="button" class="dgtx-topbar-btn dgtx-sidebar-toggle" aria-label="{{ 'Toggle the menu'|trans }}" data-sidebar-toggle>
+        <i class="material-icons">menu</i>
+      </button>
+      <div class="dgtx-topbar-title">{% block topbar_title %}{{ pageTitle }}{% endblock %}</div>
+      <div class="dgtx-topbar-actions">
+        <a class="dgtx-topbar-btn" href="{{ app.request.schemeAndHttpHost }}" target="_blank" rel="noopener" title="{{ 'View the site'|trans }}">
+          <i class="material-icons">open_in_new</i>
+          <span class="d-none d-md-inline">{{ 'View the site'|trans }}</span>
+        </a>
+        {% if is_granted('ROLE_ADMIN') %}
+        <form method="post" action="{{ path('dgtx_admin_entity_create', {entityName: 'performance'}) }}" class="d-inline">
+          <input type="hidden" name="cacheClear" value="1">
+          <input type="hidden" name="_token" value="{{ csrf_token('dgtx_cache_clear') }}">
+          <button type="submit" class="dgtx-topbar-btn" title="{{ 'Clear the cache'|trans }}">
+            <i class="material-icons">cached</i>
+            <span class="d-none d-md-inline">{{ 'Clear the cache'|trans }}</span>
+          </button>
+        </form>
+        {% endif %}
+        {% if app.user %}
+        <div class="dropdown dgtx-user">
+          <button type="button" class="dgtx-topbar-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="dgtx-avatar">{{ (app.user.firstname|default('')|slice(0, 1) ~ app.user.lastname|default('')|slice(0, 1))|upper }}</span>
+            <span class="d-none d-md-inline">{{ app.user.firstname|default('')|capitalize }} {{ app.user.lastname|default('')|capitalize }}</span>
+            <i class="material-icons">expand_more</i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" href="{{ path('dgtx_admin_entity_edit', {entityName: 'user', entityId: app.user.id}) }}">
+                <i class="material-icons">account_circle</i> {{ 'My account'|trans }}
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" href="{{ path('dgtx_admin_logout') }}">
+                <i class="material-icons">logout</i> {{ 'Log out'|trans }}
+              </a>
+            </li>
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+    </header>
+    {% endblock %}
 
-	{% block wrapper %}
-	<div id="wrapper">
-		{% block container %}
-		<div id="wrapper-container">
-			<div class="row">
-				<div class="col">
-					{% block notifications %}
-					<div id="notifications-container" class="row">
-						<div class="col">
-							{% for label, messages in app.flashes %}
-							    {% for message in messages %}
-							        <div class="alert alert-{{ label }}" role="alert">
-							            {{ message }}
-							        </div>
-							    {% endfor %}
-							{% endfor %}
-						</div>
-					</div>
-					{% endblock %}
-					{% block infos_container%}
-					<div id="infos-container" class="row">
-						<div class="col">
-							<div class="bg-white info-container">
-								{% block infos %}{% endblock%}
-							</div>
-						</div>
-					</div>
-					{% endblock%}
+    <main class="dgtx-content">
+      {% block notifications %}
+      <div class="dgtx-flashes">
+        {% for label, messages in app.flashes %}
+          {% for message in messages %}
+            <div class="alert alert-{{ label }}" role="alert">
+              <i class="material-icons">{{ {success: 'check_circle', danger: 'error', warning: 'warning', info: 'info'}[label]|default('info') }}</i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      {% endblock %}
 
-					{% block content_header %}{% endblock %}
+      {% block infos_container %}{% block infos %}{% endblock %}{% endblock %}
 
-					{% block content_container %}
-					<div class="row">
-						<div class="col">
-							{% block toolbar %}{% endblock %}
-							<div class="bg-white mb-5 px-3 py-4">
-								{% block content%}
-									HTML HERE
-								{% endblock%}
-							</div>
-						</div>
-					</div>
-					{% endblock%}
-				</div>
-			</div>
-		</div>
-		{% endblock %}
-	</div>
-	{% endblock %}
+      {% block content_header %}
+        <div class="dgtx-page-header">
+          <div>
+            <h1 class="dgtx-page-title">{% block page_title %}{{ pageTitle }}{% endblock %}</h1>
+            {% block page_subtitle %}{% endblock %}
+          </div>
+          <div class="dgtx-page-actions">{% block page_actions %}{% endblock %}</div>
+        </div>
+      {% endblock %}
 
-	{% block footer %}
-	<footer id="footer">
-		<div class="footer-container container-fluid">
-			<div class="row justify-content-end">
-				<div class="col">
-					<a href="https://www.digitix.agency" class="copyright">
-						<span>1.0.0</span>
-						<img src="{{ asset('bundles/digitixframework/assets/images/logo-full.png') }}" />
-					</a>
-				</div>
-			</div>
-		</div>
-	</footer>
-	{% endblock %}
+      {% block content_container %}
+        {% block toolbar %}{% endblock %}
+        <div class="dgtx-card">
+          <div class="dgtx-card-body">
+            {% block content %}{% endblock %}
+          </div>
+        </div>
+      {% endblock %}
+    </main>
+
+    {% block footer %}
+    <footer class="dgtx-footer">
+      <span>&copy; {{ 'now'|date('Y') }} Digitix</span>
+      <a href="https://www.digitix.agency" target="_blank" rel="noopener">digitix.agency</a>
+    </footer>
+    {% endblock %}
+  </div>
 </body>
 {% endblock %}
+</html>

@@ -10,201 +10,195 @@
 #}
 
 {% macro item(item, items, languages, currentLocale) %}
-	{% import _self as builder %}
-	{% set icons = {route: 'description', cms: 'article', link: 'link'} %}
-	<li class="dgtx-menu-item{% if not item.active %} is-inactive{% endif %}{% if item.depth > 0 %} is-nested{% endif %}"
-	    data-depth="{{ item.depth }}"
-	    style="--depth: {{ item.depth }}"
-	    data-key="{{ item.key }}"
-	    data-id="{{ item.id ?? '' }}"
-	    data-type="{{ item.type }}"
-	    data-route="{{ item.route ?? '' }}"
-	    data-params="{{ item.params|json_encode }}"
-	    data-id-entity="{{ item.idEntity ?? '' }}"
-	    data-label="{{ item.label }}"
-	    data-url="{{ item.url ?? '' }}">
-		<div class="dgtx-menu-row">
-			<span class="dgtx-menu-handle material-icons" title="{{ 'Drag to move'|trans }}">drag_indicator</span>
-			<span class="dgtx-menu-branch material-icons">subdirectory_arrow_right</span>
-			<span class="dgtx-menu-type material-icons" title="{{ ('type.' ~ item.type)|trans }}">{{ icons[item.type] }}</span>
-			<span class="dgtx-menu-title">{{ item.titles[currentLocale]|default('') ?: item.label }}</span>
-			{% if item.type != 'link' and item.url is null %}
-				<span class="dgtx-menu-warning material-icons text-warning" title="{{ 'This item has no URL: the page or the route is missing.'|trans }}">warning</span>
-			{% endif %}
-			<span class="dgtx-menu-url text-muted small">{{ item.url ?? item.link ?? item.route }}</span>
-			<div class="dgtx-menu-actions">
-				<button type="button" class="btn btn-link dgtx-menu-outdent" title="{{ 'Move up one level'|trans }}"><i class="material-icons">format_indent_decrease</i></button>
-				<button type="button" class="btn btn-link dgtx-menu-indent" title="{{ 'Move under the previous item'|trans }}"><i class="material-icons">format_indent_increase</i></button>
-				<label class="form-check form-switch m-0" title="{{ 'Visible'|trans }}">
-					<input class="form-check-input dgtx-menu-active" type="checkbox" {% if item.active %}checked{% endif %}>
-				</label>
-				<button type="button" class="btn btn-link dgtx-menu-toggle" title="{{ 'Edit'|trans }}" aria-expanded="false"><i class="material-icons">expand_more</i></button>
-				<button type="button" class="btn btn-link dgtx-menu-delete" title="{{ 'Remove'|trans }}"><i class="material-icons">delete</i></button>
-			</div>
-		</div>
-		<div class="dgtx-menu-panel" hidden>
-			{% for language in languages %}
-				<div class="mb-2 dgtx-menu-locale-field" data-locale-field="{{ language.locale }}" {% if language.locale != currentLocale %}hidden{% endif %}>
-					<label class="form-label small mb-1">{{ 'Title'|trans }} <span class="badge text-bg-light">{{ language.iso|upper }}</span></label>
-					<input type="text" class="form-control form-control-sm dgtx-menu-field" data-field="title" data-locale="{{ language.locale }}" value="{{ item.titles[language.locale]|default('') }}" placeholder="{{ item.label }}">
-				</div>
-			{% endfor %}
-			{% if item.type == 'link' %}
-				<div class="mb-2">
-					<label class="form-label small mb-1">{{ 'URL'|trans }}</label>
-					<input type="text" class="form-control form-control-sm dgtx-menu-field" data-field="link" value="{{ item.link }}">
-				</div>
-			{% endif %}
-			<div class="row g-2 align-items-end">
-				<div class="col-7">
-					<label class="form-label small mb-1">{{ 'CSS class'|trans }}</label>
-					<input type="text" class="form-control form-control-sm dgtx-menu-field" data-field="cssClass" value="{{ item.cssClass }}">
-				</div>
-				<div class="col-5">
-					<label class="form-check small mb-1">
-						<input type="checkbox" class="form-check-input dgtx-menu-field" data-field="target" {% if item.target == '_blank' %}checked{% endif %}>
-						{{ 'Open in a new tab'|trans }}
-					</label>
-				</div>
-			</div>
-		</div>
-	</li>
-	{# children follow their parent in the flat list #}
-	{% for child in items|filter(candidate => candidate.parent == item.key) %}
-		{{ builder.item(child, items, languages, currentLocale) }}
-	{% endfor %}
+  {% import _self as builder %}
+  {% set icons = {route: 'description', cms: 'article', link: 'link'} %}
+  <li class="dgtx-menu-item{% if not item.active %} is-inactive{% endif %}{% if item.depth > 0 %} is-nested{% endif %}"
+      data-depth="{{ item.depth }}"
+      style="--depth: {{ item.depth }}"
+      data-key="{{ item.key }}"
+      data-id="{{ item.id ?? '' }}"
+      data-type="{{ item.type }}"
+      data-route="{{ item.route ?? '' }}"
+      data-params="{{ item.params|json_encode }}"
+      data-id-entity="{{ item.idEntity ?? '' }}"
+      data-label="{{ item.label }}"
+      data-url="{{ item.url ?? '' }}">
+    <div class="dgtx-menu-row">
+      <span class="dgtx-menu-handle material-icons" title="{{ 'Drag to move'|trans }}">drag_indicator</span>
+      <span class="dgtx-menu-branch material-icons">subdirectory_arrow_right</span>
+      <span class="dgtx-menu-type material-icons" title="{{ ('type.' ~ item.type)|trans }}">{{ icons[item.type] }}</span>
+      <span class="dgtx-menu-title">{{ item.titles[currentLocale]|default('') ?: item.label }}</span>
+      {% if item.type != 'link' and item.url is null %}
+        <span class="dgtx-menu-warning material-icons text-warning" title="{{ 'This item has no URL: the page or the route is missing.'|trans }}">warning</span>
+      {% endif %}
+      <span class="dgtx-menu-url text-muted small">{{ item.url ?? item.link ?? item.route }}</span>
+      <div class="dgtx-menu-actions">
+        <button type="button" class="btn btn-link dgtx-menu-outdent" title="{{ 'Move up one level'|trans }}"><i class="material-icons">format_indent_decrease</i></button>
+        <button type="button" class="btn btn-link dgtx-menu-indent" title="{{ 'Move under the previous item'|trans }}"><i class="material-icons">format_indent_increase</i></button>
+        <label class="form-check form-switch m-0" title="{{ 'Visible'|trans }}">
+          <input class="form-check-input dgtx-menu-active" type="checkbox" {% if item.active %}checked{% endif %}>
+        </label>
+        <button type="button" class="btn btn-link dgtx-menu-toggle" title="{{ 'Edit'|trans }}" aria-expanded="false"><i class="material-icons">expand_more</i></button>
+        <button type="button" class="btn btn-link dgtx-menu-delete" title="{{ 'Remove'|trans }}"><i class="material-icons">delete</i></button>
+      </div>
+    </div>
+    <div class="dgtx-menu-panel" hidden>
+      {% for language in languages %}
+        <div class="mb-2 dgtx-menu-locale-field" data-locale-field="{{ language.locale }}" {% if language.locale != currentLocale %}hidden{% endif %}>
+          <label class="form-label small mb-1">{{ 'Title'|trans }} <span class="badge text-bg-light">{{ language.iso|upper }}</span></label>
+          <input type="text" class="form-control form-control-sm dgtx-menu-field" data-field="title" data-locale="{{ language.locale }}" value="{{ item.titles[language.locale]|default('') }}" placeholder="{{ item.label }}">
+        </div>
+      {% endfor %}
+      {% if item.type == 'link' %}
+        <div class="mb-2">
+          <label class="form-label small mb-1">{{ 'URL'|trans }}</label>
+          <input type="text" class="form-control form-control-sm dgtx-menu-field" data-field="link" value="{{ item.link }}">
+        </div>
+      {% endif %}
+      <div class="row g-2 align-items-end">
+        <div class="col-7">
+          <label class="form-label small mb-1">{{ 'CSS class'|trans }}</label>
+          <input type="text" class="form-control form-control-sm dgtx-menu-field" data-field="cssClass" value="{{ item.cssClass }}">
+        </div>
+        <div class="col-5">
+          <label class="form-check small mb-1">
+            <input type="checkbox" class="form-check-input dgtx-menu-field" data-field="target" {% if item.target == '_blank' %}checked{% endif %}>
+            {{ 'Open in a new tab'|trans }}
+          </label>
+        </div>
+      </div>
+    </div>
+  </li>
+  {# children follow their parent in the flat list #}
+  {% for child in items|filter(candidate => candidate.parent == item.key) %}
+    {{ builder.item(child, items, languages, currentLocale) }}
+  {% endfor %}
 {% endmacro %}
 
 {% macro source(source) %}
-	<li class="dgtx-menu-source"
-	    data-type="{{ source.type }}"
-	    data-route="{{ source.route ?? '' }}"
-	    data-params="{{ source.params|json_encode }}"
-	    data-id-entity="{{ source.idEntity ?? '' }}"
-	    data-label="{{ source.label }}"
-	    data-url="{{ source.url ?? '' }}">
-		<span class="dgtx-menu-handle material-icons">drag_indicator</span>
-		<span class="dgtx-menu-source-text">
-			<span class="dgtx-menu-source-label">{{ source.label }}</span>
-			<span class="dgtx-menu-url text-muted small">{{ source.url ?? source.route }}</span>
-		</span>
-		<button type="button" class="btn btn-sm btn-outline-primary dgtx-menu-add" title="{{ 'Add to the menu'|trans }}"><i class="material-icons">add</i></button>
-	</li>
+  <li class="dgtx-menu-source"
+      data-type="{{ source.type }}"
+      data-route="{{ source.route ?? '' }}"
+      data-params="{{ source.params|json_encode }}"
+      data-id-entity="{{ source.idEntity ?? '' }}"
+      data-label="{{ source.label }}"
+      data-url="{{ source.url ?? '' }}">
+    <span class="dgtx-menu-handle material-icons">drag_indicator</span>
+    <span class="dgtx-menu-source-text">
+      <span class="dgtx-menu-source-label">{{ source.label }}</span>
+      <span class="dgtx-menu-url text-muted small">{{ source.url ?? source.route }}</span>
+    </span>
+    <button type="button" class="btn btn-sm btn-outline-primary dgtx-menu-add" title="{{ 'Add to the menu'|trans }}"><i class="material-icons">add</i></button>
+  </li>
 {% endmacro %}
 
 {% set config = {
-	saveUrl: save_url,
-	token: csrf_token,
-	maxDepth: maxDepth,
-	currentLocale: currentLocale,
-	locales: languages|map(language => {locale: language.locale, name: language.name, iso: language.iso}),
-	labels: {
-		title: 'Title'|trans,
-		url: 'URL'|trans,
-		cssClass: 'CSS class'|trans,
-		newTab: 'Open in a new tab'|trans,
-		visible: 'Visible'|trans,
-		edit: 'Edit'|trans,
-		remove: 'Remove'|trans,
-		drag: 'Drag to move'|trans,
-		confirmRemove: 'Remove this item?'|trans,
-		confirmRemoveChildren: 'Remove this item and its %count% sub-items?'|trans,
-		saved: 'Saved at %time%'|trans,
-		savedToast: 'Menu saved.'|trans,
-		unsaved: 'Unsaved changes'|trans,
-		saveError: 'The menu could not be saved.'|trans,
-		tooDeep: 'Up to %depth% levels.'|trans({'%depth%': maxDepth}),
-		outdent: 'Move up one level'|trans,
-		indent: 'Move under the previous item'|trans,
-		noUrl: 'This item has no URL: the page or the route is missing.'|trans,
-		types: {route: 'type.route'|trans, cms: 'type.cms'|trans, link: 'type.link'|trans},
-	},
+  saveUrl: save_url,
+  token: csrf_token,
+  maxDepth: maxDepth,
+  currentLocale: currentLocale,
+  locales: languages|map(language => {locale: language.locale, name: language.name, iso: language.iso}),
+  labels: {
+    title: 'Title'|trans,
+    url: 'URL'|trans,
+    cssClass: 'CSS class'|trans,
+    newTab: 'Open in a new tab'|trans,
+    visible: 'Visible'|trans,
+    edit: 'Edit'|trans,
+    remove: 'Remove'|trans,
+    drag: 'Drag to move'|trans,
+    confirmRemove: 'Remove this item?'|trans,
+    confirmRemoveChildren: 'Remove this item and its %count% sub-items?'|trans,
+    saved: 'Saved at %time%'|trans,
+    savedToast: 'Menu saved.'|trans,
+    unsaved: 'Unsaved changes'|trans,
+    saveError: 'The menu could not be saved.'|trans,
+    tooDeep: 'Up to %depth% levels.'|trans({'%depth%': maxDepth}),
+    outdent: 'Move up one level'|trans,
+    indent: 'Move under the previous item'|trans,
+    noUrl: 'This item has no URL: the page or the route is missing.'|trans,
+    types: {route: 'type.route'|trans, cms: 'type.cms'|trans, link: 'type.link'|trans},
+  },
 } %}
 
-{% block content_header %}
-	<div class="content-header bg-white">
-		<div class="d-flex align-items-center justify-content-between">
-			<div>
-				<div class="content-header-title">{{ menuEntity.name }}</div>
-				<div class="text-muted small">
-					<code>dgtx_menu('{{ menuEntity.code }}')</code>
-					&middot; <span data-item-count>{{ items|length }}</span> {{ 'items'|trans }}
-					&middot; {{ 'Up to %depth% levels.'|trans({'%depth%': maxDepth}) }}
-				</div>
-			</div>
-			<div class="content-header-btn d-flex align-items-center gap-2">
-				<a href="{{ path('dgtx_admin_entity_read', {entityName: entityName}) }}" class="btn btn-light"><i class="material-icons">arrow_back</i></a>
-				<span class="badge dgtx-menu-status" data-status hidden></span>
-				<button type="button" class="btn btn-primary" data-save disabled>
-					<i class="material-icons md-light">save</i>
-					{{ 'Save'|trans }}
-				</button>
-			</div>
-		</div>
-	</div>
+{% block page_title %}{{ menuEntity.name }}{% endblock %}
+{% block page_subtitle %}
+  <div class="dgtx-page-subtitle">
+    <code>dgtx_menu('{{ menuEntity.code }}')</code>
+    &middot; <span data-item-count>{{ items|length }}</span> {{ 'items'|trans }}
+    &middot; {{ 'Up to %depth% levels.'|trans({'%depth%': maxDepth}) }}
+  </div>
+{% endblock %}
+{% block page_actions %}
+  <a href="{{ path('dgtx_admin_entity_read', {entityName: entityName}) }}" class="btn btn-light btn-icon" title="{{ 'Back'|trans }}"><i class="material-icons">arrow_back</i></a>
+  <span class="badge dgtx-menu-status" data-status hidden></span>
+  <button type="button" class="btn btn-primary" data-save disabled>
+    <i class="material-icons">save</i>
+    {{ 'Save'|trans }}
+  </button>
 {% endblock %}
 
 {% block toolbar %}
-	<div class="bg-white toolbar dgtx-menu-toolbar px-3 d-flex align-items-center justify-content-between">
-		<div class="btn-group btn-group-sm" role="group" aria-label="{{ 'Language'|trans }}" data-locale-switch>
-			{% for language in languages %}
-				<button type="button" class="btn btn-outline-primary{% if language.locale == currentLocale %} active{% endif %}" data-locale="{{ language.locale }}">{{ language.name }}</button>
-			{% endfor %}
-		</div>
-		<div class="text-muted small">{{ 'Drag up or down to reorder, left or right to change the level.'|trans }}</div>
-	</div>
+  <div class="dgtx-card dgtx-toolbar dgtx-menu-toolbar mb-3">
+    <div class="btn-group btn-group-sm" role="group" aria-label="{{ 'Language'|trans }}" data-locale-switch>
+      {% for language in languages %}
+        <button type="button" class="btn btn-outline-primary{% if language.locale == currentLocale %} active{% endif %}" data-locale="{{ language.locale }}">{{ language.name }}</button>
+      {% endfor %}
+    </div>
+    <div class="text-muted small">{{ 'Drag up or down to reorder, left or right to change the level.'|trans }}</div>
+  </div>
 {% endblock %}
 
 {% block content %}
-	<div id="dgtx-menu-builder" class="row g-3" data-config="{{ config|json_encode|e('html') }}" data-locale="{{ currentLocale }}">
-		<div class="col-lg-4">
-			<div class="dgtx-menu-sources">
-				<ul class="nav nav-pills nav-fill mb-2" role="tablist">
-					<li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dgtx-menu-tab-pages" type="button" role="tab">{{ 'Pages'|trans }}</button></li>
-					<li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dgtx-menu-tab-cms" type="button" role="tab">{{ 'CMS pages'|trans }} <span class="badge text-bg-light">{{ sources.cms|length }}</span></button></li>
-					<li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dgtx-menu-tab-link" type="button" role="tab">{{ 'Link'|trans }}</button></li>
-				</ul>
-				<div class="tab-content">
-					<div class="tab-pane fade show active" id="dgtx-menu-tab-pages" role="tabpanel">
-						<ul class="dgtx-menu-source-list">
-							{% for source in sources.pages %}{{ builder.source(source) }}{% endfor %}
-						</ul>
-						{% if sources.pages is empty %}
-							<p class="text-muted small mb-0">{{ 'Declare the pages of the site in digitix_framework.menu.pages.'|trans }}</p>
-						{% endif %}
-					</div>
-					<div class="tab-pane fade" id="dgtx-menu-tab-cms" role="tabpanel">
-						<input type="search" class="form-control form-control-sm mb-2" placeholder="{{ 'Search a page'|trans }}" data-source-filter="#dgtx-menu-tab-cms">
-						<ul class="dgtx-menu-source-list">
-							{% for source in sources.cms %}{{ builder.source(source) }}{% endfor %}
-						</ul>
-						{% if sources.cms is empty %}
-							<p class="text-muted small mb-0">{{ 'No active CMS page yet.'|trans }}</p>
-						{% endif %}
-					</div>
-					<div class="tab-pane fade" id="dgtx-menu-tab-link" role="tabpanel">
-						<form class="dgtx-menu-link-form" data-link-form>
-							<div class="mb-2">
-								<label class="form-label small mb-1">{{ 'Title'|trans }}</label>
-								<input type="text" class="form-control form-control-sm" name="title" required>
-							</div>
-							<div class="mb-2">
-								<label class="form-label small mb-1">{{ 'URL'|trans }}</label>
-								<input type="text" class="form-control form-control-sm" name="url" placeholder="https://" required>
-							</div>
-							<button type="submit" class="btn btn-sm btn-outline-primary"><i class="material-icons">add</i> {{ 'Add to the menu'|trans }}</button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
+  <div id="dgtx-menu-builder" class="row g-3" data-config="{{ config|json_encode|e('html') }}" data-locale="{{ currentLocale }}">
+    <div class="col-lg-4">
+      <div class="dgtx-menu-sources">
+        <ul class="nav nav-pills nav-fill mb-2" role="tablist">
+          <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dgtx-menu-tab-pages" type="button" role="tab">{{ 'Pages'|trans }}</button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dgtx-menu-tab-cms" type="button" role="tab">{{ 'CMS pages'|trans }} <span class="badge text-bg-light">{{ sources.cms|length }}</span></button></li>
+          <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dgtx-menu-tab-link" type="button" role="tab">{{ 'Link'|trans }}</button></li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="dgtx-menu-tab-pages" role="tabpanel">
+            <ul class="dgtx-menu-source-list">
+              {% for source in sources.pages %}{{ builder.source(source) }}{% endfor %}
+            </ul>
+            {% if sources.pages is empty %}
+              <p class="text-muted small mb-0">{{ 'Declare the pages of the site in digitix_framework.menu.pages.'|trans }}</p>
+            {% endif %}
+          </div>
+          <div class="tab-pane fade" id="dgtx-menu-tab-cms" role="tabpanel">
+            <input type="search" class="form-control form-control-sm mb-2" placeholder="{{ 'Search a page'|trans }}" data-source-filter="#dgtx-menu-tab-cms">
+            <ul class="dgtx-menu-source-list">
+              {% for source in sources.cms %}{{ builder.source(source) }}{% endfor %}
+            </ul>
+            {% if sources.cms is empty %}
+              <p class="text-muted small mb-0">{{ 'No active CMS page yet.'|trans }}</p>
+            {% endif %}
+          </div>
+          <div class="tab-pane fade" id="dgtx-menu-tab-link" role="tabpanel">
+            <form class="dgtx-menu-link-form" data-link-form>
+              <div class="mb-2">
+                <label class="form-label small mb-1">{{ 'Title'|trans }}</label>
+                <input type="text" class="form-control form-control-sm" name="title" required>
+              </div>
+              <div class="mb-2">
+                <label class="form-label small mb-1">{{ 'URL'|trans }}</label>
+                <input type="text" class="form-control form-control-sm" name="url" placeholder="https://" required>
+              </div>
+              <button type="submit" class="btn btn-sm btn-outline-primary"><i class="material-icons">add</i> {{ 'Add to the menu'|trans }}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
-		<div class="col-lg-8">
-			<ol class="dgtx-menu-root" data-empty-text="{{ 'Drag pages here, or click "+" next to a page.'|trans }}">
-				{% for item in items|filter(candidate => candidate.parent is null) %}
-					{{ builder.item(item, items, languages, currentLocale) }}
-				{% endfor %}
-			</ol>
-		</div>
-	</div>
+    <div class="col-lg-8">
+      <ol class="dgtx-menu-root" data-empty-text="{{ 'Drag pages here, or click "+" next to a page.'|trans }}">
+        {% for item in items|filter(candidate => candidate.parent is null) %}
+          {{ builder.item(item, items, languages, currentLocale) }}
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
 {% endblock %}

@@ -1,0 +1,171 @@
+/* Login page and dashboard */
+
+/* --- login --- */
+body#login {
+  align-items: center;
+  background: $navy-800 radial-gradient(circle at 20% 20%, rgba($brand-500, .28), transparent 45%);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+.dgtx-login {
+  width: 100%;
+  max-width: 24rem;
+  .dgtx-login-logo {
+    display: block;
+    margin: 0 auto 1.5rem;
+    max-width: 11rem;
+  }
+  .dgtx-login-card {
+    background: $white;
+    border-radius: $radius;
+    box-shadow: 0 20px 50px rgba($navy-900, .35);
+    padding: 2rem;
+  }
+  .dgtx-login-title {
+    color: $gray-900;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: .25rem;
+  }
+  .dgtx-login-subtitle {
+    color: $gray-500;
+    font-size: .8125rem;
+    margin-bottom: 1.5rem;
+  }
+  .dgtx-login-foot {
+    color: rgba($white, .5);
+    display: flex;
+    font-size: .75rem;
+    justify-content: space-between;
+    margin-top: 1.25rem;
+    a {
+      color: rgba($white, .7);
+      &:hover {
+        color: $white;
+      }
+    }
+  }
+}
+
+/* --- dashboard --- */
+.dgtx-stats {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  margin-bottom: 1.25rem;
+}
+.dgtx-stat {
+  background: $white;
+  border: 1px solid $gray-200;
+  border-radius: $radius;
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  padding: 1.1rem 1.25rem;
+  position: relative;
+  .dgtx-stat-label {
+    align-items: center;
+    color: $gray-500;
+    display: flex;
+    font-size: .75rem;
+    font-weight: 600;
+    gap: .4rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    .material-icons {
+      color: $brand-500;
+      font-size: 18px;
+    }
+  }
+  .dgtx-stat-value {
+    color: $gray-900;
+    font-size: 1.75rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    small {
+      color: $gray-500;
+      font-size: .875rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      margin-left: .25rem;
+    }
+  }
+  .dgtx-stat-hint {
+    color: $gray-500;
+    font-size: .8125rem;
+  }
+  .progress {
+    margin-top: .35rem;
+  }
+  a.dgtx-stat-link {
+    color: $brand-600;
+    font-size: .8125rem;
+    font-weight: 500;
+    margin-top: auto;
+  }
+}
+.dgtx-dashboard-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 2fr 1fr;
+  @media (max-width: 991.98px) {
+    grid-template-columns: 1fr;
+  }
+}
+.dgtx-shortcuts {
+  display: grid;
+  gap: .5rem;
+  a {
+    align-items: center;
+    border: 1px solid $gray-200;
+    border-radius: $radius;
+    color: $gray-800;
+    display: flex;
+    font-weight: 500;
+    gap: .6rem;
+    padding: .6rem .75rem;
+    transition: background-color .15s, border-color .15s;
+    .material-icons {
+      color: $brand-500;
+      font-size: 20px;
+    }
+    &:hover {
+      background: $gray-50;
+      border-color: $gray-300;
+    }
+  }
+}
+.dgtx-recent {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  li {
+    align-items: center;
+    border-bottom: 1px solid $gray-100;
+    display: flex;
+    gap: .75rem;
+    padding: .6rem 0;
+    &:last-child {
+      border-bottom: 0;
+    }
+    .dgtx-recent-title {
+      color: $gray-800;
+      flex: 1;
+      font-weight: 500;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .dgtx-recent-date {
+      color: $gray-500;
+      font-size: .75rem;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+  }
+}

@@ -210,10 +210,20 @@ Custom actions need no route: `/admin/{entityName}/action/{action}` and
 (`export_csv` calls `exportCsvAction`), 404 when it does not exist. Check the
 permission and the HTTP method yourself in the action.
 
-## Assets
+## Assets and design
 
-The admin theme (Bootstrap 5, jQuery, TinyMCE, Material icons) is built with
-webpack from `assets/` into `public/`, which is committed:
+The admin theme is built with webpack from `assets/` into `public/`, which
+is committed. Design tokens live in `assets/css/_partials/variables.scss`
+(brand red as the only accent, navy sidebar, neutral greys, 4px radius
+everywhere); Bootstrap 5 is themed from them and reduced to the modules in
+use (`_partials/bootstrap.scss`). Fonts are self-hosted: Inter (variable)
+for the text, Material Symbols Outlined for the icons, served under the
+`material-icons` class so `<i class="material-icons">edit</i>` keeps working.
+
+Templates to extend in a project: `admin/layout.html.twig` exposes the
+`page_title`, `page_subtitle`, `page_actions`, `toolbar`, `content` and
+`content_container` blocks; lists and forms use `.dgtx-card`,
+`.dgtx-toolbar`, `.dgtx-form` and `.dgtx-form-footer`.
 
 ```bash
 cd assets

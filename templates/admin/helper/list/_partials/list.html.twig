@@ -1,0 +1,125 @@
+{# The filters form is rendered empty outside the table: its inputs live in the
+   table header and reference it through the HTML "form" attribute, so that the
+   per-row delete forms are never nested inside it (nested forms are invalid). #}
+{% set filters_form_id = 'dgtx-filters-' ~ entityName %}
+{{ form_start(filters_form, {attr: {id: filters_form_id}}) }}{{ form_end(filters_form, {render_rest: false}) }}
+
+<div class="table-responsive">
+  <table class="table table-hover {% if sortable %}sortable{% endif %}" {% if sortable %}data-sortable-action="{{ url('dgtx_admin_entity_ajax_sortable', {entityName: entityName}) }}"{% endif %}>
+    <thead>
+      {% block list_label %}
+      <tr>
+        {% if sortable %}
+        <th scope="col" class="sortable-cell"></th>
+        {% endif %}
+        {% for field in list_fields %}
+        <th scope="col" {% if field.property == 'id' %}width="4%"{% elseif field.type == 'bool' or field.type == 'sortable' %}width="6%"{% elseif field.type == 'datetime' %}width="12%"{% endif %}>
+          <div class="head">
+            <span>{{ field.label|trans({}, 'Admin.Fields.Label') }}</span>
+            {% if field.sortable %}
+              <div class="sorter">
+                <a href="{{ sorter.generateLink(field.name, 'asc') }}" class="{% if sorter.orderBy == field.name and sorter.orderWay == 'asc' %}active{% endif %}" title="asc"><i class="material-icons">expand_less</i></a>
+                <a href="{{ sorter.generateLink(field.name, 'desc') }}" class="{% if sorter.orderBy == field.name and sorter.orderWay == 'desc' %}active{% endif %}" title="desc"><i class="material-icons">expand_more</i></a>
+              </div>
+            {% endif %}
+          </div>
+        </th>
+        {% endfor %}
+        {% if actions|length %}
+        <th scope="col" class="text-end" width="8%">{{ 'list.default.actions'|trans({}, 'Admin.List.Default') }}</th>
+        {% endif %}
+      </tr>
+      {% endblock %}
+      {% block filters %}
+        {% form_theme filters_form '@DigitixFramework/admin/_partials/form_theme.html.twig' %}
+        {% if filters_form.children|length %}
+        <tr class="dgtx-filters">
+          {% if sortable %}
+          <th></th>
+          {% endif %}
+          {% for field in list_fields %}
+            <th>
+              {% if attribute(filters_form.children, field.property) is defined %}
+                {{ form_widget(attribute(filters_form.children, field.property), {attr: {form: filters_form_id, class: 'form-control-sm form-select-sm'}}) }}
+              {% endif %}
+            </th>
+          {% endfor %}
+          <th class="text-end">
+            <button type="submit" form="{{ filters_form_id }}" class="btn btn-light btn-sm" title="{{ 'list.default.filter'|trans({}, 'Admin.List.Default') }}">
+              <i class="material-icons">filter_alt</i>
+              {{ 'list.default.filter'|trans({}, 'Admin.List.Default') }}
+            </button>
+          </th>
+        </tr>
+        {% endif %}
+      {% endblock %}
+    </thead>
+    <tbody>
+    {% for entity in entities %}
+      <tr {% if sortable %}id="{{ entityName ~ '_' ~ entity.id }}"{% endif %}>
+        {% if sortable %}
+        <td class="sortable-cell"><i class="material-icons sortable-item">drag_indicator</i></td>
+        {% endif %}
+
+        {% for field in list_fields %}
+          {% set item = attribute(entity, field.property) %}
+
+          {% if field.type == 'iterable' and item is iterable %}
+            <td>{{ item|join(', ') }}</td>
+          {% elseif field.type == 'entity' %}
+            <td>
+              {% if item is not null %}
+                {% if field.column is not null %}{{ attribute(item, field.column) }}{% else %}{{ item.name }}{% endif %}
+              {% else %}
+                <span class="text-muted">&mdash;</span>
+              {% endif %}
+            </td>
+          {% elseif field.type == 'datetime' %}
+            <td class="text-muted dgtx-cell-date">{{ item ? item|date('d/m/Y H:i') : '—' }}</td>
+          {% elseif field.type == 'bool' %}
+            <td class="text-center">
+              <i class="material-icons {% if item %}t-success{% else %}t-muted{% endif %}" title="{{ item ? 'yes' : 'no' }}">{% if item %}check_circle{% else %}radio_button_unchecked{% endif %}</i>
+            </td>
+          {% elseif field.type == 'choice' %}
+            <td><span class="badge text-bg-light">{{ ('label.' ~ entityName ~ '.' ~ item)|trans({}, 'Admin.Fields.Label') }}</span></td>
+          {% elseif field.type == 'sortable' %}
+            <td class="text-center text-muted">{{ item }}</td>
+          {% elseif field.property == 'id' %}
+            <td class="text-muted">{{ item }}</td>
+          {% else %}
+            <td>{{ item }}</td>
+          {% endif %}
+        {% endfor %}
+
+        {% if actions|length %}
+        <td class="text-end dgtx-row-actions">
+          {% for action in actions %}
+            {% if action == 'delete' %}
+              <form method="post" action="{{ path('dgtx_admin_entity_delete', {entityName: entityName, entityId: entity.id}) }}" class="item-delete-form" onsubmit="return confirm('{{ 'list.default.confirm_delete'|trans({}, 'Admin.List.Default')|e('js') }}');">
+                <input type="hidden" name="_token" value="{{ csrf_token('dgtx_delete_' ~ entity.id) }}">
+                <button type="submit" class="item-delete" title="{{ 'list.default.delete'|trans({}, 'Admin.List.Default') }}">
+                  <i class="material-icons">delete</i>
+                </button>
+              </form>
+            {% else %}
+              <a class="item-{{ action }}" href="{{ path('dgtx_admin_entity_' ~ action, {entityName: entityName, entityId: entity.id}) }}" title="{{ action }}">
+                <i class="material-icons">{% if action == 'view' or action == 'view_entity' %}visibility{% else %}{{ action }}{% endif %}</i>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </td>
+        {% endif %}
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="{{ list_fields|length + (sortable ? 1 : 0) + (actions|length ? 1 : 0) }}">
+          <div class="dgtx-empty">
+            <i class="material-icons">inbox</i>
+            {{ 'list.default.empty'|trans({}, 'Admin.List.Default') }}
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>

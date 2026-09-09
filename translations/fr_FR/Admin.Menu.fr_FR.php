@@ -4,6 +4,7 @@ return [
     'items' => 'éléments',
     'Up to %depth% levels.' => '%depth% niveaux maximum.',
     'Save' => 'Enregistrer',
+    'Back' => 'Retour',
     'Saved at %time%' => 'Enregistré à %time%',
     'Menu saved.' => 'Menu enregistré.',
     'Move up one level' => 'Remonter d\'un niveau',

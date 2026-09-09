@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'Dashboard' => 'Tableau de bord',
+    'Hello %name%, here is where the site stands.' => 'Bonjour %name%, voici où en est le site.',
+    'Pages' => 'Pages',
+    'active pages' => 'pages actives',
+    'Manage the pages' => 'Gérer les pages',
+    'Menus' => 'Menus',
+    '%count% item(s)' => '%count% élément(s)',
+    'Manage the menus' => 'Gérer les menus',
+    'Users' => 'Utilisateurs',
+    'active accounts' => 'comptes actifs',
+    'Manage the users' => 'Gérer les utilisateurs',
+    'Translations' => 'Traductions',
+    '%translated% of %total% translated' => '%translated% sur %total% traduites',
+    'Translate' => 'Traduire',
+    'Recently updated pages' => 'Pages modifiées récemment',
+    'No page yet.' => 'Aucune page pour le moment.',
+    'active' => 'active',
+    'inactive' => 'inactive',
+    'Shortcuts' => 'Raccourcis',
+    'New page' => 'Nouvelle page',
+    'SEO' => 'SEO',
+    'Settings' => 'Paramètres',
+];

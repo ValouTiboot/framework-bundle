@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Tests\Unit\DependencyInjection;
 
 use Digitix\FrameworkBundle\Controller\Admin\AdminController;
+use Digitix\FrameworkBundle\Controller\Admin\AdminDashboardController;
 use Digitix\FrameworkBundle\Controller\Admin\AdminMenuController;
 use Digitix\FrameworkBundle\DependencyInjection\AdminConfigResolver;
 use Digitix\FrameworkBundle\Entity\Menu;
@@ -30,7 +31,7 @@ final class AdminConfigResolverTest extends TestCase
         self::assertSame(AdminMenuController::class, $resolved['admin_entities']['Menu']['controller'], '"Admin{Name}Controller" is found by convention');
 
         self::assertNull($resolved['admin_entities']['Dashboard']['class'], 'no class = virtual entity');
-        self::assertSame(AdminController::class, $resolved['admin_entities']['Dashboard']['controller']);
+        self::assertSame(AdminDashboardController::class, $resolved['admin_entities']['Dashboard']['controller'], 'a virtual entity can still have a controller by convention');
 
         self::assertSame(AdminController::class, $resolved['admin_entities']['User']['controller'], 'generic controller when none matches');
     }
