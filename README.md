@@ -69,7 +69,7 @@ Resolution by convention, in order:
 - entity class: `App\Entity\Product`, then `Digitix\FrameworkBundle\Entity\Product`; none found = virtual entity (Dashboard, Parameter...)
 - controller: `App\Controller\Admin\ProductController`, `App\Controller\Admin\AdminProductController`, then the same in the bundle, then the generic `AdminController`. A controller must extend `Digitix\FrameworkBundle\Controller\Admin\AdminController`.
 
-Field types: `text`, `textarea`, `email`, `password`, `bool`, `choice`, `entity`, `date`, `hidden`, `translate`, `file`, `submit`, `button`, `search`.
+Field types: `text`, `textarea`, `email`, `password`, `bool`, `choice`, `entity`, `date`, `hidden`, `translate`, `file`, `permissions`, `submit`, `button`, `search`.
 Filter types: `text`, `email`, `bool`, `choice`, `entity`, `date`.
 Unknown keys under a field or a filter are passed to the type, so custom types can define their own options.
 
@@ -91,7 +91,7 @@ Twig templates (@DigitixFramework/admin/...)
 - `AdminConfig` is built once at container compile time and never changes at runtime.
 - `AdminContext` is created per request, only on admin routes, and injected into controller actions. Services never read it from a constructor.
 - Field and filter types are tagged services (`dgtx.admin.field_type`, `dgtx.admin.filter_type`): implement `FieldTypeInterface` / `FilterTypeInterface` in your project to add one.
-- Permissions: `AdminVoter` grants everything to `ROLE_SUPERADMIN`, otherwise reads `Role::authorization`, e.g. `{"*": ["read"], "cms": ["read", "create", "edit"]}`.
+- Permissions: `AdminVoter` grants everything to `ROLE_SUPERADMIN`, otherwise reads `Role::authorization`, e.g. `{"*": ["read"], "cms": ["read", "create", "edit"]}`. The role form edits it as a matrix (field type `permissions`): one row per admin entity plus "every entity", one column per permission plus "all".
 - Delete is a POST with a CSRF token.
 
 ## Translations

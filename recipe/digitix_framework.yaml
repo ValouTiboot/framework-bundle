@@ -160,6 +160,11 @@ digitix_framework:
             label: label.role.name
             name: name
             type: text
+          authorization:
+            label: label.role.authorization
+            name: authorization
+            type: permissions
+            help: help.role.authorization
     Language:
       list:
         template: null

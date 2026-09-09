@@ -15850,6 +15850,44 @@ a {
   background: #475467;
 }
 
+/* permission matrix of a role */
+.dgtx-permissions th, .dgtx-permissions td {
+  vertical-align: middle;
+}
+.dgtx-permissions thead th {
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+}
+.dgtx-permissions .dgtx-permissions-col {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0;
+}
+.dgtx-permissions .dgtx-permissions-col .form-check-input {
+  margin: 0;
+}
+.dgtx-permissions tbody th {
+  color: #1d2939;
+  font-weight: 500;
+}
+.dgtx-permissions tbody .form-check-input {
+  cursor: pointer;
+  margin: 0;
+}
+.dgtx-permissions .dgtx-permissions-wildcard th {
+  color: #8a1130;
+  font-weight: 600;
+}
+.dgtx-permissions .dgtx-permissions-wildcard td {
+  background: #fdf2f4;
+}
+.dgtx-permissions tr.is-all input[data-permission]:not([data-permission=all]) {
+  opacity: 0.3;
+}
+
 /* rich text editor and tags, same shape as the inputs */
 .tox-tinymce {
   border-color: #d0d5dd !important;

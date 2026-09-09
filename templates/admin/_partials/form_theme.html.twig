@@ -27,6 +27,47 @@
   </div>
 {%- endblock collection_widget -%}
 
+{# permission matrix of a role (PermissionsType): entities in rows, permissions in columns #}
+{%- block dgtx_permissions_widget -%}
+  {%- set columns = ['view', 'read', 'create', 'edit', 'delete', 'all'] -%}
+  <div class="table-responsive">
+    <table class="table dgtx-permissions" {{ block('widget_container_attributes') }}>
+      <thead>
+        <tr>
+          <th scope="col">{{ 'label.role.entity'|trans({}, 'Admin.Fields.Label') }}</th>
+          {%- for column in columns -%}
+            <th scope="col" class="text-center">
+              <label class="dgtx-permissions-col" title="{{ 'label.role.toggleColumn'|trans({}, 'Admin.Fields.Label') }}">
+                <input type="checkbox" class="form-check-input" data-permission-column="{{ column }}">
+                <span>{{ ('label.role.permission.' ~ column)|trans({}, 'Admin.Fields.Label') }}</span>
+              </label>
+            </th>
+          {%- endfor -%}
+        </tr>
+      </thead>
+      <tbody>
+        {%- for row in form -%}
+          <tr class="dgtx-permissions-row{% if row.vars.name == '_all' %} dgtx-permissions-wildcard{% endif %}{% if row.children.all.vars.checked %} is-all{% endif %}">
+            <th scope="row">
+              {%- if row.vars.translation_domain is same as(false) -%}
+                {{ row.vars.label }}
+              {%- else -%}
+                {{ row.vars.label|trans({}, row.vars.translation_domain) }}
+              {%- endif -%}
+            </th>
+            {%- for column in columns -%}
+              {%- set box = row.children[column] -%}
+              <td class="text-center">
+                <input type="checkbox" class="form-check-input" id="{{ box.vars.id }}" name="{{ box.vars.full_name }}" value="{{ box.vars.value }}" data-permission="{{ column }}" {% if box.vars.checked %}checked{% endif %} aria-label="{{ ('label.role.permission.' ~ column)|trans({}, 'Admin.Fields.Label') }}">
+              </td>
+            {%- endfor -%}
+          </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+  </div>
+{%- endblock dgtx_permissions_widget -%}
+
 {%- block submit_widget -%}
   {%- set attr = attr|merge({class: (attr.class|default('btn-primary') ~ ' btn')|trim}) -%}
   {{- parent() -}}

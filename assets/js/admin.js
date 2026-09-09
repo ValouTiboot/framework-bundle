@@ -132,6 +132,16 @@ $(document).ready(function(){
       associateRewriteField.val(toRewriteUrl($(this).val()));
   });
 
+  // permission matrix: a column header ticks the whole column, "all" dims the rest of its row
+  $('.dgtx-permissions').on('change', '[data-permission-column]', function(){
+    $(this).closest('table').find('tbody input[data-permission="' + $(this).data('permission-column') + '"]')
+      .prop('checked', this.checked).trigger('change');
+  });
+  $('.dgtx-permissions').on('change', 'tbody input[data-permission]', function(){
+    var row = $(this).closest('tr');
+    row.toggleClass('is-all', row.find('input[data-permission="all"]').prop('checked'));
+  });
+
   // small screens: the sidebar slides in
   $('[data-sidebar-toggle]').on('click', function(){
     $('body').toggleClass('dgtx-sidebar-open');

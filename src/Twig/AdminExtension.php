@@ -40,19 +40,7 @@ final class AdminExtension extends AbstractExtension
             return '';
         }
 
-        foreach ($this->config->getMenu() as $key => $entry) {
-            if (strcasecmp((string) $key, $slug) === 0 && isset($entry['title'])) {
-                return (string) $entry['title'];
-            }
-
-            foreach ($entry['sub'] ?? [] as $subKey => $subEntry) {
-                if (strcasecmp((string) $subKey, $slug) === 0 && isset($subEntry['title'])) {
-                    return (string) $subEntry['title'];
-                }
-            }
-        }
-
-        return ucfirst($slug);
+        return $this->config->getEntityTitle($slug) ?? ucfirst($slug);
     }
 
     private function language(int|string $id): ?Language

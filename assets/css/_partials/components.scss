@@ -344,6 +344,46 @@ a {
   }
 }
 
+/* permission matrix of a role */
+.dgtx-permissions {
+  th, td {
+    vertical-align: middle;
+  }
+  thead th {
+    padding-bottom: .5rem;
+    padding-top: .5rem;
+  }
+  .dgtx-permissions-col {
+    align-items: center;
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    gap: .3rem;
+    margin: 0;
+    .form-check-input {
+      margin: 0;
+    }
+  }
+  tbody th {
+    color: $gray-800;
+    font-weight: 500;
+  }
+  tbody .form-check-input {
+    cursor: pointer;
+    margin: 0;
+  }
+  .dgtx-permissions-wildcard th {
+    color: $brand-700;
+    font-weight: 600;
+  }
+  .dgtx-permissions-wildcard td {
+    background: $brand-50;
+  }
+  tr.is-all input[data-permission]:not([data-permission="all"]) {
+    opacity: .3;
+  }
+}
+
 /* rich text editor and tags, same shape as the inputs */
 .tox-tinymce {
   border-color: $gray-300 !important;

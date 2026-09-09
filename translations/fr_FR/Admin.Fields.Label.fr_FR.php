@@ -26,6 +26,19 @@ return array (
     'role' =>
     array (
       'name' => 'Nom',
+      'authorization' => 'Permissions',
+      'entity' => 'Section',
+      'allEntities' => 'Toutes les sections',
+      'toggleColumn' => 'Cocher ou décocher toute la colonne',
+      'permission' =>
+      array (
+        'view' => 'Voir',
+        'read' => 'Lister',
+        'create' => 'Créer',
+        'edit' => 'Modifier',
+        'delete' => 'Supprimer',
+        'all' => 'Tout',
+      ),
     ),
     'language' =>
     array (
@@ -104,6 +117,10 @@ return array (
   ),
   'help' =>
   array (
+    'role' =>
+    array (
+      'authorization' => 'Le rôle SuperAdmin a tous les droits. « Toutes les sections » s\'applique à chaque section, « Tout » donne toutes les actions de la ligne.',
+    ),
     'menu' =>
     array (
       'code' => 'Identifiant technique utilisé par les templates, ex : dgtx_menu(\'main\'). Minuscules, chiffres, tirets.',
