@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Digitix\FrameworkBundle\Controller\Admin;
 
+use Digitix\FrameworkBundle\Admin\AdminTheme;
 use Digitix\FrameworkBundle\Admin\Context\AdminContext;
 use Digitix\FrameworkBundle\Admin\Security\AdminPermission;
+use Digitix\FrameworkBundle\Entity\Configuration;
 use Digitix\FrameworkBundle\Translation\TranslationCompiler;
 use Digitix\FrameworkBundle\Translation\TranslationSynchronizer;
 use Digitix\FrameworkBundle\Utils\Cache;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
@@ -16,11 +19,45 @@ use Symfony\Component\HttpKernel\Kernel;
 /**
  * "Tools" virtual entity: maintenance actions (cache, translations) and a
  * few facts about the runtime. Every action is a POST with the page token;
- * the "clear cache" button of the top bar posts here too.
+ * the "clear cache" button and the colour mode switch of the top bar post
+ * here too.
  */
 class AdminToolsController extends AdminController
 {
     public const CSRF_TOKEN_ID = 'dgtx_tools';
+
+    /**
+     * Stores the colour mode of the admin (Configuration "adminTheme") from
+     * the switch of the user menu: JSON POST {theme, _token}. Open to every
+     * signed-in admin, it is a preference and not a maintenance action.
+     */
+    public function themeAction(AdminContext $context): JsonResponse
+    {
+        $request = $context->getRequest();
+        if (!$request->isMethod('POST')) {
+            return new JsonResponse(['error' => 'POST expected.'], Response::HTTP_METHOD_NOT_ALLOWED);
+        }
+
+        $payload = json_decode((string) $request->getContent(), true);
+        if (!\is_array($payload)) {
+            $payload = $request->request->all();
+        }
+
+        if (!$this->isCsrfTokenValid(self::CSRF_TOKEN_ID, (string) ($payload['_token'] ?? ''))) {
+            return new JsonResponse(['error' => $this->trans('Invalid security token, please try again.', [], 'Admin.Message.Error')], Response::HTTP_FORBIDDEN);
+        }
+
+        $theme = $payload['theme'] ?? null;
+        if (!\is_string($theme) || !AdminTheme::isValid($theme)) {
+            return new JsonResponse(['error' => sprintf('Unknown theme, expected one of: %s.', implode(', ', AdminTheme::ALL))], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $row = $this->configuration()->get(AdminTheme::CONFIGURATION_KEY) ?? (new Configuration())->setName(AdminTheme::CONFIGURATION_KEY);
+        $this->persister()->save($row->setValue($theme), false);
+        $this->configuration()->reset();
+
+        return new JsonResponse(['theme' => $theme]);
+    }
 
     public static function getSubscribedServices(): array
     {

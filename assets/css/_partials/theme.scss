@@ -1,0 +1,65 @@
+/*
+ * Colour tokens as CSS custom properties.
+ *
+ * Light values on :root, dark values under <html data-bs-theme="dark">. The
+ * attribute is set by the inline script of admin/layout.html.twig from the
+ * stored preference (Configuration "adminTheme": system, light or dark);
+ * "system" follows the prefers-color-scheme media query of the browser, which
+ * reflects the operating system setting. The partials use these variables for
+ * every surface, border and text colour, so this file is the only place where
+ * the two palettes are defined. Bootstrap switches its own tokens with
+ * $enable-dark-mode (see _partials/bootstrap.scss).
+ */
+:root {
+  --dgtx-body-bg: #{$body-bg};
+  --dgtx-surface: #{$white};
+  --dgtx-surface-2: #{$gray-50};
+  --dgtx-surface-3: #{$gray-100};
+  --dgtx-surface-4: #{$gray-200};
+  --dgtx-border: #{$gray-200};
+  --dgtx-border-strong: #{$gray-300};
+  --dgtx-text: #{$gray-900};
+  --dgtx-text-2: #{$gray-800};
+  --dgtx-text-3: #{$gray-700};
+  --dgtx-text-4: #{$gray-600};
+  --dgtx-muted: #{$gray-500};
+  --dgtx-icon: #{$gray-400};
+  --dgtx-icon-faint: #{$gray-300};
+  --dgtx-input-bg: #fbfbfd;
+  --dgtx-sidebar-bg: #{$navy-800};
+  --dgtx-navy: #{$navy-800};
+  --dgtx-navy-soft: #{$navy-100};
+  --dgtx-accent-soft: #{$brand-50};
+  --dgtx-accent-soft-2: #{$brand-100};
+  --dgtx-success-soft: #{$bg-success-color};
+  --dgtx-warning-soft: #{$bg-warning-color};
+  --dgtx-shadow-sm: 0 1px 4px rgba(0, 0, 0, .08);
+  --dgtx-shadow-lg: 0 8px 24px #{rgba($gray-900, .12)};
+}
+
+[data-bs-theme="dark"] {
+  --dgtx-body-bg: #{$dark-bg};
+  --dgtx-surface: #{$dark-surface};
+  --dgtx-surface-2: #{$dark-surface-2};
+  --dgtx-surface-3: #{$dark-surface-3};
+  --dgtx-surface-4: #{$dark-surface-4};
+  --dgtx-border: #{$dark-border};
+  --dgtx-border-strong: #{$dark-border-strong};
+  --dgtx-text: #{$dark-text};
+  --dgtx-text-2: #{$dark-text-2};
+  --dgtx-text-3: #{$dark-text-3};
+  --dgtx-text-4: #{$dark-text-4};
+  --dgtx-muted: #{$dark-muted};
+  --dgtx-icon: #{$dark-icon};
+  --dgtx-icon-faint: #{$dark-icon-faint};
+  --dgtx-input-bg: #{$dark-input-bg};
+  --dgtx-sidebar-bg: #{$dark-sidebar};
+  --dgtx-navy: #{$dark-navy};
+  --dgtx-navy-soft: #{$dark-navy-soft};
+  --dgtx-accent-soft: #{rgba($brand-500, .16)};
+  --dgtx-accent-soft-2: #{rgba($brand-500, .3)};
+  --dgtx-success-soft: #{rgba($success, .22)};
+  --dgtx-warning-soft: #{rgba($warning, .22)};
+  --dgtx-shadow-sm: 0 1px 4px rgba(0, 0, 0, .4);
+  --dgtx-shadow-lg: 0 8px 24px rgba(0, 0, 0, .5);
+}

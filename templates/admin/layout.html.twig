@@ -1,7 +1,21 @@
 <!DOCTYPE html>
-<html lang="{{ app.request.locale|slice(0, 2) }}">
+<html lang="{{ app.request.locale|slice(0, 2) }}" data-theme="{{ dgtx_admin_theme() }}">
 <head>
   <meta charset="utf-8">
+  {# colour mode before the first paint: data-theme is the stored choice, data-bs-theme the one applied ("system" follows the OS through prefers-color-scheme) #}
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var query = window.matchMedia('(prefers-color-scheme: dark)');
+      var apply = function () {
+        var theme = root.getAttribute('data-theme');
+        root.setAttribute('data-bs-theme', theme === 'system' ? (query.matches ? 'dark' : 'light') : theme);
+      };
+      apply();
+      query.addEventListener('change', apply);
+      window.dgtxApplyTheme = apply;
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
   <meta name="generator" content="DgtxAdmin">
@@ -71,6 +85,18 @@
               <a class="dropdown-item" href="{{ path('dgtx_admin_entity_edit', {entityName: 'user', entityId: app.user.id}) }}">
                 <i class="material-icons">account_circle</i> {{ 'My account'|trans }}
               </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dgtx-theme" data-theme-switch data-url="{{ path('dgtx_admin_entity_action_collection', {entityName: 'tools', action: 'theme'}) }}" data-token="{{ csrf_token('dgtx_tools') }}" data-error="{{ 'The theme could not be saved.'|trans }}">
+              <div class="dgtx-theme-label">{{ 'Theme'|trans }}</div>
+              <div class="dgtx-theme-switch" role="group" aria-label="{{ 'Theme'|trans }}">
+                {% for theme, icon in {system: 'brightness_auto', light: 'light_mode', dark: 'dark_mode'} %}
+                  <button type="button" data-theme-choice="{{ theme }}" class="{{ dgtx_admin_theme() == theme ? 'active' }}" title="{{ ('theme.' ~ theme)|trans }}">
+                    <i class="material-icons">{{ icon }}</i>
+                    <span>{{ ('theme.' ~ theme)|trans }}</span>
+                  </button>
+                {% endfor %}
+              </div>
             </li>
             <li><hr class="dropdown-divider"></li>
             <li>

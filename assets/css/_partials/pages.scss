@@ -1,9 +1,9 @@
-/* Login page and dashboard */
+/* Login page, tools and dashboard */
 
 /* --- login --- */
 body#login {
   align-items: center;
-  background: $navy-800 radial-gradient(circle at 20% 20%, rgba($brand-500, .28), transparent 45%);
+  background: var(--dgtx-sidebar-bg) radial-gradient(circle at 20% 20%, rgba($brand-500, .28), transparent 45%);
   display: flex;
   justify-content: center;
   min-height: 100vh;
@@ -18,19 +18,19 @@ body#login {
     max-width: 11rem;
   }
   .dgtx-login-card {
-    background: $white;
+    background: var(--dgtx-surface);
     border-radius: $radius;
     box-shadow: 0 20px 50px rgba($navy-900, .35);
     padding: 2rem;
   }
   .dgtx-login-title {
-    color: $gray-900;
+    color: var(--dgtx-text);
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: .25rem;
   }
   .dgtx-login-subtitle {
-    color: $gray-500;
+    color: var(--dgtx-muted);
     font-size: .8125rem;
     margin-bottom: 1.5rem;
   }
@@ -57,16 +57,16 @@ body#login {
 }
 .dgtx-tool {
   align-items: center;
-  border: 1px solid $gray-200;
+  border: 1px solid var(--dgtx-border);
   border-radius: $radius;
   display: flex;
   gap: 1rem;
   padding: .9rem 1rem;
   .dgtx-tool-icon {
     align-items: center;
-    background: $brand-50;
+    background: var(--dgtx-accent-soft);
     border-radius: $radius;
-    color: $brand-600;
+    color: $brand-500;
     display: flex;
     flex-shrink: 0;
     height: 2.5rem;
@@ -81,11 +81,11 @@ body#login {
     min-width: 0;
   }
   .dgtx-tool-title {
-    color: $gray-900;
+    color: var(--dgtx-text);
     font-weight: 600;
   }
   .dgtx-tool-description {
-    color: $gray-500;
+    color: var(--dgtx-muted);
     font-size: .8125rem;
   }
   form {
@@ -98,7 +98,7 @@ body#login {
   grid-template-columns: max-content 1fr;
   margin: 0;
   dt {
-    color: $gray-500;
+    color: var(--dgtx-muted);
     font-weight: 500;
   }
   dd {
@@ -106,7 +106,7 @@ body#login {
     overflow-wrap: anywhere;
   }
   code {
-    color: $gray-700;
+    color: var(--dgtx-text-3);
     font-size: .8125rem;
   }
 }
@@ -119,8 +119,8 @@ body#login {
   margin-bottom: 1.25rem;
 }
 .dgtx-stat {
-  background: $white;
-  border: 1px solid $gray-200;
+  background: var(--dgtx-surface);
+  border: 1px solid var(--dgtx-border);
   border-radius: $radius;
   display: flex;
   flex-direction: column;
@@ -129,7 +129,7 @@ body#login {
   position: relative;
   .dgtx-stat-label {
     align-items: center;
-    color: $gray-500;
+    color: var(--dgtx-muted);
     display: flex;
     font-size: .75rem;
     font-weight: 600;
@@ -142,14 +142,14 @@ body#login {
     }
   }
   .dgtx-stat-value {
-    color: $gray-900;
+    color: var(--dgtx-text);
     font-size: 1.75rem;
     font-variant-numeric: tabular-nums;
     font-weight: 600;
     letter-spacing: -.02em;
     line-height: 1.1;
     small {
-      color: $gray-500;
+      color: var(--dgtx-muted);
       font-size: .875rem;
       font-weight: 500;
       letter-spacing: 0;
@@ -157,7 +157,7 @@ body#login {
     }
   }
   .dgtx-stat-hint {
-    color: $gray-500;
+    color: var(--dgtx-muted);
     font-size: .8125rem;
   }
   .progress {
@@ -183,9 +183,9 @@ body#login {
   gap: .5rem;
   a {
     align-items: center;
-    border: 1px solid $gray-200;
+    border: 1px solid var(--dgtx-border);
     border-radius: $radius;
-    color: $gray-800;
+    color: var(--dgtx-text-2);
     display: flex;
     font-weight: 500;
     gap: .6rem;
@@ -196,8 +196,8 @@ body#login {
       font-size: 20px;
     }
     &:hover {
-      background: $gray-50;
-      border-color: $gray-300;
+      background: var(--dgtx-surface-2);
+      border-color: var(--dgtx-border-strong);
     }
   }
 }
@@ -207,7 +207,7 @@ body#login {
   padding: 0;
   li {
     align-items: center;
-    border-bottom: 1px solid $gray-100;
+    border-bottom: 1px solid var(--dgtx-border);
     display: flex;
     gap: .75rem;
     padding: .6rem 0;
@@ -215,7 +215,7 @@ body#login {
       border-bottom: 0;
     }
     .dgtx-recent-title {
-      color: $gray-800;
+      color: var(--dgtx-text-2);
       flex: 1;
       font-weight: 500;
       min-width: 0;
@@ -224,7 +224,7 @@ body#login {
       white-space: nowrap;
     }
     .dgtx-recent-date {
-      color: $gray-500;
+      color: var(--dgtx-muted);
       font-size: .75rem;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;

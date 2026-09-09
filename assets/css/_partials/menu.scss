@@ -18,7 +18,7 @@
 
   /* --- sources (left) --- */
   .dgtx-menu-sources {
-    background: $gray-100;
+    background: var(--dgtx-surface-3);
     border-radius: .35rem;
     padding: .75rem;
     position: sticky;
@@ -37,15 +37,15 @@
   }
   .dgtx-menu-source {
     align-items: center;
-    background: $white;
-    border: 1px solid $gray-200;
+    background: var(--dgtx-surface);
+    border: 1px solid var(--dgtx-border);
     border-radius: .3rem;
     display: flex;
     gap: .4rem;
     margin-bottom: .35rem;
     padding: .35rem .5rem;
     &:hover {
-      border-color: $gray-400;
+      border-color: var(--dgtx-icon);
     }
     .dgtx-menu-source-text {
       display: flex;
@@ -70,9 +70,9 @@
     padding: 0 0 3rem;
     &.is-empty {
       align-items: center;
-      border: 2px dashed $gray-300;
+      border: 2px dashed var(--dgtx-border-strong);
       border-radius: .5rem;
-      color: $gray-600;
+      color: var(--dgtx-text-4);
       display: flex;
       justify-content: center;
       padding: 2rem;
@@ -94,8 +94,8 @@
   }
   .dgtx-menu-row {
     align-items: center;
-    background: $white;
-    border: 1px solid $gray-200;
+    background: var(--dgtx-surface);
+    border: 1px solid var(--dgtx-border);
     border-radius: .35rem;
     display: flex;
     gap: .5rem;
@@ -104,11 +104,11 @@
     transition: box-shadow .15s;
     z-index: 1;
     &:hover {
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+      box-shadow: var(--dgtx-shadow-sm);
     }
   }
   .dgtx-menu-handle {
-    color: $gray-500;
+    color: var(--dgtx-muted);
     cursor: grab;
     font-size: 20px;
     &:active {
@@ -116,7 +116,7 @@
     }
   }
   .dgtx-menu-branch {
-    color: $gray-500;
+    color: var(--dgtx-muted);
     display: none;
     font-size: 18px;
     margin-right: -.25rem;
@@ -125,7 +125,7 @@
     display: inline-block;
   }
   .dgtx-menu-type {
-    color: $primary;
+    color: $brand-500;
     font-size: 18px;
   }
   .dgtx-menu-title {
@@ -147,10 +147,10 @@
     gap: .25rem;
     margin-left: auto;
     .btn-link {
-      color: $gray-600;
+      color: var(--dgtx-text-4);
       padding: 0 .2rem;
       &:hover {
-        color: $gray-900;
+        color: var(--dgtx-text);
       }
       .material-icons {
         font-size: 20px;
@@ -163,8 +163,8 @@
     }
   }
   .dgtx-menu-panel {
-    background: $gray-100;
-    border: 1px solid $gray-200;
+    background: var(--dgtx-surface-3);
+    border: 1px solid var(--dgtx-border);
     border-radius: 0 0 .35rem .35rem;
     border-top: 0;
     margin: -.35rem 0 0 2.25rem;
@@ -174,21 +174,21 @@
   /* --- drag states --- */
   #dgtx-menu-builder.is-dragging .dgtx-menu-root {
     /* one faint guide per level, so the horizontal move reads as "indent" */
-    background: repeating-linear-gradient(90deg, rgba($primary, .12) 0 1px, transparent 1px var(--dgtx-menu-indent));
+    background: repeating-linear-gradient(90deg, rgba($brand-500, .2) 0 1px, transparent 1px var(--dgtx-menu-indent));
     background-size: calc(var(--dgtx-menu-indent) * 6) 100%;
     background-repeat: no-repeat;
   }
   .dgtx-menu-ghost {
     transition: none;
     > .dgtx-menu-row {
-      background: $bg-primary-color;
-      border: 1px dashed $primary;
+      background: var(--dgtx-accent-soft);
+      border: 1px dashed $brand-500;
       > * {
         opacity: .6;
       }
     }
     &.dgtx-menu-source {
-      background: $bg-primary-color;
+      background: var(--dgtx-accent-soft);
       border-style: dashed;
     }
   }
@@ -196,11 +196,51 @@
     list-style: none;
     opacity: .95;
     > .dgtx-menu-row {
-      box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+      box-shadow: var(--dgtx-shadow-lg);
     }
     &.dgtx-menu-source {
-      box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+      box-shadow: var(--dgtx-shadow-lg);
       list-style: none;
+    }
+  }
+
+  /* --- small screens: sources above the tree, no sticky panel --- */
+  @media (max-width: 991.98px) {
+    .dgtx-menu-sources {
+      position: static;
+    }
+    .dgtx-menu-source-list {
+      max-height: 40vh;
+    }
+  }
+
+  /* --- phones: narrower levels, the title truncates, the URL goes --- */
+  @media (max-width: 767.98px) {
+    #dgtx-menu-builder {
+      --dgtx-menu-indent: 24px;
+    }
+    .dgtx-menu-row {
+      gap: .35rem;
+      padding: .4rem .4rem;
+      .dgtx-menu-url {
+        display: none;
+      }
+    }
+    .dgtx-menu-title {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .dgtx-menu-actions {
+      gap: 0;
+      .btn-link {
+        padding: 0 .1rem;
+      }
+    }
+    .dgtx-menu-panel {
+      margin-left: 0;
     }
   }
 }

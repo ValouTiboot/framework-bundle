@@ -5,10 +5,11 @@
  */
 @import "~bootstrap/scss/functions";
 
-/* options */
+/* options: the dark palette is emitted under [data-bs-theme="dark"] */
 $enable-shadows: false;
 $enable-negative-margins: true;
-$enable-dark-mode: false;
+$enable-dark-mode: true;
+$color-mode-type: data;
 
 /* typography */
 $font-family-sans-serif: $font-sans;
@@ -46,7 +47,23 @@ $theme-colors: (
 $link-color: $brand-600;
 $link-hover-color: $brand-700;
 $link-decoration: none;
-$text-muted: $gray-500;
+$text-muted: var(--dgtx-muted);
+
+/* dark palette of Bootstrap itself (body, borders, emphasis, form indicators) */
+$body-bg-dark: $dark-bg;
+$body-color-dark: $dark-text-2;
+$body-emphasis-color-dark: $dark-text;
+$body-secondary-color-dark: $dark-muted;
+$body-secondary-bg-dark: $dark-surface-3;
+$body-tertiary-color-dark: $dark-icon;
+$body-tertiary-bg-dark: $dark-surface-2;
+$border-color-dark: $dark-border;
+$border-color-translucent-dark: rgba($white, .1);
+$headings-color-dark: $dark-text;
+$link-color-dark: $dark-link;
+$link-hover-color-dark: $dark-link-hover;
+$form-select-indicator-color-dark: $dark-text-3;
+$form-switch-color-dark: $dark-border-strong;
 
 /* buttons */
 $btn-font-weight: 500;
@@ -58,32 +75,32 @@ $btn-focus-box-shadow: 0 0 0 3px rgba($brand-500, .18);
 $btn-active-box-shadow: none;
 
 /* forms: a hint of grey on the fields; focus in blue, red would read as an error */
-$input-bg: #fbfbfd;
-$form-select-bg: #fbfbfd;
-$input-focus-bg: #fbfbfd;
+$input-bg: var(--dgtx-input-bg);
+$form-select-bg: var(--dgtx-input-bg);
+$input-focus-bg: var(--dgtx-input-bg);
 $input-padding-y: .45rem;
 $input-padding-x: .75rem;
-$input-border-color: $gray-300;
+$input-border-color: var(--dgtx-border-strong);
 $input-focus-border-color: $navy-600;
 $input-focus-box-shadow: 0 0 0 3px rgba($navy-600, .16);
-$input-placeholder-color: $gray-400;
+$input-placeholder-color: var(--dgtx-icon);
 $form-label-font-weight: 500;
 $form-label-margin-bottom: .35rem;
-$form-label-color: $gray-800;
-$form-text-color: $gray-500;
+$form-label-color: var(--dgtx-text-2);
+$form-text-color: var(--dgtx-muted);
 $form-check-input-checked-bg-color: $brand-600;
 $form-check-input-checked-border-color: $brand-600;
 $form-check-input-focus-box-shadow: 0 0 0 3px rgba($navy-600, .16);
 $form-switch-focus-color: $gray-300;
 $form-select-focus-box-shadow: $input-focus-box-shadow;
 
-/* tables: white rows */
-$table-bg: $white;
+/* tables: rows on the surface colour (white in light mode) */
+$table-bg: var(--dgtx-surface);
 $table-cell-padding-y: .65rem;
 $table-cell-padding-x: .75rem;
-$table-border-color: $gray-200;
-$table-hover-bg: $gray-50;
-$table-color: $gray-700;
+$table-border-color: var(--dgtx-border);
+$table-hover-bg: var(--dgtx-surface-2);
+$table-color: var(--dgtx-text-3);
 $table-th-font-weight: 600;
 
 /* badges, pills, pagination, nav */
@@ -93,33 +110,35 @@ $badge-padding-y: .35em;
 $badge-padding-x: .6em;
 $pagination-padding-y: .35rem;
 $pagination-padding-x: .65rem;
-$pagination-color: $gray-600;
-$pagination-border-color: $gray-200;
-$pagination-hover-bg: $gray-100;
-$pagination-hover-border-color: $gray-200;
-$pagination-active-bg: $navy-800;
-$pagination-active-border-color: $navy-800;
+$pagination-color: var(--dgtx-text-4);
+$pagination-bg: var(--dgtx-surface);
+$pagination-border-color: var(--dgtx-border);
+$pagination-hover-bg: var(--dgtx-surface-3);
+$pagination-hover-border-color: var(--dgtx-border);
+$pagination-active-bg: var(--dgtx-navy);
+$pagination-active-border-color: var(--dgtx-navy);
 $pagination-focus-box-shadow: none;
-$nav-link-color: $gray-600;
-$nav-link-hover-color: $gray-900;
-$nav-pills-link-active-bg: $navy-800;
-$nav-tabs-border-color: $gray-200;
-$nav-tabs-link-active-color: $gray-900;
+$nav-link-color: var(--dgtx-text-4);
+$nav-link-hover-color: var(--dgtx-text);
+$nav-pills-link-active-bg: var(--dgtx-navy);
+$nav-tabs-border-color: var(--dgtx-border);
+$nav-tabs-link-active-color: var(--dgtx-text);
 
 /* dropdowns, alerts, cards, progress */
-$dropdown-border-color: $gray-200;
-$dropdown-box-shadow: 0 8px 24px rgba($gray-900, .12);
-$dropdown-link-hover-bg: $gray-100;
-$dropdown-link-active-bg: $gray-100;
-$dropdown-link-active-color: $gray-900;
+$dropdown-bg: var(--dgtx-surface);
+$dropdown-border-color: var(--dgtx-border);
+$dropdown-box-shadow: var(--dgtx-shadow-lg);
+$dropdown-link-hover-bg: var(--dgtx-surface-3);
+$dropdown-link-active-bg: var(--dgtx-surface-3);
+$dropdown-link-active-color: var(--dgtx-text);
 $dropdown-item-padding-y: .45rem;
 $dropdown-item-padding-x: .9rem;
 $alert-padding-y: .65rem;
 $alert-padding-x: .9rem;
-$card-border-color: $gray-200;
-$card-cap-bg: $white;
+$card-border-color: var(--dgtx-border);
+$card-cap-bg: var(--dgtx-surface);
 $progress-height: 6px;
-$progress-bg: $gray-200;
+$progress-bg: var(--dgtx-surface-4);
 $progress-bar-bg: $brand-500;
 
 @import "~bootstrap/scss/variables";

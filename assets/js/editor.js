@@ -43,15 +43,17 @@ export { tinymce };
 
 const assetsBase = () => (document.body.dataset.assets || '/bundles/digitixframework/assets/').replace(/\/?$/, '/');
 
-/** Options shared by every editor: licence, skin location, content look. */
+/** Options shared by every editor: licence, skin location, content look; the skin follows the colour mode of the page. */
 export function baseConfig() {
+  const dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+
   return {
     license_key: 'gpl',
     promotion: false,
     branding: false,
-    skin: 'oxide',
-    skin_url: `${assetsBase()}tinymce/skins/ui/oxide`,
-    content_css: `${assetsBase()}tinymce/skins/content/default/content.min.css`,
+    skin: dark ? 'oxide-dark' : 'oxide',
+    skin_url: `${assetsBase()}tinymce/skins/ui/${dark ? 'oxide-dark' : 'oxide'}`,
+    content_css: `${assetsBase()}tinymce/skins/content/${dark ? 'dark' : 'default'}/content.min.css`,
     content_style: 'body { font-family: "Inter Variable", Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.5; margin: 1rem; } img { max-width: 100%; height: auto; }',
   };
 }

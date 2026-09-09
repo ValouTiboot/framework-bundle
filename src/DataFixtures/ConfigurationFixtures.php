@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Digitix\FrameworkBundle\DataFixtures;
 
+use Digitix\FrameworkBundle\Admin\AdminTheme;
 use Digitix\FrameworkBundle\Entity\Configuration;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
 /**
- * Default rows of the global configuration (Parameter page).
+ * Default rows of the global configuration (Parameter page, colour mode).
  */
 class ConfigurationFixtures extends Fixture
 {
@@ -20,6 +21,7 @@ class ConfigurationFixtures extends Fixture
         'gtm' => null,
         'tag' => null,
         'robots' => null,
+        AdminTheme::CONFIGURATION_KEY => AdminTheme::SYSTEM,
     ];
 
     public function load(ObjectManager $manager): void

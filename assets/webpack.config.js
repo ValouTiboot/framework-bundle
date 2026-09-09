@@ -63,11 +63,13 @@ const config = {
   },
   plugins: [
     new MiniCssExtractPlugin({filename: path.join('..', 'css', '[name].css')}),
-    // TinyMCE fetches its skin and content stylesheets itself, only when an editor is created
+    // TinyMCE fetches its skin and content stylesheets itself, only when an editor is created (light and dark variants)
     new CopyWebpackPlugin({
       patterns: [
         {from: 'node_modules/tinymce/skins/ui/oxide', to: 'tinymce/skins/ui/oxide', globOptions: {ignore: ['**/*.js']}},
+        {from: 'node_modules/tinymce/skins/ui/oxide-dark', to: 'tinymce/skins/ui/oxide-dark', globOptions: {ignore: ['**/*.js']}},
         {from: 'node_modules/tinymce/skins/content/default', to: 'tinymce/skins/content/default', globOptions: {ignore: ['**/*.js']}},
+        {from: 'node_modules/tinymce/skins/content/dark', to: 'tinymce/skins/content/dark', globOptions: {ignore: ['**/*.js']}},
       ],
     }),
   ],

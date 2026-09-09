@@ -229,6 +229,17 @@ use (`_partials/bootstrap.scss`). Fonts are self-hosted: Inter (variable)
 for the text, Material Symbols Outlined for the icons, served under the
 `material-icons` class so `<i class="material-icons">edit</i>` keeps working.
 
+Colour modes: the admin has a light and a dark palette. The choice is the
+`adminTheme` Configuration row (`system`, `light` or `dark`, switch in the user
+menu of the top bar, stored through the `theme` action of the tools
+controller). `system` follows the operating system: the layout renders
+`<html data-theme="...">` and an inline script resolves it into
+`data-bs-theme` with the `prefers-color-scheme` media query before the first
+paint. Every colour of the partials is a CSS custom property defined once per
+mode in `assets/css/_partials/theme.scss`; Bootstrap switches its own tokens
+with `$enable-dark-mode`. Project styles should use the same `--dgtx-*`
+variables (surface, border, text, muted...) to follow the mode.
+
 Templates to extend in a project: `admin/layout.html.twig` exposes the
 `page_title`, `page_subtitle`, `page_actions`, `toolbar`, `content` and
 `content_container` blocks; lists and forms use `.dgtx-card`,

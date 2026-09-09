@@ -1,13 +1,14 @@
 /*
  * Admin layout (templates/admin/layout.html.twig): fixed navy sidebar,
- * sticky white top bar, content column, footer.
+ * sticky top bar, content column, footer. Colours come from the tokens of
+ * _partials/theme.scss so the whole layout follows the light or dark mode.
  */
 html {
   height: 100%;
 }
 body.dgtx-admin {
-  background: $body-bg;
-  color: $body-color;
+  background: var(--dgtx-body-bg);
+  color: var(--dgtx-text-3);
   font-family: $font-sans;
   font-size: .875rem;
   line-height: 1.5;
@@ -15,9 +16,9 @@ body.dgtx-admin {
   -webkit-font-smoothing: antialiased;
 }
 
-/* --- sidebar --- */
+/* --- sidebar (navy in both modes) --- */
 .dgtx-sidebar {
-  background: $navy-800;
+  background: var(--dgtx-sidebar-bg);
   bottom: 0;
   color: rgba($white, .8);
   display: flex;
@@ -156,8 +157,8 @@ body.dgtx-admin {
 }
 .dgtx-topbar {
   align-items: center;
-  background: $white;
-  border-bottom: 1px solid $gray-200;
+  background: var(--dgtx-surface);
+  border-bottom: 1px solid var(--dgtx-border);
   display: flex;
   gap: .75rem;
   height: $topbar-height;
@@ -167,7 +168,7 @@ body.dgtx-admin {
   z-index: 1020;
 }
 .dgtx-topbar-title {
-  color: $gray-900;
+  color: var(--dgtx-text);
   font-size: .9375rem;
   font-weight: 600;
   overflow: hidden;
@@ -185,15 +186,15 @@ body.dgtx-admin {
   background: none;
   border: 0;
   border-radius: $radius;
-  color: $gray-600;
+  color: var(--dgtx-text-4);
   display: inline-flex;
   font-weight: 500;
   gap: .4rem;
   padding: .4rem .6rem;
   transition: background-color .15s, color .15s;
   &:hover, &:focus-visible {
-    background: $gray-100;
-    color: $gray-900;
+    background: var(--dgtx-surface-3);
+    color: var(--dgtx-text);
     outline: none;
   }
   .material-icons {
@@ -205,7 +206,7 @@ body.dgtx-admin {
 }
 .dgtx-avatar {
   align-items: center;
-  background: $navy-800;
+  background: var(--dgtx-navy);
   border-radius: $radius;
   color: $white;
   display: inline-flex;
@@ -217,14 +218,60 @@ body.dgtx-admin {
   width: 1.75rem;
 }
 .dgtx-user .dropdown-menu {
-  min-width: 12rem;
+  min-width: 13rem;
   .dropdown-item {
     align-items: center;
     display: flex;
     gap: .6rem;
     .material-icons {
-      color: $gray-500;
+      color: var(--dgtx-muted);
       font-size: 18px;
+    }
+  }
+}
+
+/* colour mode switch of the user menu: three segments, the stored one is active */
+.dgtx-theme {
+  padding: .35rem .9rem .5rem;
+  .dgtx-theme-label {
+    color: var(--dgtx-muted);
+    font-size: .6875rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    margin-bottom: .35rem;
+    text-transform: uppercase;
+  }
+  .dgtx-theme-switch {
+    background: var(--dgtx-surface-3);
+    border-radius: $radius;
+    display: flex;
+    gap: .15rem;
+    padding: .15rem;
+  }
+  button {
+    align-items: center;
+    background: none;
+    border: 0;
+    border-radius: $radius;
+    color: var(--dgtx-muted);
+    display: flex;
+    flex: 1;
+    font-size: .75rem;
+    font-weight: 500;
+    gap: .3rem;
+    justify-content: center;
+    padding: .3rem .4rem;
+    transition: background-color .15s, color .15s;
+    .material-icons {
+      font-size: 18px;
+    }
+    &:hover {
+      color: var(--dgtx-text);
+    }
+    &.active {
+      background: var(--dgtx-surface);
+      box-shadow: var(--dgtx-shadow-sm);
+      color: var(--dgtx-text);
     }
   }
 }
@@ -233,14 +280,14 @@ body.dgtx-admin {
   padding: $content-padding $content-padding 2.5rem;
 }
 .dgtx-footer {
-  border-top: 1px solid $gray-200;
-  color: $gray-400;
+  border-top: 1px solid var(--dgtx-border);
+  color: var(--dgtx-icon);
   display: flex;
   font-size: .75rem;
   justify-content: space-between;
   padding: .75rem $content-padding;
   a {
-    color: $gray-500;
+    color: var(--dgtx-muted);
     &:hover {
       color: $brand-600;
     }
@@ -254,12 +301,13 @@ body.dgtx-admin {
 .dgtx-page-header {
   align-items: flex-start;
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   justify-content: space-between;
   margin-bottom: 1.25rem;
 }
 .dgtx-page-title {
-  color: $gray-900;
+  color: var(--dgtx-text);
   font-size: 1.375rem;
   font-weight: 600;
   letter-spacing: -.01em;
@@ -267,7 +315,7 @@ body.dgtx-admin {
   margin: 0;
 }
 .dgtx-page-subtitle {
-  color: $gray-500;
+  color: var(--dgtx-muted);
   font-size: .8125rem;
   margin-top: .25rem;
 }
@@ -278,8 +326,8 @@ body.dgtx-admin {
   gap: .5rem;
 }
 .dgtx-card {
-  background: $white;
-  border: 1px solid $gray-200;
+  background: var(--dgtx-surface);
+  border: 1px solid var(--dgtx-border);
   border-radius: $radius;
   & + & {
     margin-top: 1.25rem;
@@ -287,8 +335,8 @@ body.dgtx-admin {
 }
 .dgtx-card-header {
   align-items: center;
-  border-bottom: 1px solid $gray-200;
-  color: $gray-900;
+  border-bottom: 1px solid var(--dgtx-border);
+  color: var(--dgtx-text);
   display: flex;
   font-weight: 600;
   gap: 1rem;
@@ -300,7 +348,7 @@ body.dgtx-admin {
 }
 .dgtx-toolbar {
   align-items: center;
-  border-bottom: 1px solid $gray-200;
+  border-bottom: 1px solid var(--dgtx-border);
   display: flex;
   flex-wrap: wrap;
   gap: .75rem;
@@ -308,10 +356,10 @@ body.dgtx-admin {
   padding: .75rem 1.25rem;
 }
 .dgtx-count {
-  color: $gray-500;
+  color: var(--dgtx-muted);
   font-size: .8125rem;
   strong {
-    color: $gray-800;
+    color: var(--dgtx-text-2);
     font-weight: 600;
   }
 }
@@ -353,5 +401,20 @@ body.dgtx-admin {
   .dgtx-footer {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+}
+
+/* --- phones: tighter cards --- */
+@media (max-width: 575.98px) {
+  .dgtx-card-header,
+  .dgtx-toolbar {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .dgtx-card-body {
+    padding: 1rem;
+  }
+  .dgtx-page-title {
+    font-size: 1.25rem;
   }
 }

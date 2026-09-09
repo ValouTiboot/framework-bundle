@@ -1,6 +1,7 @@
-/* Digitix admin theme: tokens, themed Bootstrap, fonts, then layout, components and pages. */
+/* Digitix admin theme: tokens, themed Bootstrap, colour modes, fonts, then layout, components and pages. */
 @import "_partials/variables";
 @import "_partials/bootstrap";
+@import "_partials/theme";
 @import "_partials/fonts";
 
 /* third-party widgets (TinyMCE loads its own skin on demand, see js/editor.js) */

@@ -1,4 +1,4 @@
-/* Translation editor (templates/admin/helper/list/translation.twig) */
+/* Translation editor (templates/admin/helper/list/translation.html.twig) */
 #translation {
   .dgtx-trans-toolbar {
     padding-top: .5rem;
@@ -23,12 +23,14 @@
       justify-content: space-between;
     }
     .progress {
-      background: $gray-200;
+      background: var(--dgtx-surface-4);
       height: 4px;
     }
   }
 
   .dgtx-trans-table {
+    /* five columns: on a narrow screen the card scrolls sideways instead of squeezing the text */
+    min-width: 44rem;
     td {
       vertical-align: top;
     }
@@ -37,7 +39,7 @@
     font-weight: 500;
   }
   .dgtx-trans-key {
-    color: $gray-700;
+    color: var(--dgtx-text-3);
     font-size: .9em;
     white-space: pre-wrap;
     word-break: break-word;
@@ -55,12 +57,12 @@
       cursor: pointer;
       transition: background-color .15s;
       &:hover, &:focus {
-        background-color: $font-light-grey;
+        background-color: var(--dgtx-surface-2);
         outline: none;
       }
     }
     &.editing {
-      background-color: $font-light-grey;
+      background-color: var(--dgtx-surface-2);
       cursor: default;
       white-space: normal;
       .tox-tinymce {
@@ -91,16 +93,16 @@
   .dgtx-status {
     font-weight: 500;
     &.dgtx-status-missing {
-      background-color: $bg-warning-color;
-      color: darken($warning, 12%);
+      background-color: var(--dgtx-warning-soft);
+      color: $warning;
     }
     &.dgtx-status-translated {
       background-color: $success;
       color: $white;
     }
     &.dgtx-status-obsolete {
-      background-color: $gray-600;
-      color: $white;
+      background-color: var(--dgtx-text-4);
+      color: var(--dgtx-surface);
     }
   }
   .dgtx-trans-row-obsolete .dgtx-trans-key {
@@ -110,6 +112,6 @@
 }
 
 @keyframes dgtx-trans-saved {
-  0% { background-color: $bg-success-color; }
+  0% { background-color: var(--dgtx-success-soft); }
   100% { background-color: transparent; }
 }

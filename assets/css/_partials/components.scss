@@ -1,6 +1,7 @@
 /*
  * Components on top of the themed Bootstrap: buttons, badges, tables, forms,
- * the yes/no switch, pagination, empty states, helpers.
+ * the yes/no switch, pagination, empty states, helpers. Colours are the
+ * tokens of _partials/theme.scss (light and dark modes).
  */
 
 /* --- helpers kept from the previous theme --- */
@@ -8,7 +9,7 @@
 .t-warning { color: $warning; }
 .t-info { color: $info; }
 .t-danger { color: $danger; }
-.t-muted { color: $gray-500; }
+.t-muted { color: var(--dgtx-muted); }
 .cursor-p { cursor: pointer; }
 .hide { display: none; }
 
@@ -32,22 +33,22 @@ a {
   }
 }
 .btn-light {
-  background: $white;
-  border-color: $gray-300;
-  color: $gray-700;
+  background: var(--dgtx-surface);
+  border-color: var(--dgtx-border-strong);
+  color: var(--dgtx-text-3);
   &:hover, &:focus-visible {
-    background: $gray-100;
-    border-color: $gray-300;
-    color: $gray-900;
+    background: var(--dgtx-surface-3);
+    border-color: var(--dgtx-border-strong);
+    color: var(--dgtx-text);
   }
   &:active, &.active {
-    background: $gray-200;
-    border-color: $gray-300;
-    color: $gray-900;
+    background: var(--dgtx-surface-4);
+    border-color: var(--dgtx-border-strong);
+    color: var(--dgtx-text);
   }
 }
 .btn-outline-primary {
-  background: $white;
+  background: var(--dgtx-surface);
   &:hover {
     color: $white;
   }
@@ -62,10 +63,10 @@ a {
   }
 }
 .btn-link {
-  color: $gray-500;
+  color: var(--dgtx-muted);
   padding: 0 .2rem;
   &:hover {
-    color: $gray-900;
+    color: var(--dgtx-text);
   }
 }
 
@@ -74,8 +75,9 @@ a {
   letter-spacing: .01em;
   line-height: 1.2;
   &.text-bg-light {
-    border: 1px solid $gray-200;
-    color: $gray-600 !important;
+    background: var(--dgtx-surface-3) !important;
+    border: 1px solid var(--dgtx-border);
+    color: var(--dgtx-text-4) !important;
   }
 }
 
@@ -83,9 +85,9 @@ a {
 .table {
   margin-bottom: 0;
   thead th {
-    background: $white;
-    border-bottom: 1px solid $gray-200;
-    color: $gray-500;
+    background: var(--dgtx-surface);
+    border-bottom: 1px solid var(--dgtx-border);
+    color: var(--dgtx-muted);
     font-size: .75rem;
     font-weight: 600;
     letter-spacing: .04em;
@@ -103,7 +105,7 @@ a {
       display: flex;
       flex-direction: column;
       a {
-        color: $gray-400;
+        color: var(--dgtx-icon);
         display: flex;
         line-height: 0;
         opacity: 0;
@@ -123,7 +125,7 @@ a {
     }
   }
   thead tr.dgtx-filters th {
-    background: $white;
+    background: var(--dgtx-surface);
     padding: .5rem .5rem;
     text-transform: none;
     .form-control, .form-select {
@@ -143,7 +145,7 @@ a {
     border-bottom: 0;
   }
   &.table-hover tbody tr:hover {
-    background: $gray-50;
+    background: var(--dgtx-surface-2);
     .sortable-cell .sortable-item {
       opacity: 1;
     }
@@ -156,7 +158,7 @@ a {
     padding-right: 0;
     width: 1.75rem;
     .sortable-item {
-      color: $gray-400;
+      color: var(--dgtx-icon);
       cursor: grab;
       opacity: .35;
     }
@@ -168,18 +170,18 @@ a {
     background: none;
     border: 0;
     border-radius: $radius;
-    color: $gray-500;
+    color: var(--dgtx-muted);
     display: inline-flex;
     opacity: .55;
     padding: .2rem;
     transition: opacity .15s, color .15s, background-color .15s;
     &:hover {
-      background: $gray-100;
-      color: $gray-900;
+      background: var(--dgtx-surface-3);
+      color: var(--dgtx-text);
       opacity: 1;
     }
     &.item-delete:hover {
-      background: $brand-50;
+      background: var(--dgtx-accent-soft);
       color: $brand-600;
     }
   }
@@ -188,11 +190,11 @@ a {
   }
 }
 .dgtx-empty {
-  color: $gray-500;
+  color: var(--dgtx-muted);
   padding: 2.5rem 1rem;
   text-align: center;
   .material-icons {
-    color: $gray-300;
+    color: var(--dgtx-icon-faint);
     display: block;
     font-size: 40px;
     margin: 0 auto .5rem;
@@ -220,7 +222,7 @@ a {
 .dgtx-form {
   position: relative;
   .form-label, .col-form-label {
-    color: $gray-800;
+    color: var(--dgtx-text-2);
     font-weight: 500;
   }
   legend.col-form-label {
@@ -239,7 +241,7 @@ a {
     }
   }
   .form-text {
-    color: $gray-500;
+    color: var(--dgtx-muted);
     font-size: .8125rem;
   }
   .invalid-feedback {
@@ -254,7 +256,7 @@ a {
 }
 .dgtx-form-footer {
   align-items: center;
-  border-top: 1px solid $gray-200;
+  border-top: 1px solid var(--dgtx-border);
   display: flex;
   gap: .5rem;
   justify-content: flex-end;
@@ -281,10 +283,10 @@ a {
   .dgtx-translate-lang {
     align-items: center;
     align-self: flex-start;
-    background: $gray-50;
-    border: 1px solid $gray-300;
+    background: var(--dgtx-surface-2);
+    border: 1px solid var(--dgtx-border-strong);
     border-radius: $radius;
-    color: $gray-600;
+    color: var(--dgtx-text-4);
     display: flex;
     flex-shrink: 0;
     font-size: .6875rem;
@@ -297,7 +299,7 @@ a {
   }
 }
 .dgtx-upload-preview {
-  border: 1px solid $gray-200;
+  border: 1px solid var(--dgtx-border);
   border-radius: $radius;
   margin-top: .5rem;
   max-width: 240px;
@@ -306,8 +308,8 @@ a {
 
 /* yes / no switch: two radios rendered as a segmented control (admin.js toggles .checked) */
 .dgtx-switch {
-  background: $white;
-  border: 1px solid $gray-300;
+  background: var(--dgtx-surface);
+  border: 1px solid var(--dgtx-border-strong);
   border-radius: $radius;
   display: inline-flex;
   overflow: hidden;
@@ -319,7 +321,7 @@ a {
       display: none;
     }
     label {
-      color: $gray-500;
+      color: var(--dgtx-muted);
       cursor: pointer;
       display: block;
       font-weight: 500;
@@ -328,19 +330,19 @@ a {
       text-align: center;
       transition: background-color .15s, color .15s;
       &:hover {
-        color: $gray-900;
+        color: var(--dgtx-text);
       }
       &.checked {
-        background: $navy-800;
+        background: var(--dgtx-navy);
         color: $white;
       }
     }
     & + .form-check label {
-      border-left: 1px solid $gray-300;
+      border-left: 1px solid var(--dgtx-border-strong);
     }
   }
   &.dgtx-switch-no .form-check label.checked {
-    background: $gray-600;
+    background: var(--dgtx-text-4);
   }
 }
 
@@ -365,7 +367,7 @@ a {
     }
   }
   tbody th {
-    color: $gray-800;
+    color: var(--dgtx-text-2);
     font-weight: 500;
   }
   tbody .form-check-input {
@@ -373,11 +375,11 @@ a {
     margin: 0;
   }
   .dgtx-permissions-wildcard th {
-    color: $brand-700;
+    color: $brand-500;
     font-weight: 600;
   }
   .dgtx-permissions-wildcard td {
-    background: $brand-50;
+    background: var(--dgtx-accent-soft);
   }
   tr.is-all input[data-permission]:not([data-permission="all"]) {
     opacity: .3;
@@ -386,15 +388,18 @@ a {
 
 /* rich text editor and tags, same shape as the inputs */
 .tox-tinymce {
-  border: 1px solid $gray-300 !important;
+  border: 1px solid var(--dgtx-border-strong) !important;
   border-radius: $radius !important;
 }
 .tagify.tag {
-  --tag-bg: #{$navy-100};
-  --tag-hover: #{$navy-100};
-  --tag-text-color: #{$navy-800};
-  --tag-remove-btn-color: #{$navy-800};
-  --tags-border-color: #{$gray-300};
+  --tag-bg: var(--dgtx-navy-soft);
+  --tag-hover: var(--dgtx-navy-soft);
+  --tag-text-color: var(--dgtx-text-2);
+  --tag-remove-btn-color: var(--dgtx-text-2);
+  --tags-border-color: var(--dgtx-border-strong);
   --tags-focus-border-color: #{$brand-500};
+  --placeholder-color: var(--dgtx-icon);
+  background: var(--dgtx-input-bg);
   border-radius: $radius;
+  color: var(--dgtx-text-3);
 }

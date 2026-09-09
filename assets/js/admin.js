@@ -11,6 +11,7 @@ import './notify';
 import { notify } from './notify';
 import { initTranslationEditor } from './translation';
 import { initMenuBuilder } from './menu-builder';
+import { initThemeSwitch } from './theme';
 
 // jQuery exposed for the project scripts and inline snippets
 window.$ = window.jQuery = $;
@@ -25,6 +26,7 @@ $(document).ready(function(){
   // page modules first: they must not depend on the rest of this callback
   initTranslationEditor();
   initMenuBuilder();
+  initThemeSwitch();
 
   // rich text editors, only when the page has one
   if (document.querySelector('textarea.tinymce')) {
