@@ -21,6 +21,7 @@ class UserFixtures extends Fixture
 
         $role = new Role();
         $role->setName('SuperAdmin');
+        $role->setSuperAdmin(true);
         $role->setAuthorization([]);
 
         $user = new User();

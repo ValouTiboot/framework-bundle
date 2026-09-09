@@ -154,12 +154,29 @@ digitix_framework:
             name: name
             type: text
             sort: true
+          code:
+            label: label.role.code
+            name: code
+            type: text
+            sort: true
+          superAdmin:
+            label: label.role.superAdmin
+            name: superAdmin
+            type: bool
+            sort: true
       form:
         fields:
           name:
             label: label.role.name
             name: name
             type: text
+            help: help.role.name
+          superAdmin:
+            label: label.role.superAdmin
+            name: superAdmin
+            type: bool
+            required: true
+            help: help.role.superAdmin
           authorization:
             label: label.role.authorization
             name: authorization

@@ -26,6 +26,8 @@ return array (
     'role' =>
     array (
       'name' => 'Nom',
+      'code' => 'Code',
+      'superAdmin' => 'Accès complet',
       'authorization' => 'Permissions',
       'entity' => 'Section',
       'allEntities' => 'Toutes les sections',
@@ -119,7 +121,9 @@ return array (
   array (
     'role' =>
     array (
-      'authorization' => 'Le rôle SuperAdmin a tous les droits. « Toutes les sections » s\'applique à chaque section, « Tout » donne toutes les actions de la ligne.',
+      'name' => 'Le nom peut changer librement : le code technique du rôle est fixé à sa création et ne bouge plus.',
+      'superAdmin' => 'Tous les droits sur toutes les sections, quelle que soit la grille ci-dessous. Le dernier rôle à accès complet ne peut pas le perdre.',
+      'authorization' => '« Toutes les sections » s\'applique à chaque section, « Tout » donne toutes les actions de la ligne. Sans effet pour un rôle à accès complet.',
     ),
     'menu' =>
     array (

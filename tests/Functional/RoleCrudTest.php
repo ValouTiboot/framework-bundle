@@ -87,6 +87,53 @@ final class RoleCrudTest extends AdminTestCase
         }
     }
 
+    public function testTheLastSuperAdminRoleIsProtected(): void
+    {
+        $user = $this->login();
+        $role = $user->getRole();
+        self::assertInstanceOf(Role::class, $role);
+        self::assertTrue($role->isSuperAdmin());
+        self::assertSame('SUPERADMIN', $role->getCode());
+
+        // delete: refused, the fixture user still holds it
+        $crawler = $this->client->request('GET', '/admin/role');
+        $this->client->submit($crawler->filter(sprintf('form[action$="/admin/role/delete/%d"]', $role->getId()))->form());
+        self::assertResponseRedirects('/admin/role');
+        self::assertStringContainsString('encore attribué', implode(' ', $this->flashes($this->client->followRedirect(), 'danger')));
+        self::assertNotNull($this->em()->getRepository(Role::class)->find($role->getId()));
+
+        // a second super admin role without users can be deleted, but not the last one
+        $spare = (new Role())->setName('Spare admin')->setSuperAdmin(true);
+        $this->em()->persist($spare);
+        $this->em()->flush();
+        $crawler = $this->client->request('GET', '/admin/role');
+        $this->client->submit($crawler->filter(sprintf('form[action$="/admin/role/delete/%d"]', $spare->getId()))->form());
+        self::assertResponseRedirects('/admin/role');
+        $this->em()->clear();
+        self::assertNull($this->em()->getRepository(Role::class)->find($spare->getId()));
+
+        // renaming keeps the code and the access; removing the flag from the last super admin is refused
+        $crawler = $this->client->request('GET', '/admin/role/edit/'.$role->getId());
+        $crawler = $this->submitAdminForm($crawler, 'role', ['name' => 'Administrateur', 'superAdmin' => '0']);
+        self::assertResponseIsSuccessful('the form is displayed again with the error');
+        self::assertStringContainsString('dernier rôle', $crawler->filter('form[name="role"]')->text());
+
+        $crawler = $this->client->request('GET', '/admin/role/edit/'.$role->getId());
+        $this->submitAdminForm($crawler, 'role', ['name' => 'Administrateur', 'superAdmin' => '1']);
+        self::assertResponseRedirects('/admin/role');
+
+        $this->em()->clear();
+        $role = $this->em()->getRepository(Role::class)->find($role->getId());
+        self::assertInstanceOf(Role::class, $role);
+        self::assertSame('Administrateur', $role->getName());
+        self::assertSame('SUPERADMIN', $role->getCode(), 'the code survives the rename');
+        self::assertTrue($role->isSuperAdmin());
+
+        // ... and the renamed role still opens the admin
+        $this->client->request('GET', '/admin/dashboard/view');
+        self::assertResponseIsSuccessful();
+    }
+
     public function testValidationErrorsAreDisplayed(): void
     {
         $this->login();

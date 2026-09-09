@@ -85,13 +85,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getUserIdentifier();
     }
 
-    /** @return string[] */
+    /**
+     * Every back-office user is ROLE_ADMIN (what the firewall requires), plus
+     * the technical role of their Role (ROLE_<CODE>, stable whatever the
+     * name becomes) and ROLE_SUPERADMIN when the Role grants full access.
+     *
+     * @return string[]
+     */
     public function getRoles(): array
     {
         $roles = $this->roles;
 
-        if (null !== $this->role && null !== $this->role->getName()) {
-            $roles[] = 'ROLE_'.strtoupper(str_replace(' ', '_', $this->role->getName()));
+        if (null !== $this->role) {
+            $roles[] = Role::ADMIN_ROLE;
+            $roles[] = $this->role->getSecurityRole();
+
+            if ($this->role->isSuperAdmin()) {
+                $roles[] = Role::SUPER_ADMIN_ROLE;
+            }
         }
 
         $roles[] = 'ROLE_USER';

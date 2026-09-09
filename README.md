@@ -91,6 +91,7 @@ Twig templates (@DigitixFramework/admin/...)
 - `AdminConfig` is built once at container compile time and never changes at runtime.
 - `AdminContext` is created per request, only on admin routes, and injected into controller actions. Services never read it from a constructor.
 - Field and filter types are tagged services (`dgtx.admin.field_type`, `dgtx.admin.filter_type`): implement `FieldTypeInterface` / `FilterTypeInterface` in your project to add one.
+- Roles: every back-office user is `ROLE_ADMIN`, plus `ROLE_<CODE>` where the code is generated once from the role's first name and never changes (renaming is safe), plus `ROLE_SUPERADMIN` when the role's "full access" flag is on. The last full-access role can neither lose the flag nor be deleted, and a role still given to users cannot be deleted.
 - Permissions: `AdminVoter` grants everything to `ROLE_SUPERADMIN`, otherwise reads `Role::authorization`, e.g. `{"*": ["read"], "cms": ["read", "create", "edit"]}`. The role form edits it as a matrix (field type `permissions`): one row per admin entity plus "every entity", one column per permission plus "all".
 - Delete is a POST with a CSRF token.
 

@@ -57,7 +57,8 @@ return static function (ContainerConfigurator $container): void {
     $services->load('Digitix\\FrameworkBundle\\Controller\\', '../src/Controller/');
     $services->load('Digitix\\FrameworkBundle\\Provider\\', '../src/Provider/');
     $services->load('Digitix\\FrameworkBundle\\EventListener\\', '../src/EventListener/');
-    $services->load('Digitix\\FrameworkBundle\\Security\\', '../src/Security/');
+    $services->load('Digitix\\FrameworkBundle\\Security\\', '../src/Security/')
+        ->exclude(['../src/Security/Constraint/LastSuperAdmin.php']);
 
     // --- Translations: extraction from the code, database sync, catalogue files ------
     $services->load('Digitix\\FrameworkBundle\\Translation\\', '../src/Translation/')

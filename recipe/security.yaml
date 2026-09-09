@@ -35,7 +35,8 @@ security:
         main:
             lazy: true
 
-    # Roles are derived from Role.name ("SuperAdmin" => ROLE_SUPERADMIN), see User::getRoles()
+    # Every back-office user is ROLE_ADMIN, plus ROLE_<CODE> of their Role and
+    # ROLE_SUPERADMIN when the Role has full access (see User::getRoles())
     role_hierarchy:
         ROLE_SUPERADMIN: ROLE_ADMIN
 
