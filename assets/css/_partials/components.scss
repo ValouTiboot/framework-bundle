@@ -386,7 +386,7 @@ a {
 
 /* rich text editor and tags, same shape as the inputs */
 .tox-tinymce {
-  border-color: $gray-300 !important;
+  border: 1px solid $gray-300 !important;
   border-radius: $radius !important;
 }
 .tagify.tag {

@@ -40,10 +40,10 @@ digitix_framework:
         meta:
           title: SEO
           route: dgtx_admin_entity_read
-    performance:
-      title: Performances
-      route: dgtx_admin_entity_create
-      icon: speed
+    tools:
+      title: Outils
+      route: dgtx_admin_entity_view
+      icon: build
   # Admin Entities
   admin_entities:
     Dashboard:
@@ -345,37 +345,10 @@ digitix_framework:
             type: textarea
             rows: 10
             required: false
-    Performance:
-      list:
-      form:
-        has_return_link: false
-        template: '@DigitixFramework/admin/helper/form/performance/create'
-        fields:
-          cache:
-            label: label.performance.cache
-            name: cache
-            type: bool
-            required: true
-          compile:
-            label: label.performance.compile
-            name: compile
-            type: bool
-            required: true
-          compileCss:
-            label: label.performance.compileCss
-            name: compileCss
-            type: bool
-            required: true
-          compileJs:
-            label: label.performance.compileJs
-            name: compileJs
-            type: bool
-            required: true
-          debug:
-            label: label.performance.debug
-            name: debug
-            type: bool
-            required: true
+    Tools:
+      # maintenance actions (cache, translations), AdminToolsController
+      view:
+        template: '@DigitixFramework/admin/helper/view/tools/view.html'
     Meta:
       list:
         template: null

@@ -34,6 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AdminController extends AbstractController
 {
     public const MESSAGE_DOMAIN = 'Admin.Message.Success';
+    public const SORT_TOKEN_ID = 'dgtx_sort';
 
     public static function getSubscribedServices(): array
     {
@@ -129,11 +130,16 @@ class AdminController extends AbstractController
     {
         $this->assertGranted(AdminPermission::EDIT, $context);
 
-        $ids = $context->getRequest()->request->all()[$context->getEntitySlug()] ?? null;
+        $request = $context->getRequest();
+        if (!$this->isCsrfTokenValid(self::SORT_TOKEN_ID, (string) $request->request->get('_token'))) {
+            return new JsonResponse(['success' => false, 'error' => $this->trans('Invalid security token, please try again.', [], 'Admin.Message.Error')], Response::HTTP_FORBIDDEN);
+        }
+
+        $ids = $request->request->all()[$context->getEntitySlug()] ?? null;
         $class = $context->getEntityClass();
 
         if (!\is_array($ids) || null === $class) {
-            return new JsonResponse(['success' => false]);
+            return new JsonResponse(['success' => false], Response::HTTP_BAD_REQUEST);
         }
 
         $repository = $this->doctrine()->getRepository($class);

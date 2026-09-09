@@ -3,9 +3,7 @@
 @import "_partials/bootstrap";
 @import "_partials/fonts";
 
-/* third-party widgets */
-@import "~tinymce/skins/ui/oxide/content.min";
-@import "~tinymce/skins/ui/oxide/skin.min";
+/* third-party widgets (TinyMCE loads its own skin on demand, see js/editor.js) */
 @import "~@yaireo/tagify/src/tagify";
 
 @import "_partials/layout";

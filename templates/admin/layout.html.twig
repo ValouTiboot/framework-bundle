@@ -19,7 +19,7 @@
 
 {% block body %}
 {% trans_default_domain 'Admin.Layout' %}
-<body id="{{ entityName|default('admin') }}" class="dgtx-admin">
+<body id="{{ entityName|default('admin') }}" class="dgtx-admin" data-assets="{{ asset('bundles/digitixframework/assets/') }}">
 
   {% block menu %}
   <aside class="dgtx-sidebar">
@@ -51,9 +51,8 @@
           <span class="d-none d-md-inline">{{ 'View the site'|trans }}</span>
         </a>
         {% if is_granted('ROLE_ADMIN') %}
-        <form method="post" action="{{ path('dgtx_admin_entity_create', {entityName: 'performance'}) }}" class="d-inline">
-          <input type="hidden" name="cacheClear" value="1">
-          <input type="hidden" name="_token" value="{{ csrf_token('dgtx_cache_clear') }}">
+        <form method="post" action="{{ path('dgtx_admin_entity_action_collection', {entityName: 'tools', action: 'cache_clear'}) }}" class="d-inline">
+          <input type="hidden" name="_token" value="{{ csrf_token('dgtx_tools') }}">
           <button type="submit" class="dgtx-topbar-btn" title="{{ 'Clear the cache'|trans }}">
             <i class="material-icons">cached</i>
             <span class="d-none d-md-inline">{{ 'Clear the cache'|trans }}</span>

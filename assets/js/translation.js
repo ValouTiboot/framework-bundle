@@ -5,24 +5,9 @@
  * Click (or Enter) on a cell opens a textarea; Ctrl+Enter or the save button
  * posts {value, _token} as JSON to the cell's data-url; Esc cancels.
  * Cells flagged data-html="1" (or switched with the "code" button) are edited
- * with TinyMCE.
+ * with TinyMCE, loaded on demand from editor.js.
  */
-import tinymce from 'tinymce';
 import { notify } from './notify';
-
-const RICH_EDITOR = {
-  menubar: false,
-  plugins: 'link lists code paste autolink',
-  toolbar: 'bold italic underline | link unlink | bullist numlist | removeformat | code',
-  toolbar_mode: 'wrap',
-  height: 220,
-  skin: false,
-  content_css: false,
-  branding: false,
-  statusbar: false,
-  convert_urls: false,
-  entity_encoding: 'raw',
-};
 
 export function initTranslationEditor() {
   const table = document.querySelector('.dgtx-trans-table');
@@ -102,21 +87,26 @@ export function initTranslationEditor() {
 
   function richMode(state, toggle) {
     toggle.classList.add('active');
-    tinymce.init({
-      ...RICH_EDITOR,
-      target: state.textarea,
-      setup(editor) {
-        state.editor = editor;
-        editor.on('init', () => editor.focus());
-        editor.on('keydown', (event) => {
-          if (event.key === 'Escape') {
-            cancel(state);
-          } else if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
-            event.preventDefault();
-            save(state);
-          }
-        });
-      },
+    import(/* webpackChunkName: "editor" */ './editor').then(({ tinymce, richConfig }) => {
+      if (!state.cell.classList.contains('editing')) {
+        return; // closed while the editor was loading
+      }
+      tinymce.init({
+        ...richConfig(),
+        target: state.textarea,
+        setup(editor) {
+          state.editor = editor;
+          editor.on('init', () => editor.focus());
+          editor.on('keydown', (event) => {
+            if (event.key === 'Escape') {
+              cancel(state);
+            } else if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+              event.preventDefault();
+              save(state);
+            }
+          });
+        },
+      });
     });
   }
 
@@ -129,7 +119,7 @@ export function initTranslationEditor() {
 
   function destroyEditor(state) {
     if (state.editor) {
-      tinymce.remove(state.editor);
+      state.editor.remove();
       state.editor = null;
     }
   }

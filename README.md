@@ -93,7 +93,8 @@ Twig templates (@DigitixFramework/admin/...)
 - Field and filter types are tagged services (`dgtx.admin.field_type`, `dgtx.admin.filter_type`): implement `FieldTypeInterface` / `FilterTypeInterface` in your project to add one.
 - Roles: every back-office user is `ROLE_ADMIN`, plus `ROLE_<CODE>` where the code is generated once from the role's first name and never changes (renaming is safe), plus `ROLE_SUPERADMIN` when the role's "full access" flag is on. The last full-access role can neither lose the flag nor be deleted, and a role still given to users cannot be deleted.
 - Permissions: `AdminVoter` grants everything to `ROLE_SUPERADMIN`, otherwise reads `Role::authorization`, e.g. `{"*": ["read"], "cms": ["read", "create", "edit"]}`. The role form edits it as a matrix (field type `permissions`): one row per admin entity plus "every entity", one column per permission plus "all".
-- Delete is a POST with a CSRF token.
+- Delete is a POST with a CSRF token; so is the reordering of sortable lists (`data-sortable-token`).
+- Tools (`/admin/tools/view`, `AdminToolsController`): cache clear (also in the top bar), translation keys refresh and catalogue compilation, each a POST action with the page token; override the controller to add project actions (`{name}Action`).
 
 ## Translations
 
@@ -242,7 +243,13 @@ php bin/console assets:install  # in the project, copies public/ to public/bundl
 
 Styles: `assets/css/style.scss` and `assets/css/_partials/*.scss`. Scripts:
 `assets/js/admin.js` (entry point) and its modules. `window.dgtxNotify(message, type)`
-shows a toast (success, error, warning, info) for the AJAX screens.
+shows a toast (success, error, warning, info) for the AJAX screens. Third
+parties: jQuery and Bootstrap, TinyMCE 7 (GPL, `license_key: 'gpl'`),
+SortableJS for every drag and drop (lists, menu builder), Tagify. TinyMCE
+lives in `assets/js/editor.js`, an on-demand chunk (`public/assets/editor.*.js`
+plus its vendors) loaded only by pages with a `textarea.tinymce` or the
+translation editor; its skins are copied to `public/assets/tinymce/skins` and
+fetched by TinyMCE itself, so the rest of the admin never downloads it.
 
 File names are fixed, so let browsers notice a rebuild with the bundle's
 mtime-based version strategy (`?v=<mtime>` appended to every existing asset):

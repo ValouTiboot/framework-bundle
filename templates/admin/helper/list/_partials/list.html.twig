@@ -5,7 +5,8 @@
 {{ form_start(filters_form, {attr: {id: filters_form_id}}) }}{{ form_end(filters_form, {render_rest: false}) }}
 
 <div class="table-responsive">
-  <table class="table table-hover {% if sortable %}sortable{% endif %}" {% if sortable %}data-sortable-action="{{ url('dgtx_admin_entity_ajax_sortable', {entityName: entityName}) }}"{% endif %}>
+  <table class="table table-hover {% if sortable %}sortable{% endif %}"
+    {%- if sortable %} data-sortable-action="{{ url('dgtx_admin_entity_ajax_sortable', {entityName: entityName}) }}" data-sortable-token="{{ csrf_token('dgtx_sort') }}" data-sortable-saved="{{ 'list.default.sorted'|trans({}, 'Admin.List.Default') }}" data-sortable-error="{{ 'list.default.sort_error'|trans({}, 'Admin.List.Default') }}"{% endif %}>
     <thead>
       {% block list_label %}
       <tr>

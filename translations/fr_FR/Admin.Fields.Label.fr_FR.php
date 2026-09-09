@@ -76,14 +76,6 @@ return array (
       'gtm' => 'GTM',
       'tag' => 'Tag additionnel',
     ),
-    'performance' =>
-    array (
-      'cache' => 'Cache',
-      'compile' => 'Compilation',
-      'compileCss' => 'Compilation CSS',
-      'compileJs' => 'Compilation JS',
-      'debug' => 'Mode debug',
-    ),
     'meta' =>
     array (
       'page' => 'Page',

@@ -9,16 +9,11 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
 /**
- * Default rows of the global configuration (Parameter / Performance pages).
+ * Default rows of the global configuration (Parameter page).
  */
 class ConfigurationFixtures extends Fixture
 {
     public const DATAS = [
-        'cache' => '0',
-        'compile' => '0',
-        'compileCss' => '0',
-        'compileJs' => '0',
-        'debug' => '1',
         'mailFrom' => null,
         'mailFromName' => null,
         'ssl' => '1',

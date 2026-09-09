@@ -32,7 +32,7 @@ final class AdminPagesTest extends AdminTestCase
         yield 'translation editor filtered' => ['/admin/translation?locale=fr_FR&domain=Admin.List.Default&status=missing&q=add&page=1'];
         yield 'translation editor unknown locale' => ['/admin/translation?locale=xx_XX'];
         yield 'parameter' => ['/admin/parameter/create'];
-        yield 'performance' => ['/admin/performance/create'];
+        yield 'tools' => ['/admin/tools/view'];
         yield 'user list filtered' => ['/admin/user?filters[email]=valentin&filters[active]=1'];
         yield 'user list sorted' => ['/admin/user?sortBy=email&sortWay=desc'];
         yield 'cms list sorted on translated property' => ['/admin/cms?sortBy=name&sortWay=asc'];

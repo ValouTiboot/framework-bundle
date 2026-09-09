@@ -8,4 +8,6 @@ return [
     'list.default.empty' => 'Aucun élément pour le moment.',
     'list.default.delete' => 'Supprimer',
     'list.default.confirm_delete' => 'Confirmer la suppression ?',
+    'list.default.sorted' => 'Ordre enregistré.',
+    'list.default.sort_error' => 'L\'ordre n\'a pas pu être enregistré.',
 ];
