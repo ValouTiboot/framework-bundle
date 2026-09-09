@@ -95,7 +95,7 @@ export function initEditors() {
     quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
     contextmenu: 'link image table',
     height: 500,
-    file_picker_callback(callback, value, meta) {
+    file_picker_callback(callback) {
       const input = document.createElement('input');
       input.setAttribute('type', 'file');
 

@@ -238,6 +238,7 @@ Templates to extend in a project: `admin/layout.html.twig` exposes the
 cd assets
 yarn install --ignore-engines   # node 14 through nvm on the Digitix servers
 yarn build                      # or: yarn watch
+yarn lint                       # ESLint on assets/js and the build configuration, also run by the CI
 php bin/console assets:install  # in the project, copies public/ to public/bundles/digitixframework/
 ```
 

@@ -3,15 +3,17 @@
  * modules (translation editor, menu builder, notifications) and TinyMCE
  * loaded on demand (editor.js) for the pages that have a rich text field.
  */
-window.$ = window.jQuery = require('jquery');
-global.$ = global.jQuery = jQuery = $;
-require('bootstrap');
+import $ from 'jquery';
+import 'bootstrap';
 import Tagify from '@yaireo/tagify';
 import Sortable from 'sortablejs';
 import './notify';
 import { notify } from './notify';
 import { initTranslationEditor } from './translation';
 import { initMenuBuilder } from './menu-builder';
+
+// jQuery exposed for the project scripts and inline snippets
+window.$ = window.jQuery = $;
 
 // where webpack loads the on-demand chunks from (the layout exposes the assets base URL)
 if (document.body && document.body.dataset.assets) {
@@ -42,17 +44,16 @@ $(document).ready(function(){
 
   // Tagify
   $('.tag').each(function(){
-    var input = $(this);
-    new Tagify(input[0], {
+    new Tagify(this, {
       pattern : /^.{0,30}$/,
     });
   });
 
   // DGTX-switch
   $('.dgtx-switch').each(function(){
-    var check = $('input[type="radio"]:checked', $(this));
+    const check = $('input[type="radio"]:checked', $(this));
 
-    if (typeof check !== 'undefined' && check.val() == 1) {
+    if (check.length && String(check.val()) === '1') {
       $(this).addClass('dgtx-switch-yes');
       check.next().addClass('checked');
     } else {
@@ -63,7 +64,7 @@ $(document).ready(function(){
 
   $('.dgtx-switch label').on('click', function(){
 
-    var parent = $(this).parent().parent();
+    const parent = $(this).parent().parent();
 
     $('label', parent).removeClass('checked');
     $(this).addClass('checked');
@@ -80,10 +81,10 @@ $(document).ready(function(){
   });
 
   $('input[id*="translatableName"]').on('blur', function(){
-    var associateRewriteFieldId = $(this).prop('id').replace('Name', 'Rewrite');
-    var associateRewriteField = $('#'+associateRewriteFieldId);
+    const associateRewriteFieldId = $(this).prop('id').replace('Name', 'Rewrite');
+    const associateRewriteField = $('#'+associateRewriteFieldId);
 
-    if (associateRewriteField.val() == '')
+    if (associateRewriteField.val() === '')
       associateRewriteField.val(toRewriteUrl($(this).val()));
   });
 
@@ -93,7 +94,7 @@ $(document).ready(function(){
       .prop('checked', this.checked).trigger('change');
   });
   $('.dgtx-permissions').on('change', 'tbody input[data-permission]', function(){
-    var row = $(this).closest('tr');
+    const row = $(this).closest('tr');
     row.toggleClass('is-all', row.find('input[data-permission="all"]').prop('checked'));
   });
 
@@ -104,16 +105,16 @@ $(document).ready(function(){
 
   // sortable lists: drag a row by its handle, the new order is posted as "{entity}[]=id"
   document.querySelectorAll('table.sortable tbody').forEach(function(tbody){
-    var table = tbody.closest('table');
+    const table = tbody.closest('table');
 
     Sortable.create(tbody, {
       handle: '.sortable-item',
       animation: 150,
       onEnd: function(){
-        var body = new URLSearchParams();
+        const body = new URLSearchParams();
         body.append('_token', table.dataset.sortableToken || '');
         tbody.querySelectorAll('tr[id]').forEach(function(row){
-          var at = row.id.lastIndexOf('_');
+          const at = row.id.lastIndexOf('_');
           body.append(row.id.slice(0, at) + '[]', row.id.slice(at + 1));
         });
 
@@ -139,12 +140,9 @@ $(document).ready(function(){
 
 
 function toRewriteUrl(str) {
-  var encodedUrl = str.toString().toLowerCase(); // make the url lowercase
-  encodedUrl = encodedUrl.normalize("NFD").replace(/[̀-ͯ]/g, "");
-  encodedUrl = encodedUrl.split(/\&+/).join("-and-"); // replace & with and
-  encodedUrl = encodedUrl.split(/[^a-z0-9]/).join("-"); // remove invalid characters
-  encodedUrl = encodedUrl.split(/-+/).join("-"); // remove duplicates
-  encodedUrl = encodedUrl.trim('-'); // trim leading & trailing characters
-
-  return encodedUrl;
+  return str.toString().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') // strip the accents
+    .replace(/&+/g, '-and-')
+    .replace(/[^a-z0-9]+/g, '-') // invalid characters and runs of them become one dash
+    .replace(/^-+|-+$/g, ''); // no leading or trailing dash
 }

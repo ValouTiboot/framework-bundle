@@ -33,3 +33,25 @@ jobs:
 
       - name: Tests
         run: composer phpunit
+
+  assets:
+    name: Assets lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: yarn
+          cache-dependency-path: assets/yarn.lock
+
+      # --ignore-scripts: node-sass is not built here, the lint does not need it
+      - name: Install dependencies
+        working-directory: assets
+        run: yarn install --frozen-lockfile --ignore-engines --ignore-scripts
+
+      - name: JavaScript lint
+        working-directory: assets
+        run: yarn lint

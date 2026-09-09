@@ -1,10 +1,9 @@
-const webpack = require('webpack');
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-let config = {
+const config = {
   entry: {
     theme: ['./js/admin.js', './css/style.scss'],
   },
@@ -28,15 +27,15 @@ let config = {
       },
       {
         test: /\.scss$/,
-        use:[
-            MiniCssExtractPlugin.loader,
-            {loader: 'css-loader', options: {sourceMap: true}},
-            {loader: 'postcss-loader', options: {sourceMap: true}},
-            {loader: 'sass-loader', options: {sourceMap: true, sassOptions: {outputStyle: 'expanded'}}},
-          ],
+        use: [
+          MiniCssExtractPlugin.loader,
+          {loader: 'css-loader', options: {sourceMap: true}},
+          {loader: 'postcss-loader', options: {sourceMap: true}},
+          {loader: 'sass-loader', options: {sourceMap: true, sassOptions: {outputStyle: 'expanded'}}},
+        ],
       },
       {
-        test: /.(png|woff(2)?|eot|otf|ttf|svg|gif)(\?[a-z0-9=\.]+)?$/,
+        test: /.(png|woff(2)?|eot|otf|ttf|svg|gif)(\?[a-z0-9=.]+)?$/,
         use: [
           {
             loader: 'file-loader',
@@ -71,7 +70,7 @@ let config = {
         {from: 'node_modules/tinymce/skins/content/default', to: 'tinymce/skins/content/default', globOptions: {ignore: ['**/*.js']}},
       ],
     }),
-  ]
+  ],
 };
 
 config.optimization = {
@@ -89,22 +88,22 @@ config.optimization = {
 
 if (process.env.NODE_ENV === 'production') {
   config.optimization.minimizer = [
-      new UglifyJsPlugin({
-        sourceMap: false,
-        uglifyOptions: {
-          compress: {
-            sequences: true,
-            conditionals: true,
-            booleans: true,
-            if_return: true,
-            join_vars: true,
-            drop_console: true,
-          },
-          output: {
-            comments: false,
-          },
-        }
-      })
+    new UglifyJsPlugin({
+      sourceMap: false,
+      uglifyOptions: {
+        compress: {
+          sequences: true,
+          conditionals: true,
+          booleans: true,
+          if_return: true,
+          join_vars: true,
+          drop_console: true,
+        },
+        output: {
+          comments: false,
+        },
+      },
+    }),
   ];
 }
 
