@@ -38,10 +38,11 @@ $(document).ready(function(){
     e.preventDefault();
     $('.menu-items a[href^="#"]').removeClass('expand').parent().find('.sub-menu').slideUp('fast');
 
-    if ($(this).parent().find('.sub-menu').is(':visible'))
+    if ($(this).parent().find('.sub-menu').is(':visible')) {
       $(this).removeClass('expand').parent().find('.sub-menu').slideUp('fast');
-    else
+    } else {
       $(this).addClass('expand').parent().find('.sub-menu').slideDown('fast');
+    }
   });
 
   // Tagify
@@ -71,10 +72,11 @@ $(document).ready(function(){
     $('label', parent).removeClass('checked');
     $(this).addClass('checked');
 
-    if (parent.hasClass('dgtx-switch-no'))
+    if (parent.hasClass('dgtx-switch-no')) {
       parent.removeClass('dgtx-switch-no').addClass('dgtx-switch-yes');
-    else
+    } else {
       parent.removeClass('dgtx-switch-yes').addClass('dgtx-switch-no');
+    }
   });
 
   // FriendlyUrl
@@ -82,12 +84,18 @@ $(document).ready(function(){
     $(this).val(toRewriteUrl($(this).val()));
   });
 
+  // short codes (menus): same normalisation, with underscores
+  $('input[id$="_shortCode"]').on('keyup blur', function(){
+    $(this).val(toRewriteUrl($(this).val(), false));
+  });
+
   $('input[id*="translatableName"]').on('blur', function(){
     const associateRewriteFieldId = $(this).prop('id').replace('Name', 'Rewrite');
     const associateRewriteField = $('#'+associateRewriteFieldId);
 
-    if (associateRewriteField.val() === '')
+    if (associateRewriteField.val() === '') {
       associateRewriteField.val(toRewriteUrl($(this).val()));
+    }
   });
 
   // permission matrix: a column header ticks the whole column, "all" dims the rest of its row
@@ -95,6 +103,7 @@ $(document).ready(function(){
     $(this).closest('table').find('tbody input[data-permission="' + $(this).data('permission-column') + '"]')
       .prop('checked', this.checked).trigger('change');
   });
+
   $('.dgtx-permissions').on('change', 'tbody input[data-permission]', function(){
     const row = $(this).closest('tr');
     row.toggleClass('is-all', row.find('input[data-permission="all"]').prop('checked'));
@@ -137,14 +146,16 @@ $(document).ready(function(){
       },
     });
   });
-
 });
 
+// Lower case ASCII letters and digits, separated by dashes (rewrites) or,
+// with dash = false, by underscores (short codes).
+function toRewriteUrl(str, dash = true) {
+  const sep = dash ? '-' : '_';
 
-function toRewriteUrl(str) {
   return str.toString().toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g, '') // strip the accents
-    .replace(/&+/g, '-and-')
-    .replace(/[^a-z0-9]+/g, '-') // invalid characters and runs of them become one dash
-    .replace(/^-+|-+$/g, ''); // no leading or trailing dash
+    .replace(/&+/g, sep + 'and' + sep)
+    .replace(/[^a-z0-9]+/g, sep) // invalid characters and runs of them become one separator
+    .replace(new RegExp('^' + sep + '+|' + sep + '+$', 'g'), ''); // no leading or trailing separator
 }

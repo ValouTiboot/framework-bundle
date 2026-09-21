@@ -12,7 +12,7 @@ enum MenuItemType: string
     /** A route of the project (static page), with optional parameters. */
     case Route = 'route';
 
-    /** A CMS page (front_cms_show + the page id). */
+    /** A CMS page (front_cms_show with the rewrite of the page, whose id is stored). */
     case Cms = 'cms';
 
     /** A free URL, internal or external. */

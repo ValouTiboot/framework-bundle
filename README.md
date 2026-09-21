@@ -143,7 +143,8 @@ filter on it in the editor.
 ## Menus
 
 Menus are built in the admin (`/admin/menu`, then the eye icon) and rendered
-on the front by their code:
+on the front by their short code (lower case letters, digits and underscores:
+the admin normalises it like a rewrite, with underscores):
 
 ```twig
 {{ dgtx_menu('main') }}

@@ -40,7 +40,7 @@ final class MenuTreeTest extends TestCase
         $copy = MenuTree::fromArray(json_decode((string) json_encode($tree->toArray()), true));
 
         self::assertSame($tree->toArray(), $copy->toArray());
-        self::assertSame('main', $copy->code);
+        self::assertSame('main', $copy->shortCode);
         self::assertSame(MenuItemType::Link, $copy->items[2]->type);
         self::assertTrue($copy->items[1]->hasChildren());
         self::assertFalse($copy->isEmpty());

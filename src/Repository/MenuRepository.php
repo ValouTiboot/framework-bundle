@@ -19,14 +19,14 @@ class MenuRepository extends ServiceEntityRepository
         parent::__construct($registry, Menu::class);
     }
 
-    /** A menu by its code ("main") or by its id. */
-    public function findOneByCodeOrId(string|int $identifier): ?Menu
+    /** A menu by its short code ("main") or by its id. */
+    public function findOneByShortCodeOrId(string|int $identifier): ?Menu
     {
         if (\is_int($identifier) || ctype_digit($identifier)) {
             return $this->find((int) $identifier);
         }
 
-        return $this->findOneBy(['code' => strtolower($identifier)]);
+        return $this->findOneBy(['shortCode' => strtolower($identifier)]);
     }
 
     /**

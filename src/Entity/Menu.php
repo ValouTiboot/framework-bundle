@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * A navigation menu, rendered on the front through dgtx_menu('<code>').
+ * A navigation menu, rendered on the front through dgtx_menu('<shortCode>').
  *
  * Translated fields, resolved in the current language (see Translatable):
  *
@@ -26,12 +26,15 @@ class Menu extends Translatable
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    /** Stable identifier used by templates: dgtx_menu('main'). */
+    /**
+     * Stable identifier used by templates: dgtx_menu('main'). The back office
+     * normalises it like a rewrite, with underscores (toRewriteUrl(value, false)).
+     */
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 50)]
-    #[Assert\Regex(pattern: '/^[a-z0-9][a-z0-9_-]*$/', message: 'Use lower case letters, digits, "-" and "_" only.')]
-    private ?string $code = null;
+    #[Assert\Regex(pattern: '/^[a-z0-9][a-z0-9_-]*$/', message: 'Use lower case letters, digits, "_" and "-" only.')]
+    private ?string $shortCode = null;
 
     #[ORM\Column(type: 'boolean')]
     private bool $active = false;
@@ -61,14 +64,14 @@ class Menu extends Translatable
         return $this->id;
     }
 
-    public function getCode(): ?string
+    public function getShortCode(): ?string
     {
-        return $this->code;
+        return $this->shortCode;
     }
 
-    public function setCode(?string $code): self
+    public function setShortCode(?string $shortCode): self
     {
-        $this->code = null === $code ? null : strtolower(trim($code));
+        $this->shortCode = null === $shortCode ? null : strtolower(trim($shortCode));
 
         return $this;
     }

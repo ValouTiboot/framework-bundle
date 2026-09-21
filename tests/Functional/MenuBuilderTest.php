@@ -174,7 +174,7 @@ final class MenuBuilderTest extends AdminTestCase
 
         $second = $roots->eq(1);
         self::assertSame('About us', $second->filter('a')->first()->text(), 'a CMS item without title takes the page name');
-        self::assertSame(sprintf('/%d-about-us.html', $cms->getId()), $second->filter('a')->first()->attr('href'));
+        self::assertSame('/about-us.html', $second->filter('a')->first()->attr('href'));
         self::assertStringContainsString('has-children', (string) $second->attr('class'));
         self::assertStringContainsString('active', (string) $second->attr('class'), 'ancestor of the current page');
 
@@ -265,10 +265,10 @@ final class MenuBuilderTest extends AdminTestCase
         return $language;
     }
 
-    private function createMenu(string $code, bool $active = true): Menu
+    private function createMenu(string $shortCode, bool $active = true): Menu
     {
-        $menu = (new Menu())->setCode($code)->setActive($active)->setDateAdd(new \DateTime())->setDateUpd(new \DateTime());
-        $menu->addTranslation((new MenuTranslation())->setLanguage($this->defaultLanguage())->setName(ucfirst($code).' menu'));
+        $menu = (new Menu())->setShortCode($shortCode)->setActive($active)->setDateAdd(new \DateTime())->setDateUpd(new \DateTime());
+        $menu->addTranslation((new MenuTranslation())->setLanguage($this->defaultLanguage())->setName(ucfirst($shortCode).' menu'));
 
         $this->em()->persist($menu);
         $this->em()->flush();

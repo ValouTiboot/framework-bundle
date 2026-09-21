@@ -561,7 +561,7 @@ digitix_framework:
             type: bool
             required: true
     Menu:
-      # front menus: the eye opens the builder (AdminMenuController), rendered with dgtx_menu('<code>')
+      # front menus: the eye opens the builder (AdminMenuController), rendered with dgtx_menu('<shortCode>')
       view:
         template: '@DigitixFramework/admin/helper/view/menu/view.html'
       list:
@@ -580,9 +580,9 @@ digitix_framework:
             label: label.menu.name
             name: name
             type: text
-          code:
-            label: label.menu.code
-            name: code
+          shortCode:
+            label: label.menu.shortCode
+            name: shortCode
             type: text
             sort: true
           active:
@@ -599,8 +599,8 @@ digitix_framework:
             label: label.menu.name
             type: text
             alias: 't'
-          code:
-            label: label.menu.code
+          shortCode:
+            label: label.menu.shortCode
             type: text
           active:
             label: label.default.active
@@ -612,11 +612,11 @@ digitix_framework:
             name: name
             type: translate
             collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
-          code:
-            label: label.menu.code
-            name: code
+          shortCode:
+            label: label.menu.shortCode
+            name: shortCode
             type: text
-            help: help.menu.code
+            help: help.menu.shortCode
           active:
             label: label.default.active
             name: active

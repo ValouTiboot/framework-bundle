@@ -29,7 +29,7 @@ final class MenuProvider
     }
 
     /**
-     * @param string|int  $identifier menu code ("main") or id
+     * @param string|int  $identifier menu short code ("main") or id
      * @param string|null $locale     defaults to the default language
      *
      * @return MenuTree|null null when the menu does not exist or is disabled
@@ -40,7 +40,7 @@ final class MenuProvider
         $item = $this->cache->getItem(self::cacheKey($identifier, (string) $language->getLocale()));
 
         if (!$item->isHit()) {
-            $menu = $this->menus->findOneByCodeOrId($identifier);
+            $menu = $this->menus->findOneByShortCodeOrId($identifier);
             $data = null === $menu || !$menu->isActive() ? null : $this->build($menu, $language)->toArray();
 
             $item->set($data)->expiresAfter(self::CACHE_TTL);
@@ -58,7 +58,7 @@ final class MenuProvider
         $keys = [];
 
         foreach ($this->languages->getActiveLanguages() as $language) {
-            foreach (array_filter([$menu->getId(), $menu->getCode()]) as $identifier) {
+            foreach (array_filter([$menu->getId(), $menu->getShortCode()]) as $identifier) {
                 $keys[] = self::cacheKey($identifier, (string) $language->getLocale());
             }
         }
@@ -112,7 +112,7 @@ final class MenuProvider
 
         $menu->setCurrentLanguageId($languageId);
 
-        return new MenuTree((int) $menu->getId(), (string) $menu->getCode(), (string) $menu->getName(), (string) $language->getLocale(), $roots);
+        return new MenuTree((int) $menu->getId(), (string) $menu->getShortCode(), (string) $menu->getName(), (string) $language->getLocale(), $roots);
     }
 
     private static function title(MenuItem $item, int $languageId): string

@@ -51,7 +51,7 @@ final class MenuUrlResolver implements ResetInterface
             case MenuItemType::Cms:
                 $rewrite = null === $idEntity ? null : ($this->cmsRewrites($language)[$idEntity] ?? null);
 
-                return null === $rewrite ? null : $this->generate(MenuItemType::CMS_ROUTE, ['entityId' => $idEntity, 'rewrite' => $rewrite]);
+                return null === $rewrite ? null : $this->generate(MenuItemType::CMS_ROUTE, ['rewrite' => $rewrite]);
 
             case MenuItemType::Route:
                 return null === $route ? null : $this->generate($route, $params);

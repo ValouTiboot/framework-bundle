@@ -15,9 +15,9 @@ final class CmsPageTest extends AdminTestCase
 {
     public function testThePageRendersWithTheBundleTemplateAndABreadcrumb(): void
     {
-        $cms = $this->createCms('About us', 'about-us');
+        $this->createCms('About us', 'about-us');
 
-        $crawler = $this->client->request('GET', sprintf('/%d-about-us.html', $cms->getId()));
+        $crawler = $this->client->request('GET', '/about-us.html');
 
         self::assertResponseIsSuccessful();
         self::assertSame('About us', $crawler->filter('h1')->text());
@@ -27,20 +27,52 @@ final class CmsPageTest extends AdminTestCase
         self::assertSame('/', $crawler->filter('.breadcrumb-item a')->attr('href'));
     }
 
-    public function testAStaleRewriteRedirectsPermanently(): void
+    public function testThePageMetaComesFromTheRecord(): void
+    {
+        $this->createCms('About us', 'about-us');
+
+        $crawler = $this->client->request('GET', '/about-us.html');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('About us', $crawler->filter('title')->text());
+    }
+
+    public function testTheFormerIdPrefixedUrlRedirectsPermanently(): void
     {
         $cms = $this->createCms('About us', 'about-us');
 
         $this->client->request('GET', sprintf('/%d-old-slug.html', $cms->getId()));
 
-        self::assertResponseRedirects(sprintf('/%d-about-us.html', $cms->getId()), 301);
+        self::assertResponseRedirects('/about-us.html', 301);
+    }
+
+    public function testAnInactivePageIs404(): void
+    {
+        $cms = $this->createCms('Draft', 'draft')->setActive(false);
+        $this->em()->flush();
+
+        $this->client->request('GET', '/draft.html');
+
+        self::assertResponseStatusCodeSame(404);
     }
 
     public function testAnUnknownPageIs404(): void
     {
-        $this->client->request('GET', '/999-nope.html');
-
+        $this->client->request('GET', '/nope.html');
         self::assertResponseStatusCodeSame(404);
+
+        $this->client->request('GET', '/999-nope.html');
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testTheProjectRoutesStillWinOverTheCmsCatchAll(): void
+    {
+        $this->createCms('Contact', 'contact');
+
+        $this->client->request('GET', '/contact.html');
+
+        // the bundle's own contact route, not the CMS one (whatever the contact page renders in this test app)
+        self::assertSame('front_contact', $this->client->getRequest()->attributes->get('_route'));
     }
 
     private function createCms(string $name, string $rewrite): Cms

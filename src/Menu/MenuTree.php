@@ -14,7 +14,7 @@ final class MenuTree
      */
     public function __construct(
         public readonly int $id,
-        public readonly string $code,
+        public readonly string $shortCode,
         public readonly string $name,
         public readonly string $locale,
         public readonly array $items,
@@ -58,7 +58,7 @@ final class MenuTree
     {
         return [
             'id' => $this->id,
-            'code' => $this->code,
+            'shortCode' => $this->shortCode,
             'name' => $this->name,
             'locale' => $this->locale,
             'items' => array_map(static fn (MenuNode $node) => $node->toArray(), $this->items),
@@ -70,7 +70,7 @@ final class MenuTree
     {
         return new self(
             (int) $data['id'],
-            (string) $data['code'],
+            (string) ($data['shortCode'] ?? $data['code'] ?? ''), // "code": trees cached before the rename
             (string) $data['name'],
             (string) $data['locale'],
             array_map(static fn (array $node) => MenuNode::fromArray($node), $data['items'] ?? []),

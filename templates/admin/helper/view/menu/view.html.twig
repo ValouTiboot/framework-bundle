@@ -124,7 +124,7 @@
 {% block page_title %}{{ menuEntity.name }}{% endblock %}
 {% block page_subtitle %}
   <div class="dgtx-page-subtitle">
-    <code>dgtx_menu('{{ menuEntity.code }}')</code>
+    <code>dgtx_menu('{{ menuEntity.shortCode }}')</code>
     &middot; <span data-item-count>{{ items|length }}</span> {{ 'items'|trans }}
     &middot; {{ 'Up to %depth% levels.'|trans({'%depth%': maxDepth}) }}
   </div>
