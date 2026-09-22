@@ -1,4 +1,9 @@
 digitix_framework:
+  # front menus (Menus in the back office, dgtx_menu('main') in the templates)
+  menu:
+    max_depth: 3
+    pages:
+      - { route: app_index, label: 'Accueil' }
   admin_menu:
     dashboard:
       title: Dashbord
@@ -8,10 +13,14 @@ digitix_framework:
       title: Pages
       route: dgtx_admin_entity_read
       icon: web
-    menu:
-      title: Menus
-      route: dgtx_admin_entity_read
-      icon: menu
+    apperence:
+      title: Apparence
+      route: ~
+      icon: computer
+      sub:
+        menu:
+          title: Menu
+          route: dgtx_admin_entity_read
     international:
       title: International
       route: ~
