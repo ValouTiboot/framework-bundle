@@ -1,33 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Utils;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class Cache
+/**
+ * Runs "cache:clear" from the admin (Performance page).
+ */
+final class Cache
 {
-	private $kernel;
-
-	public function __construct(KernelInterface $kernel)
-	{
-		$this->kernel = $kernel;
-	}
-
-	public function cacheClear()
+    public function __construct(private readonly KernelInterface $kernel)
     {
-        $env = $this->kernel->getEnvironment();
+    }
 
+    /** @return int console exit code, 0 on success */
+    public function cacheClear(): int
+    {
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
 
-        $input = new ArrayInput(array(
+        return $application->run(new ArrayInput([
             'command' => 'cache:clear',
-            '--env' => $env
-        ));
-
-        return $application->run($input);
+            '--env' => $this->kernel->getEnvironment(),
+        ]), new NullOutput());
     }
 }

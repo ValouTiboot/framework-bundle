@@ -1,0 +1,405 @@
+/*
+ * Components on top of the themed Bootstrap: buttons, badges, tables, forms,
+ * the yes/no switch, pagination, empty states, helpers. Colours are the
+ * tokens of _partials/theme.scss (light and dark modes).
+ */
+
+/* --- helpers kept from the previous theme --- */
+.t-success, .t-success:hover { color: $success; }
+.t-warning { color: $warning; }
+.t-info { color: $info; }
+.t-danger { color: $danger; }
+.t-muted { color: var(--dgtx-muted); }
+.cursor-p { cursor: pointer; }
+.hide { display: none; }
+
+a {
+  transition: color .15s;
+}
+
+/* --- buttons --- */
+.btn {
+  align-items: center;
+  display: inline-flex;
+  gap: .35rem;
+  justify-content: center;
+  line-height: 1.4;
+  .material-icons {
+    font-size: 18px;
+    margin: 0 -.1rem;
+  }
+  &.btn-sm .material-icons {
+    font-size: 16px;
+  }
+}
+.btn-light {
+  background: var(--dgtx-surface);
+  border-color: var(--dgtx-border-strong);
+  color: var(--dgtx-text-3);
+  &:hover, &:focus-visible {
+    background: var(--dgtx-surface-3);
+    border-color: var(--dgtx-border-strong);
+    color: var(--dgtx-text);
+  }
+  &:active, &.active {
+    background: var(--dgtx-surface-4);
+    border-color: var(--dgtx-border-strong);
+    color: var(--dgtx-text);
+  }
+}
+.btn-outline-primary {
+  background: var(--dgtx-surface);
+  &:hover {
+    color: $white;
+  }
+}
+.btn-icon {
+  height: 2.125rem;
+  padding: 0;
+  width: 2.125rem;
+  .material-icons {
+    font-size: 20px;
+    margin: 0;
+  }
+}
+.btn-link {
+  color: var(--dgtx-muted);
+  padding: 0 .2rem;
+  &:hover {
+    color: var(--dgtx-text);
+  }
+}
+
+/* --- badges --- */
+.badge {
+  letter-spacing: .01em;
+  line-height: 1.2;
+  &.text-bg-light {
+    background: var(--dgtx-surface-3) !important;
+    border: 1px solid var(--dgtx-border);
+    color: var(--dgtx-text-4) !important;
+  }
+}
+
+/* --- tables --- */
+.table {
+  margin-bottom: 0;
+  thead th {
+    background: var(--dgtx-surface);
+    border-bottom: 1px solid var(--dgtx-border);
+    color: var(--dgtx-muted);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    padding-bottom: .85rem;
+    padding-top: .85rem;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+    .head {
+      align-items: center;
+      display: flex;
+      gap: .25rem;
+    }
+    .sorter {
+      display: flex;
+      flex-direction: column;
+      a {
+        color: var(--dgtx-icon);
+        display: flex;
+        line-height: 0;
+        opacity: 0;
+        transition: opacity .15s, color .15s;
+        .material-icons {
+          font-size: 14px;
+          line-height: .5;
+        }
+        &:hover, &.active {
+          color: $brand-600;
+          opacity: 1;
+        }
+      }
+    }
+    &:hover .sorter a {
+      opacity: 1;
+    }
+  }
+  thead tr.dgtx-filters th {
+    background: var(--dgtx-surface);
+    padding: .5rem .5rem;
+    text-transform: none;
+    .form-control, .form-select {
+      font-size: .8125rem;
+    }
+  }
+  tbody td {
+    vertical-align: middle;
+    .material-icons {
+      font-size: 20px;
+    }
+    &.dgtx-cell-date {
+      white-space: nowrap;
+    }
+  }
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  &.table-hover tbody tr:hover {
+    background: var(--dgtx-surface-2);
+    .sortable-cell .sortable-item {
+      opacity: 1;
+    }
+    .dgtx-row-actions a, .dgtx-row-actions button {
+      opacity: 1;
+    }
+  }
+  .sortable-cell {
+    padding-left: .25rem;
+    padding-right: 0;
+    width: 1.75rem;
+    .sortable-item {
+      color: var(--dgtx-icon);
+      cursor: grab;
+      opacity: .35;
+    }
+  }
+}
+.dgtx-row-actions {
+  white-space: nowrap;
+  a, button {
+    background: none;
+    border: 0;
+    border-radius: $radius;
+    color: var(--dgtx-muted);
+    display: inline-flex;
+    opacity: .55;
+    padding: .2rem;
+    transition: opacity .15s, color .15s, background-color .15s;
+    &:hover {
+      background: var(--dgtx-surface-3);
+      color: var(--dgtx-text);
+      opacity: 1;
+    }
+    &.item-delete:hover {
+      background: var(--dgtx-accent-soft);
+      color: $brand-600;
+    }
+  }
+  form {
+    display: inline;
+  }
+}
+.dgtx-empty {
+  color: var(--dgtx-muted);
+  padding: 2.5rem 1rem;
+  text-align: center;
+  .material-icons {
+    color: var(--dgtx-icon-faint);
+    display: block;
+    font-size: 40px;
+    margin: 0 auto .5rem;
+  }
+}
+
+/* --- pagination --- */
+.pagination {
+  margin: 0;
+  .page-link {
+    align-items: center;
+    display: flex;
+    font-weight: 500;
+    height: 100%;
+    &.page-link-i {
+      padding: .35rem .4rem;
+    }
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+}
+
+/* --- forms: label on the left, field on the right, full width of the card --- */
+.dgtx-form {
+  position: relative;
+  .form-label, .col-form-label {
+    color: var(--dgtx-text-2);
+    font-weight: 500;
+  }
+  legend.col-form-label {
+    font-size: .875rem;
+  }
+  .row.mb-3 {
+    margin-bottom: .85rem !important;
+  }
+  /* every field stops where a language code would sit, so all fields share the same width */
+  .dgtx-form-group {
+    > .form-control, > .form-select, > .tox-tinymce, > .tagify {
+      width: calc(100% - 3rem);
+    }
+    > .form-check {
+      margin-right: 3rem;
+    }
+  }
+  .form-text {
+    color: var(--dgtx-muted);
+    font-size: .8125rem;
+  }
+  .invalid-feedback {
+    display: block;
+  }
+  textarea.form-control {
+    min-height: 6rem;
+  }
+  .date-select .form-control {
+    margin-right: .5rem;
+  }
+}
+.dgtx-form-footer {
+  align-items: center;
+  border-top: 1px solid var(--dgtx-border);
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  .dgtx-form-back {
+    margin-right: auto;
+  }
+}
+.dgtx-translate {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  .dgtx-translate-entry {
+    align-items: stretch;
+    display: flex;
+    gap: .5rem;
+    .dgtx-translate-field {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+  /* language code after the field, as tall as the field */
+  .dgtx-translate-lang {
+    align-items: center;
+    align-self: flex-start;
+    background: var(--dgtx-surface-2);
+    border: 1px solid var(--dgtx-border-strong);
+    border-radius: $radius;
+    color: var(--dgtx-text-4);
+    display: flex;
+    flex-shrink: 0;
+    font-size: .6875rem;
+    font-weight: 600;
+    height: calc(1.5em + .9rem + 2px);
+    justify-content: center;
+    letter-spacing: .04em;
+    min-width: 2.5rem;
+    padding: 0 .5rem;
+  }
+}
+.dgtx-upload-preview {
+  border: 1px solid var(--dgtx-border);
+  border-radius: $radius;
+  margin-top: .5rem;
+  max-width: 240px;
+  padding: .25rem;
+}
+
+/* yes / no switch: two radios rendered as a segmented control (admin.js toggles .checked) */
+.dgtx-switch {
+  background: var(--dgtx-surface);
+  border: 1px solid var(--dgtx-border-strong);
+  border-radius: $radius;
+  display: inline-flex;
+  overflow: hidden;
+  .form-check {
+    margin: 0;
+    min-height: 0;
+    padding: 0;
+    input[type="radio"] {
+      display: none;
+    }
+    label {
+      color: var(--dgtx-muted);
+      cursor: pointer;
+      display: block;
+      font-weight: 500;
+      min-width: 4.5rem;
+      padding: .4rem 1rem;
+      text-align: center;
+      transition: background-color .15s, color .15s;
+      &:hover {
+        color: var(--dgtx-text);
+      }
+      &.checked {
+        background: var(--dgtx-navy);
+        color: $white;
+      }
+    }
+    & + .form-check label {
+      border-left: 1px solid var(--dgtx-border-strong);
+    }
+  }
+  &.dgtx-switch-no .form-check label.checked {
+    background: var(--dgtx-text-4);
+  }
+}
+
+/* permission matrix of a role */
+.dgtx-permissions {
+  th, td {
+    vertical-align: middle;
+  }
+  thead th {
+    padding-bottom: .5rem;
+    padding-top: .5rem;
+  }
+  .dgtx-permissions-col {
+    align-items: center;
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    gap: .3rem;
+    margin: 0;
+    .form-check-input {
+      margin: 0;
+    }
+  }
+  tbody th {
+    color: var(--dgtx-text-2);
+    font-weight: 500;
+  }
+  tbody .form-check-input {
+    cursor: pointer;
+    margin: 0;
+  }
+  .dgtx-permissions-wildcard th {
+    color: $brand-500;
+    font-weight: 600;
+  }
+  .dgtx-permissions-wildcard td {
+    background: var(--dgtx-accent-soft);
+  }
+  tr.is-all input[data-permission]:not([data-permission="all"]) {
+    opacity: .3;
+  }
+}
+
+/* rich text editor and tags, same shape as the inputs */
+.tox-tinymce {
+  border: 1px solid var(--dgtx-border-strong) !important;
+  border-radius: $radius !important;
+}
+.tagify.tag {
+  --tag-bg: var(--dgtx-navy-soft);
+  --tag-hover: var(--dgtx-navy-soft);
+  --tag-text-color: var(--dgtx-text-2);
+  --tag-remove-btn-color: var(--dgtx-text-2);
+  --tags-border-color: var(--dgtx-border-strong);
+  --tags-focus-border-color: #{$brand-500};
+  --placeholder-color: var(--dgtx-icon);
+  background: var(--dgtx-input-bg);
+  border-radius: $radius;
+  color: var(--dgtx-text-3);
+}

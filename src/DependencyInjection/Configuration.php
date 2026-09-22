@@ -45,11 +45,84 @@ final class Configuration implements ConfigurationInterface
                     ->scalarPrototype()->end()
                     ->defaultValue(['App\\Controller\\Admin\\', 'Digitix\\FrameworkBundle\\Controller\\Admin\\'])
                 ->end()
+                ->append(self::translationNode())
+                ->append(self::frontNode())
+                ->append(self::frontMenuNode())
                 ->append(self::menuNode())
                 ->append(self::adminEntitiesNode())
                 ->append(self::frontEntitiesNode())
             ->end()
         ;
+    }
+
+    private static function translationNode(): NodeDefinition
+    {
+        $node = (new TreeBuilder('translation'))->getRootNode();
+
+        $node
+            ->info('Translation editor: where keys are searched and where the catalogue files are generated.')
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->arrayNode('paths')
+                    ->info('Directories scanned for translation keys, in addition to the bundle itself.')
+                    ->scalarPrototype()->end()
+                    ->defaultValue(['%kernel.project_dir%/src', '%kernel.project_dir%/templates'])
+                ->end()
+                ->scalarNode('output_dir')
+                    ->info('Directory where the catalogue files are generated from the database. Do not commit it.')
+                    ->defaultValue('%kernel.project_dir%/var/translations')
+                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    private static function frontNode(): NodeDefinition
+    {
+        $node = (new TreeBuilder('front'))->getRootNode();
+
+        $node
+            ->info('Public pages served by the bundle controllers.')
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->scalarNode('home_route')
+                    ->info('Route of the home page, first entry of the breadcrumb (skipped when the route does not exist).')
+                    ->defaultValue('app_index')
+                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    private static function frontMenuNode(): NodeDefinition
+    {
+        $node = (new TreeBuilder('menu'))->getRootNode();
+
+        $node
+            ->info('Front menus built in the admin (Menu / MenuItem entities).')
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->integerNode('max_depth')
+                    ->info('Number of levels a menu may have.')
+                    ->min(1)->max(6)
+                    ->defaultValue(3)
+                ->end()
+                ->arrayNode('pages')
+                    ->info('Project routes offered as "pages" in the menu builder; labels are translated in the "Menu.Label" domain.')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('route')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('label')->isRequired()->cannotBeEmpty()->end()
+                            ->variableNode('params')->defaultValue([])->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+
+        return $node;
     }
 
     private static function menuNode(): NodeDefinition

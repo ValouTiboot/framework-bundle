@@ -26,6 +26,21 @@ return array (
     'role' =>
     array (
       'name' => 'Nom',
+      'code' => 'Code',
+      'superAdmin' => 'Accès complet',
+      'authorization' => 'Permissions',
+      'entity' => 'Section',
+      'allEntities' => 'Toutes les sections',
+      'toggleColumn' => 'Cocher ou décocher toute la colonne',
+      'permission' =>
+      array (
+        'view' => 'Voir',
+        'read' => 'Lister',
+        'create' => 'Créer',
+        'edit' => 'Modifier',
+        'delete' => 'Supprimer',
+        'all' => 'Tout',
+      ),
     ),
     'language' =>
     array (
@@ -39,12 +54,19 @@ return array (
     ),
     'translation' =>
     array (
-      'type' => 'Type',
-      'bo' => 'Back-Office',
-      'fo' => 'Front-Office',
-      'theme' => 'Thème',
-      'email' => 'Emails',
-      'locale' => 'Locale',
+      'domain' => 'Domaine',
+      'key' => 'Texte source',
+      'locale' => 'Langue',
+      'value' => 'Traduction',
+      'status' => 'Statut',
+      'missing' => 'À traduire',
+      'translated' => 'Traduite',
+      'obsolete' => 'Obsolète',
+    ),
+    'menu' =>
+    array (
+      'name' => 'Nom',
+      'code' => 'Code',
     ),
     'parameter' =>
     array (
@@ -54,18 +76,11 @@ return array (
       'gtm' => 'GTM',
       'tag' => 'Tag additionnel',
     ),
-    'performance' =>
-    array (
-      'cache' => 'Cache',
-      'compile' => 'Compilation',
-      'compileCss' => 'Compilation CSS',
-      'compileJs' => 'Compilation JS',
-      'debug' => 'Mode debug',
-    ),
     'meta' =>
     array (
       'page' => 'Page',
-      'dgtx_index' => 'Index',
+      'app_index' => 'Accueil',
+      'front_contact' => 'Contact',
       'metaTitle' => 'Meta title',
       'metaDescription' => 'Meta description',
       'metaKeywords' => 'Meta keywords',
@@ -96,6 +111,16 @@ return array (
   ),
   'help' =>
   array (
+    'role' =>
+    array (
+      'name' => 'Le nom peut changer librement : le code technique du rôle est fixé à sa création et ne bouge plus.',
+      'superAdmin' => 'Tous les droits sur toutes les sections, quelle que soit la grille ci-dessous. Le dernier rôle à accès complet ne peut pas le perdre.',
+      'authorization' => '« Toutes les sections » s\'applique à chaque section, « Tout » donne toutes les actions de la ligne. Sans effet pour un rôle à accès complet.',
+    ),
+    'menu' =>
+    array (
+      'code' => 'Identifiant technique utilisé par les templates, ex : dgtx_menu(\'main\'). Minuscules, chiffres, tirets.',
+    ),
     'language' =>
     array (
       'iso' => 'norme iso, ex: "fr", "en"',

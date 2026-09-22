@@ -33,6 +33,27 @@ final class AdminConfig
         return $this->menu;
     }
 
+    /**
+     * Title of the admin menu entry (or sub-entry) of an entity, if any:
+     * "Pages" for "cms".
+     */
+    public function getEntityTitle(string $slug): ?string
+    {
+        foreach ($this->menu as $key => $entry) {
+            if (0 === strcasecmp((string) $key, $slug) && isset($entry['title'])) {
+                return (string) $entry['title'];
+            }
+
+            foreach ($entry['sub'] ?? [] as $subKey => $subEntry) {
+                if (0 === strcasecmp((string) $subKey, $slug) && isset($subEntry['title'])) {
+                    return (string) $subEntry['title'];
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function hasEntity(string $name): bool
     {
         return isset($this->entities[self::key($name)]);
@@ -60,6 +81,12 @@ final class AdminConfig
     public function getFrontForm(string $name): FormConfig
     {
         return $this->frontForms[self::key($name)] ?? throw new UnknownEntityException($name, array_keys($this->frontForms));
+    }
+
+    /** @return array<string, FormConfig> */
+    public function getFrontForms(): array
+    {
+        return $this->frontForms;
     }
 
     /**

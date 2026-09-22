@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -103,15 +104,22 @@ abstract class FrontController extends AbstractController
             return null;
         }
 
-        $home = [
-            'name' => $this->trans('Home', [], 'Front.Breadcrumb'),
-            'url' => $this->generateUrl('dgtx_index'),
-            'ico' => 'home',
-        ];
+        try {
+            $home = [[
+                'name' => $this->trans('Home', [], 'Front.Breadcrumb'),
+                'url' => $this->generateUrl((string) $this->getParameter('digitix_framework.front.home_route')),
+                'ico' => 'home',
+            ]];
+        } catch (RouteNotFoundException) {
+            $home = []; // no home route in this project: the breadcrumb starts at the page
+        }
 
-        return array_merge([$home], $this->breadcrumb);
+        return array_merge($home, $this->breadcrumb);
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     protected function render(string $view, array $parameters = [], ?Response $response = null): Response
     {
         $request = $this->currentRequest();
@@ -146,6 +154,8 @@ abstract class FrontController extends AbstractController
      * Form generated from "digitix_framework.front_entities.{$name}.form".
      *
      * @param array<string, mixed> $options
+     *
+     * @return FormInterface<mixed>
      */
     protected function createFrontForm(string $name, mixed $data = null, array $options = []): FormInterface
     {

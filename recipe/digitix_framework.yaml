@@ -8,6 +8,10 @@ digitix_framework:
       title: Pages
       route: dgtx_admin_entity_read
       icon: web
+    menu:
+      title: Menus
+      route: dgtx_admin_entity_read
+      icon: menu
     international:
       title: International
       route: ~
@@ -36,15 +40,15 @@ digitix_framework:
         meta:
           title: SEO
           route: dgtx_admin_entity_read
-    performance:
-      title: Performances
-      route: dgtx_admin_entity_create
-      icon: speed
+    tools:
+      title: Outils
+      route: dgtx_admin_entity_view
+      icon: build
   # Admin Entities
   admin_entities:
     Dashboard:
       view:
-        template: null
+        template: '@DigitixFramework/admin/helper/view/dashboard/view.html'
     User:
       list:
         template: null
@@ -150,12 +154,34 @@ digitix_framework:
             name: name
             type: text
             sort: true
+          code:
+            label: label.role.code
+            name: code
+            type: text
+            sort: true
+          superAdmin:
+            label: label.role.superAdmin
+            name: superAdmin
+            type: bool
+            sort: true
       form:
         fields:
           name:
             label: label.role.name
             name: name
             type: text
+            help: help.role.name
+          superAdmin:
+            label: label.role.superAdmin
+            name: superAdmin
+            type: bool
+            required: true
+            help: help.role.superAdmin
+          authorization:
+            label: label.role.authorization
+            name: authorization
+            type: permissions
+            help: help.role.authorization
     Language:
       list:
         template: null
@@ -257,31 +283,37 @@ digitix_framework:
             type: bool
             required: true
     Translation:
+      # translation editor: one tab per language, inline edition (AdminTranslationController)
       list:
-        template: null
+        template: '@DigitixFramework/admin/helper/list/translation'
         has_create: false
-        fields: ~
+        items_per_page: 50
+        toolbar: []
+        actions: ['edit']
       form:
-        has_return_link: false
         fields:
-          type:
-            label: label.translation.type
-            name: type
-            type: choice
-            choice: {'label.translation.bo': 'bo', 'label.translation.fo': 'fo', 'label.translation.theme': 'theme', 'label.translation.email': 'email'}
-            required: true
-          theme:
-            label: label.translation.theme
-            name: type
-            type: choice
-            callback: 'Digitix\FrameworkBundle\Factory\TranslationFormFactory::findThemes'
-            required: true
+          domain:
+            label: label.translation.domain
+            name: domain
+            type: text
+            disabled: true
+          key:
+            label: label.translation.key
+            name: key
+            type: textarea
+            rows: 3
+            disabled: true
           locale:
             label: label.translation.locale
             name: locale
-            type: entity
-            collection: {name: Language, value: locale}
-            required: true
+            type: text
+            disabled: true
+          value:
+            label: label.translation.value
+            name: value
+            type: textarea
+            rows: 4
+            required: false
     Parameter:
       list:
       form:
@@ -313,37 +345,10 @@ digitix_framework:
             type: textarea
             rows: 10
             required: false
-    Performance:
-      list:
-      form:
-        has_return_link: false
-        template: '@DigitixFramework/admin/helper/form/performance/create'
-        fields:
-          cache:
-            label: label.performance.cache
-            name: cache
-            type: bool
-            required: true
-          compile:
-            label: label.performance.compile
-            name: compile
-            type: bool
-            required: true
-          compileCss:
-            label: label.performance.compileCss
-            name: compileCss
-            type: bool
-            required: true
-          compileJs:
-            label: label.performance.compileJs
-            name: compileJs
-            type: bool
-            required: true
-          debug:
-            label: label.performance.debug
-            name: debug
-            type: bool
-            required: true
+    Tools:
+      # maintenance actions (cache, translations), AdminToolsController
+      view:
+        template: '@DigitixFramework/admin/helper/view/tools/view.html'
     Meta:
       list:
         template: null
@@ -369,7 +374,7 @@ digitix_framework:
             name: page
             type: choice
             choice: {
-              label.meta.dgtx_index: dgtx_index,
+              label.meta.app_index: app_index,
               label.meta.front_contact: front_contact,
             }
             required: true
@@ -384,13 +389,6 @@ digitix_framework:
             name: metaDescription
             type: translate
             collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
-            required: false
-          translatableMetaKeywords:
-            label: label.meta.metaKeywords
-            name: metaKeyword
-            type: translate
-            class: tag
-            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
             required: false
           translatableRewrite:
             label: label.meta.rewrite
@@ -462,13 +460,6 @@ digitix_framework:
             name: metaDescription
             type: translate
             collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
-            required: false
-          translatableMetaKeywords:
-            label: label.cmsCategory.metaKeywords
-            name: metaKeyword
-            type: translate
-            class: tag
-            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
             required: false
           translatableRewrite:
             label: label.cmsCategory.rewrite
@@ -558,13 +549,6 @@ digitix_framework:
             type: translate
             collectionType: Symfony\Component\Form\Extension\Core\Type\TextareaType
             required: false
-          translatableMetaKeywords:
-            label: label.cms.metaKeywords
-            name: metaKeyword
-            type: translate
-            class: tag
-            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
-            required: false
           translatableRewrite:
             label: label.cms.rewrite
             name: rewrite
@@ -573,6 +557,68 @@ digitix_framework:
             required: true
           active:
             label: label.cms.active
+            name: active
+            type: bool
+            required: true
+    Menu:
+      # front menus: the eye opens the builder (AdminMenuController), rendered with dgtx_menu('<shortCode>')
+      view:
+        template: '@DigitixFramework/admin/helper/view/menu/view.html'
+      list:
+        template: null
+        has_create: true
+        toolbar: ['add']
+        actions: ['view_entity', 'edit', 'delete']
+        fields:
+          id:
+            label: label.default.id
+            name: id
+            type: text
+            sort: true
+            default_sort: 'asc'
+          name:
+            label: label.menu.name
+            name: name
+            type: text
+          shortCode:
+            label: label.menu.shortCode
+            name: shortCode
+            type: text
+            sort: true
+          active:
+            label: label.default.active
+            name: active
+            type: bool
+            sort: true
+          dateAdd:
+            label: label.default.dateAdd
+            name: dateAdd
+            type: datetime
+        filters:
+          name:
+            label: label.menu.name
+            type: text
+            alias: 't'
+          shortCode:
+            label: label.menu.shortCode
+            type: text
+          active:
+            label: label.default.active
+            type: 'bool'
+      form:
+        fields:
+          translatableName:
+            label: label.menu.name
+            name: name
+            type: translate
+            collectionType: Symfony\Component\Form\Extension\Core\Type\TextType
+          shortCode:
+            label: label.menu.shortCode
+            name: shortCode
+            type: text
+            help: help.menu.shortCode
+          active:
+            label: label.default.active
             name: active
             type: bool
             required: true

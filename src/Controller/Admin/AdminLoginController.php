@@ -19,7 +19,7 @@ final class AdminLoginController extends AbstractController
             return $this->redirectToRoute('dgtx_admin_entity_view', ['entityName' => 'dashboard']);
         }
 
-        return $this->render('@DigitixFramework/admin/login.twig', [
+        return $this->render('@DigitixFramework/admin/login.html.twig', [
             'last_username' => $authenticationUtils->getLastUsername(),
             'error' => $authenticationUtils->getLastAuthenticationError(),
         ]);

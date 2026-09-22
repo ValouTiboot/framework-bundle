@@ -1,0 +1,40 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: auto
+            cost: 4
+
+    providers:
+        dgtx_admin_user_provider:
+            entity:
+                class: Digitix\FrameworkBundle\Entity\User
+                property: email
+
+    firewalls:
+        dgtx_admin:
+            pattern: ^/admin
+            lazy: true
+            provider: dgtx_admin_user_provider
+            entry_point: form_login
+            custom_authenticators:
+                - Digitix\FrameworkBundle\Security\AdminAuthenticator
+            form_login:
+                enable_csrf: true
+                login_path: dgtx_admin_login
+                check_path: dgtx_admin_login
+            logout:
+                path: dgtx_admin_logout
+            remember_me:
+                secret: '%kernel.secret%'
+                signature_properties: [password]
+                lifetime: 604800
+                path: /admin
+        main:
+            lazy: true
+
+    role_hierarchy:
+        ROLE_SUPERADMIN: ROLE_ADMIN
+
+    access_control:
+        - { path: ^/admin/$, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }

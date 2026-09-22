@@ -4,27 +4,24 @@ declare(strict_types=1);
 
 namespace Digitix\FrameworkBundle\DataFixtures;
 
+use Digitix\FrameworkBundle\Admin\AdminTheme;
 use Digitix\FrameworkBundle\Entity\Configuration;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
 /**
- * Default rows of the global configuration (Parameter / Performance pages).
+ * Default rows of the global configuration (Parameter page, colour mode).
  */
 class ConfigurationFixtures extends Fixture
 {
     public const DATAS = [
-        'cache' => '0',
-        'compile' => '0',
-        'compileCss' => '0',
-        'compileJs' => '0',
-        'debug' => '1',
         'mailFrom' => null,
         'mailFromName' => null,
         'ssl' => '1',
         'gtm' => null,
         'tag' => null,
         'robots' => null,
+        AdminTheme::CONFIGURATION_KEY => AdminTheme::SYSTEM,
     ];
 
     public function load(ObjectManager $manager): void

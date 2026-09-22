@@ -1,0 +1,47 @@
+{% extends '@DigitixFramework/admin/layout.html.twig' %}
+{% trans_default_domain 'Admin.Tools' %}
+
+{% block page_title %}{{ 'Tools'|trans }}{% endblock %}
+{% block page_subtitle %}
+  <div class="dgtx-page-subtitle">{{ 'Maintenance actions, each one runs immediately.'|trans }}</div>
+{% endblock %}
+
+{% macro tool(entityName, action, icon, title, description, label, token, primary) %}
+  <div class="dgtx-tool">
+    <div class="dgtx-tool-icon"><i class="material-icons">{{ icon }}</i></div>
+    <div class="dgtx-tool-text">
+      <div class="dgtx-tool-title">{{ title }}</div>
+      <div class="dgtx-tool-description">{{ description }}</div>
+    </div>
+    <form method="post" action="{{ path('dgtx_admin_entity_action_collection', {entityName: entityName, action: action}) }}">
+      <input type="hidden" name="_token" value="{{ token }}">
+      <button type="submit" class="btn {{ primary ? 'btn-primary' : 'btn-light' }}">{{ label }}</button>
+    </form>
+  </div>
+{% endmacro %}
+{% import _self as tools %}
+
+{% block content_container %}
+  <div class="dgtx-dashboard-grid">
+    <div class="dgtx-card">
+      <div class="dgtx-card-header">{{ 'Actions'|trans }}</div>
+      <div class="dgtx-card-body dgtx-tools">
+        {{ tools.tool(entityName, 'cache_clear', 'cached', 'Clear the cache'|trans, 'Rebuilds the application cache: configuration, routes, templates, translations. To do after a deployment.'|trans, 'Clear'|trans, csrf_token, true) }}
+        {{ tools.tool(entityName, 'translations_extract', 'manage_search', 'Refresh the translation keys'|trans, 'Scans the code and the configuration for new or removed keys, then compiles the catalogues.'|trans, 'Refresh'|trans, csrf_token, false) }}
+        {{ tools.tool(entityName, 'translations_compile', 'sync', 'Recompile the translations'|trans, 'Regenerates the catalogue files from the database, without scanning the code.'|trans, 'Compile'|trans, csrf_token, false) }}
+      </div>
+    </div>
+    <div class="dgtx-card">
+      <div class="dgtx-card-header">{{ 'Runtime'|trans }}</div>
+      <div class="dgtx-card-body">
+        <dl class="dgtx-facts">
+          <dt>PHP</dt><dd>{{ system.php }}</dd>
+          <dt>Symfony</dt><dd>{{ system.symfony }}</dd>
+          <dt>{{ 'Environment'|trans }}</dt><dd>{{ system.environment }}{% if system.debug %} <span class="badge text-bg-warning">debug</span>{% endif %}</dd>
+          <dt>{{ 'Cache directory'|trans }}</dt><dd><code>{{ system.cache_dir }}</code></dd>
+          <dt>{{ 'Translation catalogues'|trans }}</dt><dd><code>{{ system.translations_dir }}</code></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+{% endblock %}

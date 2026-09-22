@@ -25,6 +25,9 @@ final class UploadHandler
     ) {
     }
 
+    /**
+     * @param FormInterface<mixed> $form
+     */
     public function handle(AdminContext $context, FormInterface $form, ?FormConfig $formConfig = null): void
     {
         $entity = $context->getEntity();

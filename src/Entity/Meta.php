@@ -11,6 +11,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * SEO meta of a static front page, keyed by route name.
+ *
+ * Translated fields, resolved in the current language (see Translatable):
+ *
+ * @method string|null getMetaTitle()
+ * @method string|null getMetaDescription()
+ * @method string|null getRewrite()
  */
 #[ORM\Entity]
 class Meta extends Translatable

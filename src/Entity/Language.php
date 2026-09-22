@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 class Language
@@ -15,18 +16,28 @@ class Language
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 80)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 80)]
     private ?string $name = null;
 
     #[ORM\Column(type: 'string', length: 2)]
+    #[Assert\NotBlank]
+    #[Assert\Length(exactly: 2)]
     private ?string $iso = null;
 
     #[ORM\Column(type: 'string', length: 5)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 5)]
     private ?string $locale = null;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 30)]
     private ?string $formatDate = null;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 30)]
     private ?string $formatDatetime = null;
 
     #[ORM\Column(type: 'boolean')]

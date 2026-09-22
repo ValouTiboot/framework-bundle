@@ -32,6 +32,8 @@ final class AdminFormBuilder
      * already bound to the request.
      *
      * @param array<string, mixed> $options Symfony form options overriding the defaults
+     *
+     * @return FormInterface<mixed>
      */
     public function createForm(AdminContext $context, array $options = [], mixed $data = null, ?FormConfig $formConfig = null): FormInterface
     {
@@ -51,6 +53,8 @@ final class AdminFormBuilder
 
     /**
      * Filters form of the list, bound to the query string.
+     *
+     * @return FormInterface<mixed>
      */
     public function createFiltersForm(AdminContext $context): FormInterface
     {
@@ -101,6 +105,8 @@ final class AdminFormBuilder
     /**
      * @param list<array{name: string, type: string, options?: array<string, mixed>}> $definitions
      * @param array<string, mixed>                                                    $options
+     *
+     * @return FormInterface<mixed>
      */
     public function createFromDefinitions(string $name, array $definitions, mixed $data, array $options = [], ?Request $request = null): FormInterface
     {

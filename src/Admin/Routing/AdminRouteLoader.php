@@ -18,6 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
 final class AdminRouteLoader extends Loader
 {
     public const TYPE = 'digitix_framework';
+    public const ACTION_REQUIREMENT = '[a-z][a-z0-9_]*';
 
     private bool $loaded = false;
 
@@ -40,6 +41,10 @@ final class AdminRouteLoader extends Loader
         $routes->add('dgtx_admin_entity_edit', $this->route('/admin/{entityName}/edit/{entityId}', AdminController::class, 'edit', ['entityId' => '\d+']));
         $routes->add('dgtx_admin_entity_delete', $this->route('/admin/{entityName}/delete/{entityId}', AdminController::class, 'delete', ['entityId' => '\d+'], ['POST']));
         $routes->add('dgtx_admin_entity_ajax_sortable', $this->route('/admin/{entityName}/sort', AdminController::class, 'ajaxSortable', [], ['POST']));
+
+        // custom actions of an entity controller: "{action}Action(AdminContext $context)"
+        $routes->add('dgtx_admin_entity_action', $this->route('/admin/{entityName}/action/{action}/{entityId}', AdminController::class, 'action', ['action' => self::ACTION_REQUIREMENT, 'entityId' => '\d+']));
+        $routes->add('dgtx_admin_entity_action_collection', $this->route('/admin/{entityName}/action/{action}', AdminController::class, 'action', ['action' => self::ACTION_REQUIREMENT]));
 
         return $routes;
     }

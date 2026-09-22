@@ -11,6 +11,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Generic form whose children are given as definitions:
  *   [['name' => 'email', 'type' => EmailType::class, 'options' => [...]], ...]
+ *
+ * @extends AbstractType<mixed>
  */
 final class AdminFormType extends AbstractType
 {

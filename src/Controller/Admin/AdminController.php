@@ -34,6 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AdminController extends AbstractController
 {
     public const MESSAGE_DOMAIN = 'Admin.Message.Success';
+    public const SORT_TOKEN_ID = 'dgtx_sort';
 
     public static function getSubscribedServices(): array
     {
@@ -81,7 +82,7 @@ class AdminController extends AbstractController
 
         $form = $this->forms()->createForm($context, ['validation_groups' => ['Default', 'Create']]);
 
-        return $this->handleForm($context, $form, 'Entity successfuly added.');
+        return $this->handleForm($context, $form, $this->trans('Entity successfuly added.', [], 'Admin.Message.Success'));
     }
 
     public function edit(AdminContext $context): Response
@@ -90,7 +91,7 @@ class AdminController extends AbstractController
 
         $form = $this->forms()->createForm($context);
 
-        return $this->handleForm($context, $form, 'Entity successfuly updated.');
+        return $this->handleForm($context, $form, $this->trans('Entity successfuly updated.', [], 'Admin.Message.Success'));
     }
 
     public function delete(AdminContext $context): RedirectResponse
@@ -100,7 +101,7 @@ class AdminController extends AbstractController
         $token = (string) $context->getRequest()->request->get('_token');
 
         if (!$this->isCsrfTokenValid(self::deleteTokenId($context->getEntityId()), $token)) {
-            $this->addFlash('danger', $this->trans('Invalid security token, please try again.', 'Admin.Message.Error'));
+            $this->addFlash('danger', $this->trans('Invalid security token, please try again.', [], 'Admin.Message.Error'));
 
             return $this->redirectToList($context);
         }
@@ -112,10 +113,10 @@ class AdminController extends AbstractController
         }
 
         if (null === $entity) {
-            $this->addFlash('info', $this->trans('This entity does not exist anymore.', 'Admin.Message.Info'));
+            $this->addFlash('info', $this->trans('This entity does not exist anymore.', [], 'Admin.Message.Info'));
         } else {
             $this->persister()->remove($entity);
-            $this->addFlash('success', $this->trans('Entity successfuly deleted.'));
+            $this->addFlash('success', $this->trans('Entity successfuly deleted.', [], 'Admin.Message.Success'));
         }
 
         return $this->redirectToList($context);
@@ -129,11 +130,16 @@ class AdminController extends AbstractController
     {
         $this->assertGranted(AdminPermission::EDIT, $context);
 
-        $ids = $context->getRequest()->request->all()[$context->getEntitySlug()] ?? null;
+        $request = $context->getRequest();
+        if (!$this->isCsrfTokenValid(self::SORT_TOKEN_ID, (string) $request->request->get('_token'))) {
+            return new JsonResponse(['success' => false, 'error' => $this->trans('Invalid security token, please try again.', [], 'Admin.Message.Error')], Response::HTTP_FORBIDDEN);
+        }
+
+        $ids = $request->request->all()[$context->getEntitySlug()] ?? null;
         $class = $context->getEntityClass();
 
         if (!\is_array($ids) || null === $class) {
-            return new JsonResponse(['success' => false]);
+            return new JsonResponse(['success' => false], Response::HTTP_BAD_REQUEST);
         }
 
         $repository = $this->doctrine()->getRepository($class);
@@ -155,6 +161,23 @@ class AdminController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
+    /**
+     * Dispatches "/admin/{entityName}/action/{action}[/{entityId}]" to the
+     * "{action}Action(AdminContext $context)" method of the entity controller
+     * ("export_csv" => exportCsvAction). Lets a controller add actions
+     * without declaring routes.
+     */
+    public function action(AdminContext $context, string $action): Response
+    {
+        $method = lcfirst(str_replace('_', '', ucwords($action, '_'))).'Action';
+
+        if (!method_exists($this, $method) || !(new \ReflectionMethod($this, $method))->isPublic()) {
+            throw new NotFoundHttpException(sprintf('Unknown action "%s" for "%s".', $action, $context->getEntityName()));
+        }
+
+        return $this->$method($context);
+    }
+
     public static function deleteTokenId(?int $entityId): string
     {
         return 'dgtx_delete_'.$entityId;
@@ -165,6 +188,9 @@ class AdminController extends AbstractController
     /**
      * Saves the entity when the form is valid and redirects to the list,
      * otherwise renders the form page.
+     *
+     * @param FormInterface<mixed> $form
+     * @param string               $successMessage already translated flash message
      */
     protected function handleForm(AdminContext $context, FormInterface $form, string $successMessage): Response
     {
@@ -174,7 +200,7 @@ class AdminController extends AbstractController
                 $this->persister()->save($entity);
             }
 
-            $this->addFlash('success', $this->trans($successMessage));
+            $this->addFlash('success', $successMessage);
 
             return $this->redirectToList($context);
         }
@@ -224,11 +250,14 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Same signature as the translator, so that the translation extractor
+     * finds the keys: always pass the domain as a literal string.
+     *
      * @param array<string, mixed> $parameters
      */
-    protected function trans(string $message, string $domain = self::MESSAGE_DOMAIN, array $parameters = []): string
+    protected function trans(string $id, array $parameters = [], string $domain = self::MESSAGE_DOMAIN): string
     {
-        return $this->container->get(TranslatorInterface::class)->trans($message, $parameters, $domain);
+        return $this->container->get(TranslatorInterface::class)->trans($id, $parameters, $domain);
     }
 
     protected function adminConfig(): AdminConfig

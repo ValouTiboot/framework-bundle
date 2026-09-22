@@ -5,17 +5,36 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Entity;
 
 use Digitix\FrameworkBundle\Entity\Translatable\Translatable;
+use Digitix\FrameworkBundle\Repository\MenuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+/**
+ * A navigation menu, rendered on the front through dgtx_menu('<shortCode>').
+ *
+ * Translated fields, resolved in the current language (see Translatable):
+ *
+ * @method string|null getName()
+ */
+#[ORM\Entity(repositoryClass: MenuRepository::class)]
 class Menu extends Translatable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    /**
+     * Stable identifier used by templates: dgtx_menu('main'). The back office
+     * normalises it like a rewrite, with underscores (toRewriteUrl(value, false)).
+     */
+    #[ORM\Column(type: 'string', length: 50, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 50)]
+    #[Assert\Regex(pattern: '/^[a-z0-9][a-z0-9_-]*$/', message: 'Use lower case letters, digits, "_" and "-" only.')]
+    private ?string $shortCode = null;
 
     #[ORM\Column(type: 'boolean')]
     private bool $active = false;
@@ -43,6 +62,18 @@ class Menu extends Translatable
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getShortCode(): ?string
+    {
+        return $this->shortCode;
+    }
+
+    public function setShortCode(?string $shortCode): self
+    {
+        $this->shortCode = null === $shortCode ? null : strtolower(trim($shortCode));
+
+        return $this;
     }
 
     public function isActive(): bool

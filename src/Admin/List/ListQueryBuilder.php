@@ -6,6 +6,7 @@ namespace Digitix\FrameworkBundle\Admin\List;
 
 use Digitix\FrameworkBundle\Admin\Context\AdminContext;
 use Digitix\FrameworkBundle\Admin\Filter\FilterTypeRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -27,12 +28,19 @@ final class ListQueryBuilder
     ) {
     }
 
+    /**
+     * @param FormInterface<mixed>|null $filtersForm
+     */
     public function create(AdminContext $context, Sorter $sorter, ?FormInterface $filtersForm = null): QueryBuilder
     {
         $config = $context->getEntityConfig();
         $class = $config->class ?? throw new \LogicException(sprintf('Cannot list the virtual entity "%s".', $config->name));
 
         $manager = $this->registry->getManagerForClass($class);
+        if (!$manager instanceof EntityManagerInterface) {
+            throw new \LogicException(sprintf('"%s" is not managed by a Doctrine ORM entity manager.', $class));
+        }
+
         $metadata = $manager->getClassMetadata($class);
         $translatable = $config->isTranslatable();
 
@@ -71,6 +79,8 @@ final class ListQueryBuilder
 
     /**
      * Properties that do not belong to the entity are looked up on its translation.
+     *
+     * @param ClassMetadata<object> $metadata
      */
     private function aliasFor(string $property, ClassMetadata $metadata, bool $translatable): string
     {

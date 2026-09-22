@@ -32,7 +32,9 @@ final class Paginator
 
     public static function pageFromRequest(Request $request): int
     {
-        return max(1, $request->query->getInt('page', 1));
+        $page = filter_var($request->query->get('page', 1), \FILTER_VALIDATE_INT);
+
+        return max(1, false === $page ? 1 : $page);
     }
 
     public function paginate(): self

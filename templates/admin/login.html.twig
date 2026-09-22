@@ -1,0 +1,55 @@
+{% extends '@DigitixFramework/admin/layout.html.twig' %}
+{% trans_default_domain 'Admin.Login' %}
+
+{% block seo_title %}{{ 'Sign in'|trans }}{% endblock %}
+
+{% block body %}
+<body id="login" class="dgtx-admin">
+  <div class="dgtx-login">
+    <img class="dgtx-login-logo" src="{{ asset('bundles/digitixframework/assets/images/phoenix.svg') }}" alt="Digitix">
+
+    <div class="dgtx-login-card">
+      <div class="dgtx-login-title">{{ 'Sign in'|trans }}</div>
+      <div class="dgtx-login-subtitle">{{ 'Digitix administration'|trans }}</div>
+
+      <form method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        {% if error %}
+          <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+            <i class="material-icons">error</i>
+            <span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+          </div>
+        {% endif %}
+
+        {% if app.user %}
+          <div class="alert alert-info" role="alert">
+            {{ 'Signed in as %user%.'|trans({'%user%': app.user.userIdentifier}) }}
+            <a href="{{ path('dgtx_admin_logout') }}">{{ 'Log out'|trans }}</a>
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label" for="loginEmail">{{ 'Email'|trans }}</label>
+          <input type="email" value="{{ last_username }}" name="email" id="loginEmail" class="form-control" required autofocus autocomplete="username" placeholder="you@domain.tld">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="loginPassword">{{ 'Password'|trans }}</label>
+          <input type="password" name="password" id="loginPassword" class="form-control" required autocomplete="current-password">
+        </div>
+        <div class="form-check mb-3">
+          <input type="checkbox" id="loginRememberMe" class="form-check-input" name="_remember_me">
+          <label class="form-check-label" for="loginRememberMe">{{ 'Remember me'|trans }}</label>
+        </div>
+
+        <button class="btn btn-primary w-100" type="submit">{{ 'Sign in'|trans }}</button>
+      </form>
+    </div>
+
+    <div class="dgtx-login-foot">
+      <span>&copy; {{ 'now'|date('Y') }} Digitix</span>
+      <a href="https://www.digitix.agency" target="_blank" rel="noopener">digitix.agency</a>
+    </div>
+  </div>
+</body>
+{% endblock %}

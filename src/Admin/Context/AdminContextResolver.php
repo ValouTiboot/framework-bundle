@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  */
 final class AdminContextResolver implements ValueResolverInterface
 {
+    /** @return iterable<int, AdminContext|null> */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         if (AdminContext::class !== $argument->getType()) {

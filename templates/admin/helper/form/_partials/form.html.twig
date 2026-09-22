@@ -1,47 +1,36 @@
-{% extends '@DigitixFramework/admin/helper/form/create.twig' %}
-{% form_theme form '@DigitixFramework/admin/_partials/form_theme.twig' %}
+{% extends '@DigitixFramework/admin/helper/form/create.html.twig' %}
+{% form_theme form '@DigitixFramework/admin/_partials/form_theme.html.twig' %}
 
 {% block form %}
   {{ form_start(form) }}
-    <div class="form-errors">
-      {{ form_errors(form) }}
-    </div>
+    {{ form_errors(form) }}
 
     {% for key, field in fields %}
       {% if key not in ['saveAndStay', 'save'] and form.children[key] is defined %}
-
         {{ form_row(form.children[key]) }}
 
         {% if key in uploadfields and upload_values[key]|default(null) %}
-          <div class="form-group row">
-            <label class="col-sm-2"></label>
-            <div class="col-sm-9">
-              <img src="{{ asset('uploads/' ~ entityName ~ '/' ~ key ~ '/' ~ upload_values[key]) }}" width="200" alt="" />
-            </div>
+          <div class="mb-3">
+            <img class="dgtx-upload-preview" src="{{ asset('uploads/' ~ entityName ~ '/' ~ key ~ '/' ~ upload_values[key]) }}" alt="">
           </div>
         {% endif %}
       {% endif %}
     {% endfor %}
 
-    <div class="form-buttons d-flex align-items-center justify-content-end mt-5">
-
+    {% block form_footer %}
+    <div class="dgtx-form-footer">
       {% if hasReturnLink %}
-        <div class="me-3">
-          <a class="btn btn-light" href="{{ path('dgtx_admin_entity_read', {entityName: entityName}) }}">
-            {{ 'form.default.back'|trans({}, 'Admin.Form.Default') }}
-          </a>
-        </div>
+        <a class="btn btn-light dgtx-form-back" href="{{ path('dgtx_admin_entity_read', {entityName: entityName}) }}">
+          {{ 'form.default.back'|trans({}, 'Admin.Form.Default') }}
+        </a>
       {% endif %}
-
       {% if form.children.saveAndStay is defined %}
-        {{ form_widget(form.children.saveAndStay) }}
+        {{ form_widget(form.children.saveAndStay, {attr: {class: 'btn-light'}}) }}
       {% endif %}
-
       {% if form.children.save is defined %}
-        {{ form_widget(form.children.save) }}
+        {{ form_widget(form.children.save, {attr: {class: 'btn-primary'}}) }}
       {% endif %}
-
     </div>
-
+    {% endblock %}
   {{ form_end(form) }}
 {% endblock %}

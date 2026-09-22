@@ -19,6 +19,7 @@ final class FormViewBuilder
     }
 
     /**
+     * @param FormInterface<mixed> $form
      * @param array<string, mixed> $extra variables merged on top of the defaults
      *
      * @return array<string, mixed>
@@ -48,8 +49,8 @@ final class FormViewBuilder
     /**
      * Several independent forms on one page (translation editor).
      *
-     * @param array<string, FormInterface> $forms
-     * @param array<string, mixed>         $extra
+     * @param array<string, FormInterface<mixed>> $forms
+     * @param array<string, mixed>                $extra
      *
      * @return array<string, mixed>
      */

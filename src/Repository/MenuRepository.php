@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Repository;
+declare(strict_types=1);
 
-use App\Entity\Menu;
+namespace Digitix\FrameworkBundle\Repository;
+
+use Digitix\FrameworkBundle\Entity\Menu;
+use Digitix\FrameworkBundle\Entity\MenuItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Menu>
- *
- * @method Menu|null find($id, $lockMode = null, $lockVersion = null)
- * @method Menu|null findOneBy(array $criteria, array $orderBy = null)
- * @method Menu[]    findAll()
- * @method Menu[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class MenuRepository extends ServiceEntityRepository
 {
@@ -21,46 +19,31 @@ class MenuRepository extends ServiceEntityRepository
         parent::__construct($registry, Menu::class);
     }
 
-    public function add(Menu $entity, bool $flush = false): void
+    /** A menu by its short code ("main") or by its id. */
+    public function findOneByShortCodeOrId(string|int $identifier): ?Menu
     {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
+        if (\is_int($identifier) || ctype_digit($identifier)) {
+            return $this->find((int) $identifier);
         }
+
+        return $this->findOneBy(['shortCode' => strtolower($identifier)]);
     }
 
-    public function remove(Menu $entity, bool $flush = false): void
+    /**
+     * Every item of a menu with its translations and parent loaded, parents
+     * before children, siblings in order.
+     *
+     * @return MenuItem[]
+     */
+    public function findItems(Menu $menu): array
     {
-        $this->getEntityManager()->remove($entity);
+        /** @var MenuItem[] $items */
+        $items = $this->getEntityManager()->createQuery(
+            'SELECT i, t, l, p FROM '.MenuItem::class.' i'
+            .' LEFT JOIN i.translations t LEFT JOIN t.language l LEFT JOIN i.parent p'
+            .' WHERE i.menu = :menu ORDER BY i.depth ASC, i.position ASC, i.id ASC'
+        )->setParameter('menu', $menu)->getResult();
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        return $items;
     }
-
-//    /**
-//     * @return Menu[] Returns an array of Menu objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('m.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Menu
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }
