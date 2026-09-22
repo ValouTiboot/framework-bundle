@@ -1,0 +1,46 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        dgtx_admin_user_provider:
+            entity:
+                class: Digitix\FrameworkBundle\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        dgtx_admin:
+            pattern: ^/admin
+            lazy: true
+            provider: dgtx_admin_user_provider
+            entry_point: form_login
+            custom_authenticators:
+                - Digitix\FrameworkBundle\Security\AdminAuthenticator
+            form_login:
+                enable_csrf: true
+                login_path: dgtx_admin_login
+                check_path: dgtx_admin_login
+            logout:
+                path: dgtx_admin_logout
+            remember_me:
+                secret: '%kernel.secret%'
+                signature_properties: [password]
+                lifetime: 604800 # 1 week in seconds
+                path: /admin
+        main:
+            lazy: true
+
+    # Every back-office user is ROLE_ADMIN, plus ROLE_<CODE> of their Role and
+    # ROLE_SUPERADMIN when the Role has full access (see User::getRoles())
+    role_hierarchy:
+        ROLE_SUPERADMIN: ROLE_ADMIN
+
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/admin/$, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }

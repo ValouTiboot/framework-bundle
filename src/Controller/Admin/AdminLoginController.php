@@ -1,38 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Controller\Admin;
 
-use Digitix\FrameworkBundle\Controller\Admin\AdminController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
- * @Route("/admin")
+ * Routes are declared by AdminRouteLoader (dgtx_admin_login / dgtx_admin_logout).
  */
-class AdminLoginController extends AdminController
+final class AdminLoginController extends AbstractController
 {
-    /**
-     * @Route("/", name="dgtx_admin_login")
-     */
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        if ($this->getUser()) {
+        if (null !== $this->getUser()) {
             return $this->redirectToRoute('dgtx_admin_entity_view', ['entityName' => 'dashboard']);
         }
 
-        // get the login error if there is one
-        $error = $authenticationUtils->getLastAuthenticationError();
-        // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        return $this->render('@DigitixFramework/admin/login.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render('@DigitixFramework/admin/login.html.twig', [
+            'last_username' => $authenticationUtils->getLastUsername(),
+            'error' => $authenticationUtils->getLastAuthenticationError(),
+        ]);
     }
 
-    /**
-     * @Route("/logout", name="dgtx_admin_logout")
-     */
-    public function logout()
+    public function logout(): never
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }

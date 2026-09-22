@@ -1,62 +1,45 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Digitix\FrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class CmsTranslation
 {
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity=Cms::class, inversedBy="translations")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $translatable;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Cms::class, inversedBy: 'translations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Cms $translatable = null;
 
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity=Language::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $language;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Language::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Language $language = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $content;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $content = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $metaTitle;
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
+    private ?string $metaTitle = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $metaKeywords;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $metaDescription = null;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $metaDescription;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $rewrite;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
+    private ?string $rewrite = null;
 
     public function getTranslatable(): ?Cms
     {
@@ -87,7 +70,7 @@ class CmsTranslation
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -111,21 +94,9 @@ class CmsTranslation
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(string $metaTitle): self
+    public function setMetaTitle(?string $metaTitle): self
     {
         $this->metaTitle = $metaTitle;
-
-        return $this;
-    }
-
-    public function getMetaKeywords(): ?string
-    {
-        return $this->metaKeywords;
-    }
-
-    public function setMetaKeywords(?string $metaKeywords): self
-    {
-        $this->metaKeywords = $metaKeywords;
 
         return $this;
     }
@@ -147,7 +118,7 @@ class CmsTranslation
         return $this->rewrite;
     }
 
-    public function setRewrite(string $rewrite): self
+    public function setRewrite(?string $rewrite): self
     {
         $this->rewrite = $rewrite;
 

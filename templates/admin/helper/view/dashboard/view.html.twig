@@ -1,0 +1,73 @@
+{% extends '@DigitixFramework/admin/layout.html.twig' %}
+{% trans_default_domain 'Admin.Dashboard' %}
+
+{% block page_title %}{{ 'Dashboard'|trans }}{% endblock %}
+{% block page_subtitle %}
+  <div class="dgtx-page-subtitle">{{ 'Hello %name%, here is where the site stands.'|trans({'%name%': app.user.firstname|default('')|capitalize}) }}</div>
+{% endblock %}
+
+{% block content_container %}
+  <div class="dgtx-stats">
+    <div class="dgtx-stat">
+      <div class="dgtx-stat-label"><i class="material-icons">web</i> {{ 'Pages'|trans }}</div>
+      <div class="dgtx-stat-value">{{ stats.cms.active }} <small>/ {{ stats.cms.total }}</small></div>
+      <div class="dgtx-stat-hint">{{ 'active pages'|trans }}</div>
+      <a class="dgtx-stat-link" href="{{ path('dgtx_admin_entity_read', {entityName: 'cms'}) }}">{{ 'Manage the pages'|trans }} →</a>
+    </div>
+    <div class="dgtx-stat">
+      <div class="dgtx-stat-label"><i class="material-icons">menu</i> {{ 'Menus'|trans }}</div>
+      <div class="dgtx-stat-value">{{ stats.menus.active }} <small>/ {{ stats.menus.total }}</small></div>
+      <div class="dgtx-stat-hint">{{ '%count% item(s)'|trans({'%count%': stats.menus.items}) }}</div>
+      <a class="dgtx-stat-link" href="{{ path('dgtx_admin_entity_read', {entityName: 'menu'}) }}">{{ 'Manage the menus'|trans }} →</a>
+    </div>
+    <div class="dgtx-stat">
+      <div class="dgtx-stat-label"><i class="material-icons">group</i> {{ 'Users'|trans }}</div>
+      <div class="dgtx-stat-value">{{ stats.users.active }} <small>/ {{ stats.users.total }}</small></div>
+      <div class="dgtx-stat-hint">{{ 'active accounts'|trans }}</div>
+      <a class="dgtx-stat-link" href="{{ path('dgtx_admin_entity_read', {entityName: 'user'}) }}">{{ 'Manage the users'|trans }} →</a>
+    </div>
+    {% for translation in stats.translations %}
+    <div class="dgtx-stat">
+      <div class="dgtx-stat-label"><i class="material-icons">translate</i> {{ 'Translations'|trans }} <span class="badge text-bg-light">{{ translation.iso|upper }}</span></div>
+      <div class="dgtx-stat-value">{{ translation.percent }}<small>%</small></div>
+      <div class="progress"><div class="progress-bar {% if translation.percent == 100 %}bg-success{% endif %}" style="width: {{ translation.percent }}%"></div></div>
+      <div class="dgtx-stat-hint">{{ '%translated% of %total% translated'|trans({'%translated%': translation.translated, '%total%': translation.total}) }}</div>
+      <a class="dgtx-stat-link" href="{{ path('dgtx_admin_entity_read', {entityName: 'translation', locale: translation.locale}) }}">{{ 'Translate'|trans }} →</a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="dgtx-dashboard-grid">
+    <div class="dgtx-card">
+      <div class="dgtx-card-header">{{ 'Recently updated pages'|trans }}</div>
+      <div class="dgtx-card-body">
+        {% if latestPages %}
+          <ul class="dgtx-recent">
+            {% for page in latestPages %}
+              <li>
+                <i class="material-icons {% if page.active %}t-success{% else %}t-muted{% endif %}" title="{{ page.active ? 'active'|trans : 'inactive'|trans }}">{{ page.active ? 'check_circle' : 'radio_button_unchecked' }}</i>
+                <span class="dgtx-recent-title">{{ page.name }}</span>
+                <span class="dgtx-recent-date">{{ page.dateUpd ? page.dateUpd|date('d/m/Y H:i') : '' }}</span>
+                <a class="btn btn-light btn-sm" href="{{ path('dgtx_admin_entity_edit', {entityName: 'cms', entityId: page.id}) }}"><i class="material-icons">edit</i></a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="dgtx-empty"><i class="material-icons">web</i>{{ 'No page yet.'|trans }}</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="dgtx-card">
+      <div class="dgtx-card-header">{{ 'Shortcuts'|trans }}</div>
+      <div class="dgtx-card-body">
+        <div class="dgtx-shortcuts">
+          <a href="{{ path('dgtx_admin_entity_create', {entityName: 'cms'}) }}"><i class="material-icons">add</i> {{ 'New page'|trans }}</a>
+          <a href="{{ path('dgtx_admin_entity_read', {entityName: 'menu'}) }}"><i class="material-icons">menu</i> {{ 'Menus'|trans }}</a>
+          <a href="{{ path('dgtx_admin_entity_read', {entityName: 'translation'}) }}"><i class="material-icons">translate</i> {{ 'Translations'|trans }}</a>
+          <a href="{{ path('dgtx_admin_entity_read', {entityName: 'meta'}) }}"><i class="material-icons">travel_explore</i> {{ 'SEO'|trans }}</a>
+          <a href="{{ path('dgtx_admin_entity_create', {entityName: 'parameter'}) }}"><i class="material-icons">settings</i> {{ 'Settings'|trans }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

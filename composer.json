@@ -1,10 +1,10 @@
 {
     "name": "digitix/framework-bundle",
-    "description": "DIGITX extra framework for Admin generator",
-    "keywords": ["backend", "admin", "generator"],
+    "description": "Digitix admin generator: a YAML-described back office for Symfony",
+    "keywords": ["backend", "admin", "generator", "symfony", "bundle"],
     "type": "symfony-bundle",
     "homepage": "https://www.digitix.agency",
-    "license": "DIGITIX",
+    "license": "proprietary",
     "authors": [
         {
             "name": "THIBAULT Valentin",
@@ -13,35 +13,81 @@
         }
     ],
     "require": {
-        "php": ">=7.3",
+        "php": ">=8.2",
         "ext-json": "*",
-        "doctrine/common": "^2.13 || ^3.0",
-        "doctrine/dbal": "^2.10",
-        "doctrine/doctrine-bundle": "^1.12|^2.0",
-        "doctrine/orm": "^2.6,>=2.6.3",
-        "doctrine/persistence": "^1.3.3 || ^2.0",
-        "symfony/asset": "^4.4|^5.0",
-        "symfony/cache": "^4.4|^5.0",
-        "symfony/config": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/deprecation-contracts": "^2.0",
-        "symfony/event-dispatcher": "^4.4|^5.0",
-        "symfony/filesystem": "^4.4|^5.0",
-        "symfony/form": "^4.4|^5.0",
-        "symfony/framework-bundle": "^4.4|^5.0",
-        "symfony/http-foundation": "^4.4|^5.0",
-        "symfony/http-kernel": "^4.4|^5.0",
-        "symfony/intl": "^4.4|^5.0",
-        "symfony/polyfill-php73": "^1.13",
-        "symfony/property-access": "^4.4|^5.0",
-        "symfony/security-bundle": "^4.4|^5.0",
-        "symfony/string": "^5.0",
-        "symfony/translation": "^4.4|^5.0",
-        "symfony/twig-bundle": "^4.4|^5.0"
+        "doctrine/collections": "^1.8|^2.0",
+        "doctrine/dbal": "^3.8|^4.0",
+        "doctrine/doctrine-bundle": "^2.11",
+        "doctrine/doctrine-fixtures-bundle": "^3.5|^4.0",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.18|^3.0",
+        "doctrine/persistence": "^3.1|^4.0",
+        "nikic/php-parser": "^4.18|^5.0",
+        "symfony/asset": "^6.4|^7.0",
+        "symfony/config": "^6.4|^7.0",
+        "symfony/console": "^6.4|^7.0",
+        "symfony/dependency-injection": "^6.4|^7.0",
+        "symfony/doctrine-bridge": "^6.4|^7.0",
+        "symfony/event-dispatcher": "^6.4|^7.0",
+        "symfony/filesystem": "^6.4|^7.0",
+        "symfony/finder": "^6.4|^7.0",
+        "symfony/form": "^6.4|^7.0",
+        "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/http-foundation": "^6.4|^7.0",
+        "symfony/http-kernel": "^6.4|^7.0",
+        "symfony/mailer": "^6.4|^7.0",
+        "symfony/mime": "^6.4|^7.0",
+        "symfony/options-resolver": "^6.4|^7.0",
+        "symfony/password-hasher": "^6.4|^7.0",
+        "symfony/property-access": "^6.4|^7.0",
+        "symfony/routing": "^6.4|^7.0",
+        "symfony/security-bundle": "^6.4|^7.0",
+        "symfony/security-core": "^6.4|^7.0",
+        "symfony/security-csrf": "^6.4|^7.0",
+        "symfony/security-http": "^6.4|^7.0",
+        "symfony/string": "^6.4|^7.0",
+        "symfony/translation": "^6.4|^7.0",
+        "symfony/twig-bridge": "^6.4|^7.0",
+        "symfony/twig-bundle": "^6.4|^7.0",
+        "symfony/validator": "^6.4|^7.0",
+        "symfony/var-exporter": "^6.4|^7.0",
+        "symfony/yaml": "^6.4|^7.0",
+        "twig/twig": "^3.0"
+    },
+    "require-dev": {
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^11.5",
+        "symfony/browser-kit": "^6.4|^7.0",
+        "symfony/css-selector": "^6.4|^7.0",
+        "symfony/dom-crawler": "^6.4|^7.0",
+        "symfony/error-handler": "^6.4|^7.0"
     },
     "autoload": {
         "psr-4": {
             "Digitix\\FrameworkBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Digitix\\FrameworkBundle\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "phpstan": "phpstan analyse --memory-limit=1G",
+        "phpunit": "phpunit",
+        "test": [
+            "@phpstan",
+            "@phpunit"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "process-timeout": 0,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
         }
     }
 }
