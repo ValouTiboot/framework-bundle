@@ -9,12 +9,14 @@ use Digitix\FrameworkBundle\Admin\Field\FieldTypeContext;
 use Digitix\FrameworkBundle\Admin\Field\FieldTypeRegistry;
 use Digitix\FrameworkBundle\Admin\Field\Type\BoolFieldType;
 use Digitix\FrameworkBundle\Admin\Field\Type\ChoiceFieldType;
+use Digitix\FrameworkBundle\Admin\Field\Type\EmbedFieldType;
 use Digitix\FrameworkBundle\Admin\Field\Type\TextareaFieldType;
 use Digitix\FrameworkBundle\Admin\Field\Type\TextFieldType;
 use Digitix\FrameworkBundle\Admin\Field\Type\TranslateFieldType;
 use Digitix\FrameworkBundle\Admin\Exception\UnknownTypeException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
@@ -95,6 +97,23 @@ final class FieldTypesTest extends TestCase
         self::assertSame(['attr' => ['class' => 'tag'], 'required' => true, 'label' => false], $options['entry_options']);
         self::assertArrayNotHasKey('attr', $options, 'attributes go to the entries, not the wrapper');
         self::assertFalse($options['allow_add']);
+    }
+
+    public function testEmbedCollection(): void
+    {
+        $type = new EmbedFieldType();
+        $options = $type->getFormOptions(FieldConfig::fromArray('items', ['entryType' => TextType::class, 'help' => 'help.items']), $this->context);
+
+        self::assertSame(CollectionType::class, $type->getFormType(FieldConfig::fromArray('items', []), $this->context));
+        self::assertSame(TextType::class, $options['entry_type']);
+        self::assertTrue($options['allow_add']);
+        self::assertTrue($options['allow_delete']);
+        self::assertFalse($options['by_reference'], 'the parent adder and remover keep the relation in sync');
+        self::assertSame('dgtx_embed', $options['block_prefix']);
+        self::assertSame('help.items', $options['help']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $type->getFormOptions(FieldConfig::fromArray('items', ['entryType' => 'App\\Nope']), $this->context);
     }
 
     public function testRegistry(): void

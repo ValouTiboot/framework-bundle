@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Digitix\FrameworkBundle\Admin\Persistence;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 
 /**
  * Thin persistence helper: persists/flushes and maintains the conventional
- * dateAdd / dateUpd timestamps when the entity exposes their setters.
+ * dateAdd / dateUpd timestamps when the entity exposes their setters. A new
+ * entity with a "position" field saved alone (admin create form) goes last:
+ * MAX(position) + 1; an update never touches it.
  */
 final class EntityPersister
 {
@@ -19,9 +23,14 @@ final class EntityPersister
     public function save(object $entity, bool $touchTimestamps = true): void
     {
         $manager = $this->managerFor($entity);
+        $isManaged = $manager->contains($entity);
+
+        if (!$isManaged) {
+            $this->placeLast($entity, $manager);
+        }
 
         if ($touchTimestamps) {
-            $this->touch($entity, $manager->contains($entity));
+            $this->touch($entity, $isManaged);
         }
 
         $manager->persist($entity);
@@ -69,7 +78,22 @@ final class EntityPersister
         }
     }
 
-    private function managerFor(object $entity): \Doctrine\Persistence\ObjectManager
+    private function placeLast(object $entity, ObjectManager $manager): void
+    {
+        if (!method_exists($entity, 'setPosition') || !$manager instanceof EntityManagerInterface || !$manager->getClassMetadata($entity::class)->hasField('position')) {
+            return;
+        }
+
+        $max = $manager->createQueryBuilder()
+            ->select('MAX(e.position)')
+            ->from($entity::class, 'e')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $entity->setPosition((int) $max + 1);
+    }
+
+    private function managerFor(object $entity): ObjectManager
     {
         return $this->registry->getManagerForClass($entity::class)
             ?? throw new \LogicException(sprintf('"%s" is not a managed Doctrine entity.', $entity::class));

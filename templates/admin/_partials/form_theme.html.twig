@@ -27,6 +27,40 @@
   </div>
 {%- endblock collection_widget -%}
 
+{# an "embed" field (EmbedFieldType): one row per entry with a drag handle and a remove button, the add button clones the prototype (admin.js) #}
+{%- block dgtx_embed_entry -%}
+  <li class="dgtx-embed-entry">
+    <span class="dgtx-embed-handle material-icons" aria-hidden="true">drag_indicator</span>
+    <div class="dgtx-embed-fields">
+      {%- for field in entry -%}
+        {{- form_widget(field) -}}
+        {{- form_errors(field) -}}
+      {%- endfor -%}
+    </div>
+    <button type="button" class="btn btn-light dgtx-embed-remove" data-embed-remove title="{{ 'form.default.removeItem'|trans({}, 'Admin.Form.Default') }}">
+      <i class="material-icons" aria-hidden="true">delete</i>
+    </button>
+  </li>
+{%- endblock dgtx_embed_entry -%}
+
+{%- block dgtx_embed_widget -%}
+  {%- set prototype_markup = '' -%}
+  {%- if prototype is defined -%}
+    {%- set entry = prototype -%}
+    {%- set prototype_markup = block('dgtx_embed_entry') -%}
+  {%- endif -%}
+  <div class="dgtx-embed" data-embed data-embed-prefix="{{ full_name }}" data-prototype="{{ prototype_markup|e('html_attr') }}" {{ block('widget_container_attributes') }}>
+    <ol class="dgtx-embed-list" data-embed-list>
+      {%- for entry in form -%}
+        {{- block('dgtx_embed_entry') -}}
+      {%- endfor -%}
+    </ol>
+    <button type="button" class="btn btn-light btn-sm dgtx-embed-add" data-embed-add>
+      <i class="material-icons" aria-hidden="true">add</i> {{ 'form.default.addItem'|trans({}, 'Admin.Form.Default') }}
+    </button>
+  </div>
+{%- endblock dgtx_embed_widget -%}
+
 {# permission matrix of a role (PermissionsType): entities in rows, permissions in columns #}
 {%- block dgtx_permissions_widget -%}
   {%- set columns = ['view', 'read', 'create', 'edit', 'delete', 'all'] -%}

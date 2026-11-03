@@ -13,6 +13,10 @@ digitix_framework:
       title: Pages
       route: dgtx_admin_entity_read
       icon: web
+    faq:
+      title: FAQ
+      route: dgtx_admin_entity_read
+      icon: quiz
     apperence:
       title: Apparence
       route: ~

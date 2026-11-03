@@ -45,10 +45,11 @@ $(document).ready(function(){
     }
   });
 
-  // Tagify
+  // Tagify: the field keeps a plain comma separated list ("Symfony, PHP"), not Tagify's JSON
   $('.tag').each(function(){
     new Tagify(this, {
       pattern : /^.{0,30}$/,
+      originalInputValueFormat: values => values.map(item => item.value).join(', '),
     });
   });
 
@@ -114,6 +115,9 @@ $(document).ready(function(){
     $('body').toggleClass('dgtx-sidebar-open');
   });
 
+  // embedded entries ("embed" fields): add from the prototype, remove, drag to reorder
+  document.querySelectorAll('[data-embed]').forEach(initEmbed);
+
   // sortable lists: drag a row by its handle, the new order is posted as "{entity}[]=id"
   document.querySelectorAll('table.sortable tbody').forEach(function(tbody){
     const table = tbody.closest('table');
@@ -147,6 +151,53 @@ $(document).ready(function(){
     });
   });
 });
+
+// An "embed" field (EmbedFieldType). The entries are renumbered 0..n in the
+// displayed order after each change: the form maps submitted keys to the
+// existing records in order, so the values follow the new order.
+function initEmbed(embed) {
+  const list = embed.querySelector('[data-embed-list]');
+  const prefix = embed.dataset.embedPrefix;
+  const idPrefix = prefix.replace(/\]\[|\[|\]/g, '_').replace(/_$/, '');
+
+  const renumber = function(){
+    list.querySelectorAll(':scope > .dgtx-embed-entry').forEach(function(entry, index){
+      entry.querySelectorAll('[name^="' + prefix + '["]').forEach(function(input){
+        input.name = input.name.replace(new RegExp('^' + escapeRegExp(prefix) + '\\[[^\\]]+\\]'), prefix + '[' + index + ']');
+      });
+      entry.querySelectorAll('[id^="' + idPrefix + '_"]').forEach(function(element){
+        element.id = element.id.replace(new RegExp('^' + escapeRegExp(idPrefix) + '_[^_]+'), idPrefix + '_' + index);
+      });
+    });
+  };
+
+  embed.querySelector('[data-embed-add]').addEventListener('click', function(){
+    const template = document.createElement('template');
+    template.innerHTML = embed.dataset.prototype.replace(/__name__/g, String(list.children.length)).trim();
+    const entry = template.content.firstElementChild;
+    list.appendChild(entry);
+    renumber();
+    entry.querySelector('input, textarea, select')?.focus();
+  });
+
+  list.addEventListener('click', function(e){
+    const remove = e.target.closest('[data-embed-remove]');
+    if (remove) {
+      remove.closest('.dgtx-embed-entry').remove();
+      renumber();
+    }
+  });
+
+  Sortable.create(list, {
+    handle: '.dgtx-embed-handle',
+    animation: 150,
+    onEnd: renumber,
+  });
+}
+
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // Lower case ASCII letters and digits, separated by dashes (rewrites) or,
 // with dash = false, by underscores (short codes).

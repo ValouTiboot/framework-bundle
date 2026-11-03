@@ -8,4 +8,6 @@ return [
     'form.default.reinit' => 'Réinitialiser',
     'form.default.new' => 'Création',
     'form.default.edit' => 'Modification',
+    'form.default.addItem' => 'Ajouter',
+    'form.default.removeItem' => 'Supprimer',
 ];

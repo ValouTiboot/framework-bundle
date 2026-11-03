@@ -260,6 +260,7 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('column')->info('Property displayed for "entity" list columns.')->end()
                     ->scalarNode('callback')->info('Static callable returning choices, e.g. "App\\Foo::choices".')->end()
                     ->scalarNode('collectionType')->end()
+                    ->scalarNode('entryType')->info('Form type of each entry of an "embed" field, e.g. "App\\Form\\ItemType".')->end()
                     ->integerNode('rows')->end()
                     ->scalarNode('class')->info('CSS class(es) added to the widget.')->end()
                     ->variableNode('attr')->end()

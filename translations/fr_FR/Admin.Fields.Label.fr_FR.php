@@ -68,6 +68,11 @@ return array (
       'name' => 'Nom',
       'code' => 'Code',
     ),
+    'faq' =>
+    array (
+      'question' => 'Question',
+      'answer' => 'Réponse',
+    ),
     'parameter' =>
     array (
       'mailFrom' => 'Adresse e-mail d\'expediteur',
