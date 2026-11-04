@@ -47,4 +47,9 @@ final class PermissionsFieldType extends AbstractFieldType
 
         return ['entities' => $entities, 'required' => false];
     }
+
+    protected function getImplicitConstraints(FieldConfig $field, FieldTypeContext $context): array
+    {
+        return [];
+    }
 }

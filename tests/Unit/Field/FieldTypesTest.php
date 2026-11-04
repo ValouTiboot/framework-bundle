@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Tests\Unit\Field;
 
 use Digitix\FrameworkBundle\Admin\Config\FieldConfig;
+use Digitix\FrameworkBundle\Admin\Context\AdminContext;
 use Digitix\FrameworkBundle\Admin\Field\FieldTypeContext;
 use Digitix\FrameworkBundle\Admin\Field\FieldTypeRegistry;
 use Digitix\FrameworkBundle\Admin\Field\Type\BoolFieldType;
 use Digitix\FrameworkBundle\Admin\Field\Type\ChoiceFieldType;
+use Digitix\FrameworkBundle\Admin\Field\Type\EmailFieldType;
 use Digitix\FrameworkBundle\Admin\Field\Type\EmbedFieldType;
+use Digitix\FrameworkBundle\Admin\Field\Type\SubmitFieldType;
 use Digitix\FrameworkBundle\Admin\Field\Type\TextareaFieldType;
 use Digitix\FrameworkBundle\Admin\Field\Type\TextFieldType;
 use Digitix\FrameworkBundle\Admin\Field\Type\TranslateFieldType;
@@ -19,14 +22,68 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 final class FieldTypesTest extends TestCase
 {
+    /** A front form: no admin context. */
     private FieldTypeContext $context;
 
     protected function setUp(): void
     {
         $this->context = new FieldTypeContext('Admin.Fields.Label');
+    }
+
+    public function testFrontFormsGetImplicitConstraints(): void
+    {
+        self::assertTrue($this->context->isFrontForm());
+
+        $text = (new TextFieldType())->getFormOptions(FieldConfig::fromArray('lastname', []), $this->context)['constraints'];
+        self::assertSame([NotBlank::class, Length::class], array_map('get_class', $text), 'required by default');
+        self::assertSame(TextFieldType::MAX_LENGTH, $text[1]->max);
+
+        $optional = (new TextFieldType())->getFormOptions(FieldConfig::fromArray('company', ['required' => false]), $this->context)['constraints'];
+        self::assertSame([Length::class], array_map('get_class', $optional));
+
+        $email = (new EmailFieldType())->getFormOptions(FieldConfig::fromArray('mail', []), $this->context)['constraints'];
+        self::assertSame([NotBlank::class, Email::class, Length::class], array_map('get_class', $email));
+
+        $message = (new TextareaFieldType())->getFormOptions(FieldConfig::fromArray('message', []), $this->context)['constraints'];
+        self::assertSame(TextareaFieldType::MAX_LENGTH, $message[1]->max);
+
+        $switch = (new BoolFieldType())->getFormOptions(FieldConfig::fromArray('active', ['required' => true]), $this->context);
+        self::assertArrayNotHasKey('constraints', $switch, '"no" is a valid answer');
+
+        $submit = (new SubmitFieldType())->getFormOptions(FieldConfig::fromArray('send', ['constraints' => ['NotBlank']]), $this->context);
+        self::assertArrayNotHasKey('constraints', $submit, 'SubmitType has no such option');
+    }
+
+    public function testDeclaredConstraintsReplaceTheImplicitOnes(): void
+    {
+        $options = (new TextareaFieldType())->getFormOptions(
+            FieldConfig::fromArray('message', ['constraints' => [['Length' => ['min' => 20, 'max' => 2000]]]]),
+            $this->context
+        );
+
+        self::assertSame([NotBlank::class, Length::class], array_map('get_class', $options['constraints']));
+        self::assertSame(20, $options['constraints'][1]->min);
+        self::assertSame(2000, $options['constraints'][1]->max);
+    }
+
+    public function testAdminFormsOnlyGetTheDeclaredConstraints(): void
+    {
+        // any admin context will do: only its presence matters here
+        $adminContext = (new \ReflectionClass(AdminContext::class))->newInstanceWithoutConstructor();
+        $admin = new FieldTypeContext('Admin.Fields.Label', $adminContext);
+        self::assertFalse($admin->isFrontForm());
+
+        $plain = (new TextFieldType())->getFormOptions(FieldConfig::fromArray('name', ['required' => true]), $admin);
+        self::assertArrayNotHasKey('constraints', $plain);
+
+        $declared = (new TextFieldType())->getFormOptions(FieldConfig::fromArray('name', ['constraints' => ['NotBlank']]), $admin);
+        self::assertSame([NotBlank::class], array_map('get_class', $declared['constraints']));
     }
 
     public function testCommonOptionsAndCssClass(): void

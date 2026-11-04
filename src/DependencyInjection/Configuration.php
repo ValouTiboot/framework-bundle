@@ -264,6 +264,7 @@ final class Configuration implements ConfigurationInterface
                     ->integerNode('rows')->end()
                     ->scalarNode('class')->info('CSS class(es) added to the widget.')->end()
                     ->variableNode('attr')->end()
+                    ->variableNode('constraints')->info('Validator constraints: names of Symfony\\Component\\Validator\\Constraints ("NotBlank"), single-key maps with named options ({Length: {max: 80}}) or class names.')->end()
                     ->variableNode('choice')->end()
                     ->arrayNode('collection')
                         ->children()

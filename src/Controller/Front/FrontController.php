@@ -13,6 +13,7 @@ use Digitix\FrameworkBundle\Entity\Translatable\Translatable;
 use Digitix\FrameworkBundle\Provider\ConfigurationProvider;
 use Digitix\FrameworkBundle\Provider\LanguageProvider;
 use Digitix\FrameworkBundle\Utils\Mailer;
+use Digitix\FrameworkBundle\Utils\SpamGuard;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -47,6 +48,7 @@ abstract class FrontController extends AbstractController
             AdminConfig::class,
             Mailer::class,
             RequestStack::class,
+            SpamGuard::class,
         ]);
     }
 
@@ -151,7 +153,9 @@ abstract class FrontController extends AbstractController
     }
 
     /**
-     * Form generated from "digitix_framework.front_entities.{$name}.form".
+     * Form generated from "digitix_framework.front_entities.{$name}.form",
+     * validated server side (see AbstractFieldType) and completed with the
+     * anti-spam fields of SpamGuard; check isSpam() once the form is valid.
      *
      * @param array<string, mixed> $options
      *
@@ -167,7 +171,20 @@ abstract class FrontController extends AbstractController
             new FieldTypeContext($formConfig->translationDomain, null, \is_object($data) ? $data : null)
         );
 
+        $definitions = array_merge($definitions, $this->container->get(SpamGuard::class)->definitions());
+
         return $builder->createFromDefinitions(strtolower($name), $definitions, $data, $options, $this->currentRequest());
+    }
+
+    /**
+     * Submission of a front form made by a bot (honeypot filled, or sent too
+     * fast). Answer as if everything went fine, without doing anything.
+     *
+     * @param FormInterface<mixed> $form
+     */
+    protected function isSpam(FormInterface $form): bool
+    {
+        return $this->container->get(SpamGuard::class)->isSpam($form);
     }
 
     /**

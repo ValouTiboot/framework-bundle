@@ -51,4 +51,10 @@ final class EmbedFieldType extends AbstractFieldType
             'block_prefix' => 'dgtx_embed',
         ];
     }
+
+    /** The entries carry their own constraints; an empty collection is allowed. */
+    protected function getImplicitConstraints(FieldConfig $field, FieldTypeContext $context): array
+    {
+        return [];
+    }
 }

@@ -25,8 +25,14 @@ final class ButtonFieldType extends AbstractFieldType
     {
         $options = parent::getFormOptions($field, $context);
 
-        unset($options['required'], $options['help'], $options['data']);
+        // a button has no value: no "required", no "data", no constraints
+        unset($options['required'], $options['help'], $options['data'], $options['constraints']);
 
         return $options;
+    }
+
+    protected function getImplicitConstraints(FieldConfig $field, FieldTypeContext $context): array
+    {
+        return [];
     }
 }

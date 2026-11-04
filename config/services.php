@@ -18,6 +18,7 @@ use Digitix\FrameworkBundle\Translation\ConfigKeyExtractor;
 use Digitix\FrameworkBundle\Translation\TranslationCompiler;
 use Digitix\FrameworkBundle\Translation\TranslationExtractor;
 use Digitix\FrameworkBundle\Translation\TranslationSynchronizer;
+use Digitix\FrameworkBundle\Utils\SpamGuard;
 
 return static function (ContainerConfigurator $container): void {
     $services = $container->services()
@@ -32,6 +33,7 @@ return static function (ContainerConfigurator $container): void {
             '../src/Admin/Config/',
             '../src/Admin/Exception/',
             '../src/Admin/Context/AdminContext.php',
+            '../src/Admin/Field/ConstraintFactory.php',
             '../src/Admin/Field/FieldTypeContext.php',
             '../src/Admin/List/Sorter.php',
             '../src/Admin/List/Paginator.php',
@@ -111,4 +113,8 @@ return static function (ContainerConfigurator $container): void {
     // --- Content kit: mailer, cache, fixtures, validators ------------------------------
     $services->load('Digitix\\FrameworkBundle\\Utils\\', '../src/Utils/');
     $services->load('Digitix\\FrameworkBundle\\DataFixtures\\', '../src/DataFixtures/');
+
+    // anti-spam of the front forms: the timestamp field is signed with the app secret
+    $services->set(SpamGuard::class)
+        ->arg('$secret', param('kernel.secret'));
 };

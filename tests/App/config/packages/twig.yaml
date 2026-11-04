@@ -1,3 +1,6 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
     strict_variables: true
+    paths:
+        # e-mail templates of the bundle Mailer (@Mail/<locale>/<name>.txt|.html.twig)
+        '%kernel.project_dir%/templates/mails': Mail

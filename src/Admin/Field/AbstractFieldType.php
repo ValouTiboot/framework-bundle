@@ -5,10 +5,19 @@ declare(strict_types=1);
 namespace Digitix\FrameworkBundle\Admin\Field;
 
 use Digitix\FrameworkBundle\Admin\Config\FieldConfig;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Handles the options every field understands (label, required, help,
- * disabled, data, attr, class); subclasses add their own in getTypeOptions().
+ * disabled, data, attr, class, constraints); subclasses add their own in
+ * getTypeOptions().
+ *
+ * Validation: the "constraints" key of the YAML is always applied. Front
+ * forms (see FieldTypeContext::isFrontForm()) also get implicit constraints,
+ * NotBlank for required fields plus what each type adds in
+ * getImplicitConstraints(), because the browser "required" attribute alone
+ * protects nothing. Admin forms rely on the entity's own constraints.
  */
 abstract class AbstractFieldType implements FieldTypeInterface
 {
@@ -26,6 +35,15 @@ abstract class AbstractFieldType implements FieldTypeInterface
             if ($field->has($name)) {
                 $options[$name] = $field->get($name);
             }
+        }
+
+        $constraints = ConstraintFactory::merge(
+            $context->isFrontForm() ? $this->getImplicitConstraints($field, $context) : [],
+            ConstraintFactory::fromDefinitions($field->name, $field->get('constraints')),
+        );
+
+        if ($constraints) {
+            $options['constraints'] = $constraints;
         }
 
         $attr = $this->buildAttributes($field);
@@ -48,6 +66,18 @@ abstract class AbstractFieldType implements FieldTypeInterface
     protected function getTypeOptions(FieldConfig $field, FieldTypeContext $context): array
     {
         return [];
+    }
+
+    /**
+     * Constraints a front form gets without declaring them: NotBlank unless
+     * the field is "required: false". Types add theirs (Length, Email...) or
+     * return [] when the value cannot be blank-checked (switches, collections).
+     *
+     * @return list<Constraint>
+     */
+    protected function getImplicitConstraints(FieldConfig $field, FieldTypeContext $context): array
+    {
+        return false !== $field->isRequired() ? [new NotBlank()] : [];
     }
 
     /**

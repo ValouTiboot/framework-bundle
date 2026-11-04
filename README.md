@@ -73,6 +73,41 @@ Field types: `text`, `textarea`, `email`, `password`, `bool`, `choice`, `entity`
 Filter types: `text`, `email`, `bool`, `choice`, `entity`, `date`.
 Unknown keys under a field or a filter are passed to the type, so custom types can define their own options.
 
+Validation: a field accepts a `constraints` list, applied by the Symfony
+validator when the form is submitted:
+
+```yaml
+message:
+  type: textarea
+  constraints:
+    - NotBlank                        # short name in Symfony\Component\Validator\Constraints
+    - { Length: { min: 20, max: 2000 } }   # options are the constructor named arguments
+    - App\Validator\NoUrl             # or a class name
+```
+
+### Front forms
+
+`front_entities` declares the public forms (the recipe ships `Contact`),
+built by `FrontController::createFrontForm()` with the same field types.
+Because the browser `required` attribute protects nothing, front forms are
+validated server side without any declaration: every field not marked
+`required: false` gets `NotBlank`, `text` fields a `Length` of 255,
+`textarea` of 5000, `email` fields `Email` plus a `Length` of 180. A
+constraint declared in `constraints` replaces the implicit one of the same
+class (`{Length: {max: 2000}}` on a textarea), so the YAML always wins.
+Admin forms get only what they declare: their entities carry the rules.
+
+Bots are handled by `SpamGuard`, without any third party. Each front form
+carries two unmapped fields: a honeypot (`website`, off-screen, not
+tabbable, hidden from assistive technology) that bots fill in, and a signed
+timestamp (`renderedAt`) that rejects a submission made less than
+`SpamGuard::MIN_SECONDS` after the form was displayed, or with a forged
+value. A controller calls `$this->isSpam($form)` once the form is valid and
+answers exactly as for a genuine message, without doing anything (see
+`ContactController`). Render the form with `form_end()` or `form(form)` so
+that the two fields are output; a project template rendering fields one by
+one must not skip `form_end()`.
+
 ## How it works
 
 ```

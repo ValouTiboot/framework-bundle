@@ -25,11 +25,27 @@ class ContactController extends FrontController
         $form = $this->createFrontForm('Contact');
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->isSpam($form)) {
+                // Same answer as for a genuine message, so that bots learn nothing; nothing is sent.
+                $this->addFlash('success', $this->trans('Message succesfully sent.', [], 'Front.Contact.Form'));
+
+                return $this->redirectToRoute('front_contact');
+            }
+
+            $data = (array) $form->getData();
+            // Reply-To the visitor (fields "mail" and "lastname" of the form), so a plain reply reaches them.
+            // The address is checked again here: a project form without the "mail" constraint would make the Mailer throw.
+            $replyTo = (string) ($data['mail'] ?? '');
+            $replyTo = false !== filter_var($replyTo, FILTER_VALIDATE_EMAIL) ? $replyTo : '';
+            $replyToName = (string) ($data['lastname'] ?? '');
+
             $sent = $this->container->get(Mailer::class)->sendMail(
                 'contact',
                 $this->trans('New contact', [], 'Email.Subject'),
-                (array) $form->getData(),
+                $data,
                 (string) $this->getConfiguration('mailFrom'),
+                replyTo: '' !== $replyTo ? $replyTo : null,
+                replyToName: '' !== $replyToName ? $replyToName : null,
             );
 
             if ($sent) {

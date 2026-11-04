@@ -41,4 +41,10 @@ final class BoolFieldType extends AbstractFieldType
 
         return $options;
     }
+
+    /** "no" is a valid answer: a switch is never blank-checked. */
+    protected function getImplicitConstraints(FieldConfig $field, FieldTypeContext $context): array
+    {
+        return [];
+    }
 }
