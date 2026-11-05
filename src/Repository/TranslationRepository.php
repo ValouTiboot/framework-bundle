@@ -120,6 +120,25 @@ class TranslationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Deletes the obsolete entries of one locale (every locale when null).
+     *
+     * @return int number of deleted entries
+     */
+    public function deleteObsolete(?string $locale = null): int
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->delete()
+            ->where('t.status = :status')
+            ->setParameter('status', TranslationStatus::Obsolete->value);
+
+        if (null !== $locale && '' !== $locale) {
+            $qb->andWhere('t.locale = :locale')->setParameter('locale', $locale);
+        }
+
+        return (int) $qb->getQuery()->execute();
+    }
+
+    /**
      * @return array<string, array<string, int>> locale => status => count
      */
     public function countByLocaleAndStatus(): array

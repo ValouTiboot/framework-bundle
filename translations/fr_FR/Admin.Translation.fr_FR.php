@@ -2,6 +2,9 @@
 
 return [
     'Refresh keys' => 'Actualiser les clés',
+    'Delete obsolete keys' => 'Supprimer les obsolètes',
+    'Deletes the keys that are no longer in the code' => 'Supprime les clés qui ne sont plus dans le code',
+    'Delete the %count% obsolete key(s) of this language? Their translations will be lost.' => 'Supprimer les %count% clé(s) obsolète(s) de cette langue ? Leurs traductions seront perdues.',
     'Export' => 'Exporter',
     'Import' => 'Importer',
     'Downloads the translations of this language as a JSON file' => 'Télécharge les traductions de cette langue en fichier JSON',

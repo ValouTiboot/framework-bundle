@@ -1,3 +1,5 @@
+{# declared at module level: a default domain set inside a block does not reach the nested blocks, which Twig hoists out of it #}
+{% trans_default_domain 'Admin.Layout' %}
 <!DOCTYPE html>
 <html lang="{{ app.request.locale|slice(0, 2) }}" data-theme="{{ dgtx_admin_theme() }}">
 <head>
@@ -32,7 +34,6 @@
 </head>
 
 {% block body %}
-{% trans_default_domain 'Admin.Layout' %}
 <body id="{{ entityName|default('admin') }}" class="dgtx-admin" data-assets="{{ asset('bundles/digitixframework/assets/') }}">
 
   {% block menu %}

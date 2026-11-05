@@ -128,6 +128,56 @@ final class TranslationWorkflowTest extends AdminTestCase
         self::assertFileExists($this->compiler()->getOutputDir().'/fr_FR/Admin.Fields.Label.fr_FR.php');
     }
 
+    public function testExtractCommandPurgesObsoleteEntriesOnRequest(): void
+    {
+        $this->synchronizer()->synchronize();
+        $this->em()->persist(Translation::create('Admin.List.Default', 'gone.key', 'fr_FR')->setValue('Parti')->markObsolete());
+        $this->em()->flush();
+        $total = $this->repository()->count([]);
+
+        $application = new Application(static::$kernel);
+        $tester = new CommandTester($application->find('dgtx:translation:extract'));
+
+        $tester->execute(['--no-compile' => true]);
+        self::assertSame($total, $this->repository()->count([]), 'without --purge nothing is deleted');
+
+        $tester->execute(['--purge' => true, '--no-compile' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertStringContainsString('1 obsolete entrie(s) deleted', $tester->getDisplay());
+        self::assertSame($total - 1, $this->repository()->count([]));
+        self::assertSame(0, $this->repository()->count(['status' => TranslationStatus::Obsolete]));
+    }
+
+    public function testPurgeFromTheAdminDeletesTheObsoleteEntriesOfTheLocaleOnly(): void
+    {
+        $this->synchronizer()->synchronize();
+        $this->em()->persist(Translation::create('Admin.List.Default', 'gone.key', 'fr_FR')->setValue('Parti')->markObsolete());
+        $this->em()->persist(Translation::create('Admin.List.Default', 'gone.key', 'en_US')->setValue('Gone')->markObsolete());
+        $this->em()->flush();
+        $this->login();
+
+        $crawler = $this->client->request('GET', '/admin/translation?locale=fr_FR');
+        self::assertResponseIsSuccessful();
+        $button = $crawler->filter('form[action$="/action/purge?locale=fr_FR"] button');
+        self::assertCount(1, $button, 'the purge button shows up when the language has obsolete keys');
+        self::assertStringContainsString('1', $button->text());
+        $token = $crawler->filter('.dgtx-trans-table')->attr('data-token');
+
+        $this->client->request('POST', '/admin/translation/action/purge?locale=fr_FR', ['_token' => 'wrong']);
+        self::assertResponseRedirects('/admin/translation?locale=fr_FR');
+        self::assertSame(2, $this->repository()->count(['status' => TranslationStatus::Obsolete]), 'a bad token deletes nothing');
+
+        $this->client->request('POST', '/admin/translation/action/purge?locale=fr_FR', ['_token' => $token]);
+        self::assertResponseRedirects('/admin/translation?locale=fr_FR');
+        $crawler = $this->client->followRedirect();
+
+        self::assertStringContainsString('Clés de traduction obsolètes supprimées : 1', implode(' ', $this->flashes($crawler, 'success')));
+        self::assertCount(0, $crawler->filter('form[action$="/action/purge?locale=fr_FR"]'), 'no obsolete key left, no button');
+        self::assertSame(0, $this->repository()->count(['status' => TranslationStatus::Obsolete, 'locale' => 'fr_FR']));
+        self::assertSame(1, $this->repository()->count(['status' => TranslationStatus::Obsolete, 'locale' => 'en_US']), 'other locales are untouched');
+    }
+
     public function testCompileCommandTargetsOneLocale(): void
     {
         $this->synchronizer()->synchronize();

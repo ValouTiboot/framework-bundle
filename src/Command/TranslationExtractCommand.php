@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Digitix\FrameworkBundle\Command;
 
+use Digitix\FrameworkBundle\Repository\TranslationRepository;
 use Digitix\FrameworkBundle\Translation\TranslationCompiler;
 use Digitix\FrameworkBundle\Translation\TranslationExtractor;
 use Digitix\FrameworkBundle\Translation\TranslationSynchronizer;
@@ -24,6 +25,7 @@ final class TranslationExtractCommand extends Command
         private readonly TranslationExtractor $extractor,
         private readonly TranslationSynchronizer $synchronizer,
         private readonly TranslationCompiler $compiler,
+        private readonly TranslationRepository $repository,
     ) {
         parent::__construct();
     }
@@ -33,13 +35,16 @@ final class TranslationExtractCommand extends Command
         $this
             ->addOption('locale', 'l', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Locale(s) to synchronise (default: every active language)')
             ->addOption('no-compile', null, InputOption::VALUE_NONE, 'Do not regenerate the catalogue files afterwards')
+            ->addOption('purge', null, InputOption::VALUE_NONE, 'Delete the obsolete entries once the keys are synchronised')
             ->setHelp(<<<'HELP'
                 Scans the configured directories (project and bundle sources and templates)
                 and the digitix configuration, then creates one database entry per new key
-                and per locale. Keys that disappeared from the code are flagged obsolete.
+                and per locale. Keys that disappeared from the code are flagged obsolete,
+                and deleted with <info>--purge</info> (their translations are lost).
 
                   <info>php %command.full_name%</info>
                   <info>php %command.full_name% --locale=fr_FR --locale=en_US</info>
+                  <info>php %command.full_name% --purge</info>
                 HELP);
     }
 
@@ -55,6 +60,14 @@ final class TranslationExtractCommand extends Command
         $report = $this->synchronizer->synchronize($this->extractor->extract(), [] === $locales ? null : $locales);
 
         $io->table(['Keys', 'Locales', 'Added', 'Seeded', 'Reactivated', 'Obsoleted'], [array_values($report->toArray())]);
+
+        if ($input->getOption('purge')) {
+            $deleted = 0;
+            foreach ($report->locales as $locale) {
+                $deleted += $this->repository->deleteObsolete($locale);
+            }
+            $io->text(sprintf('%d obsolete entrie(s) deleted.', $deleted));
+        }
 
         if (!$input->getOption('no-compile')) {
             $files = $this->compiler->compile();

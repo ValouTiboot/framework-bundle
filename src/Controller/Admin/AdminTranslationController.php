@@ -28,6 +28,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *  read:           one locale (tab), filters (domain, status, search), paginated table
  *  update action:  POST {value, _token} for one entry, JSON when requested by script
  *  refresh action: POST, re-extracts the keys from the code
+ *  purge action:   POST, deletes the obsolete entries of the locale
  *  export action:  GET, JSON file of the locale
  *  import action:  POST file + token, merges a JSON export into the locale
  *  edit:           generic form, fallback without JavaScript
@@ -147,6 +148,7 @@ class AdminTranslationController extends AdminController
             'pagination' => $paginator,
             'total_items' => $paginator->getTotal(),
             'can_edit' => $this->isGranted(AdminPermission::EDIT, $context->getEntityConfig()),
+            'can_delete' => $this->isGranted(AdminPermission::DELETE, $context->getEntityConfig()),
             'csrf_token' => $this->container->get('security.csrf.token_manager')->getToken(self::CSRF_TOKEN_ID)->getValue(),
         ]);
     }
@@ -214,6 +216,34 @@ class AdminTranslationController extends AdminController
         $this->addFlash('success', $this->trans(
             'Translation keys refreshed: %added% added, %obsoleted% obsolete.',
             ['%added%' => $report->added, '%obsoleted%' => $report->obsoleted],
+            'Admin.Message.Success'
+        ));
+
+        return $this->redirectToEditor($context, $locale);
+    }
+
+    /**
+     * Deletes the obsolete entries of the current locale (POST + token), then compiles.
+     */
+    public function purgeAction(AdminContext $context): Response
+    {
+        $this->assertGranted(AdminPermission::DELETE, $context);
+
+        $request = $context->getRequest();
+        $locale = $this->localeFromRequest($request, $this->languages()->getActiveLanguages(), $context);
+
+        if (!$request->isMethod('POST') || !$this->isCsrfTokenValid(self::CSRF_TOKEN_ID, (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', $this->trans('Invalid security token, please try again.', [], 'Admin.Message.Error'));
+
+            return $this->redirectToEditor($context, $locale);
+        }
+
+        $deleted = $this->repository()->deleteObsolete($locale);
+        $this->compiler()->compile($locale);
+
+        $this->addFlash('success', $this->trans(
+            'Obsolete translation keys deleted: %deleted%.',
+            ['%deleted%' => $deleted],
             'Admin.Message.Success'
         ));
 

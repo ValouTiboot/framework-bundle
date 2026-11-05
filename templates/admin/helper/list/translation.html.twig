@@ -23,6 +23,16 @@
       </button>
     </form>
   {% endif %}
+  {% set obsolete_count = counts[locale].obsolete|default(0) %}
+  {% if can_delete and obsolete_count > 0 %}
+    <form method="post" action="{{ path('dgtx_admin_entity_action_collection', {entityName: entityName, action: 'purge', locale: locale}) }}" class="d-inline" onsubmit="return confirm('{{ 'Delete the %count% obsolete key(s) of this language? Their translations will be lost.'|trans({'%count%': obsolete_count})|e('js') }}');">
+      <input type="hidden" name="_token" value="{{ csrf_token }}">
+      <button type="submit" class="btn btn-light" title="{{ 'Deletes the keys that are no longer in the code'|trans }}">
+        <i class="material-icons">delete_sweep</i>
+        {{ 'Delete obsolete keys'|trans }} <span class="badge text-bg-dark">{{ obsolete_count }}</span>
+      </button>
+    </form>
+  {% endif %}
 {% endblock %}
 
 {% block content_container %}

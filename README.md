@@ -149,7 +149,10 @@ code ──(dgtx:translation:extract)──> translation table ──(compile)�
   with the domain passed as a literal string too. One entry is created per
   key and per active language; new entries are pre-filled with the value the
   translator already knows (bundle defaults, legacy `translations/` files of
-  the project). Keys that left the code are flagged `obsolete`, never deleted.
+  the project). Keys that left the code are flagged `obsolete` and keep their
+  value until someone deletes them ("Delete obsolete keys" in the editor,
+  or `--purge` on the console), so that a renamed or temporarily removed key
+  gets its translation back.
 - **Compilation**: after every save the translated values are dumped into
   `digitix_framework.translation.output_dir` (default `var/translations`,
   never commit it) and the translator cache is invalidated. `RuntimeTranslator`
@@ -160,8 +163,10 @@ code ──(dgtx:translation:extract)──> translation table ──(compile)�
   cell (Ctrl+Enter saves, Esc cancels) posted as JSON to
   `/admin/translation/action/update/{id}` with the page token; the pencil
   opens the plain form for browsers without JavaScript. "Refresh keys" runs
-  the extraction. Styles and script live in `assets/` (see below).
-- Console: `dgtx:translation:extract [--locale=fr_FR] [--no-compile]`,
+  the extraction; "Delete obsolete keys" (delete permission, shown when the
+  language has some) removes the obsolete entries of the current language
+  after a confirmation. Styles and script live in `assets/` (see below).
+- Console: `dgtx:translation:extract [--locale=fr_FR] [--no-compile] [--purge]`,
   `dgtx:translation:compile [locale]`. Run `extract` after each deployment
   (or click "Refresh keys" in the admin) so that new keys show up.
 - **Export / import**: one JSON file per locale ("Export" and "Import" in
